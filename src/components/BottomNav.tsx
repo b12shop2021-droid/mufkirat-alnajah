@@ -14,7 +14,7 @@ interface NavEntry {
 const NAV_ITEMS: NavEntry[] = [
   { path: '/', label: 'الرئيسية', icon: '🏠' },
   { path: '/goals', label: 'الأهداف', icon: '🎯' },
-  { path: '/habits', label: 'العادات', icon: '🔁' },
+  { path: '/routine', label: 'العادات', icon: '🔁' },
   { path: '/analytics', label: 'التحليلات', icon: '📊' },
   { path: '/more', label: 'المزيد', icon: '☰' },
 ];
