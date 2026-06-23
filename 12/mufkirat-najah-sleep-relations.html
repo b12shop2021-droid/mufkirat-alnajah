@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>النوم والعلاقات - مفكرة النجاح</title>
+<style>
+:root{
+  --primary:#05AD98; --primary-light:#2BCFCE; --deep:#245F73;
+  --accent:#EC4D25; --gray:#878787; --gray-light:#BBBFBF;
+  --bg:#FAFAFA; --white:#FFFFFF; --text:#1A2E2C;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Alyamama','Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--text);direction:rtl;-webkit-font-smoothing:antialiased;}
+.amiri{font-family:'Amiri','Segoe UI',serif;}
+.screen{max-width:430px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;padding-bottom:100px;}
+
+.topbar{display:flex;align-items:center;gap:12px;padding:16px 18px 10px;position:sticky;top:0;z-index:60;background:rgba(250,250,250,.92);backdrop-filter:blur(12px);}
+.back-btn{width:38px;height:38px;border-radius:50%;background:rgba(5,173,152,.08);display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:var(--primary);cursor:pointer;flex-shrink:0;}
+.topbar-title{font-size:1.05rem;font-weight:800;color:var(--deep);flex:1;}
+.topbar-icon{width:38px;height:38px;border-radius:50%;background:rgba(5,173,152,.08);display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;}
+
+.tabs-wrap{display:flex;gap:8px;margin:10px 18px 18px;background:#fff;border-radius:16px;padding:5px;box-shadow:0 2px 10px rgba(5,173,152,.06);}
+.tab-btn{flex:1;text-align:center;padding:10px 0;border-radius:12px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:.85rem;font-weight:700;color:var(--gray);transition:all .25s;}
+.tab-btn.active{background:var(--deep);color:#fff;box-shadow:0 4px 12px rgba(36,95,115,.3);}
+.tab-btn.active.rel-active{background:var(--primary);box-shadow:0 4px 12px rgba(5,173,152,.3);}
+
+.section{display:none;}
+.section.active{display:block;animation:fadeUp .35s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.section-block{margin:0 18px 20px;}
+.section-head{font-size:.9rem;font-weight:800;color:var(--deep);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+
+/* ══ SLEEP ══ */
+.sleep-hero{
+  border-radius:24px;padding:24px;text-align:center;color:#fff;margin-bottom:18px;position:relative;overflow:hidden;
+  background:linear-gradient(165deg,#1a3a52 0%,#245F73 55%,#0f2433 100%);
+}
+.sleep-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 80% 0%, rgba(255,255,255,.12), transparent 55%);}
+.sleep-stars{position:absolute;inset:0;pointer-events:none;}
+.sleep-stars span{position:absolute;width:3px;height:3px;background:#fff;border-radius:50%;animation:tw 3s infinite ease-in-out;}
+@keyframes tw{0%,100%{opacity:.15}50%{opacity:.8}}
+.sleep-moon{font-size:2.4rem;position:relative;z-index:2;}
+.sleep-hours{font-size:2.4rem;font-weight:800;position:relative;z-index:2;margin-top:4px;}
+.sleep-hours-label{font-size:.78rem;opacity:.8;position:relative;z-index:2;}
+
+.sleep-input-card{background:#fff;border-radius:20px;padding:18px;box-shadow:0 4px 18px rgba(36,95,115,.07);margin-bottom:16px;}
+.sleep-row{display:flex;gap:10px;margin-bottom:12px;}
+.sleep-field{flex:1;}
+.sleep-field label{font-size:.74rem;font-weight:700;color:var(--gray);display:block;margin-bottom:5px;}
+.sleep-input{width:100%;border:1.5px solid rgba(36,95,115,.15);border-radius:12px;padding:10px 12px;font-family:inherit;font-size:.86rem;outline:none;text-align:center;}
+.sleep-input:focus{border-color:var(--deep);}
+.sleep-save-btn{width:100%;padding:12px;border-radius:12px;border:none;background:var(--deep);color:#fff;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit;}
+
+.sleep-alert{
+  margin:0 0 16px;padding:14px 16px;border-radius:16px;
+  background:rgba(236,77,37,.06);border:1px solid rgba(236,77,37,.18);
+  font-size:.78rem;color:var(--accent);line-height:1.7;display:none;
+}
+.sleep-alert.show{display:block;}
+
+.sleep-week-card{background:#fff;border-radius:20px;padding:18px;box-shadow:0 4px 18px rgba(36,95,115,.06);}
+.sleep-bars{display:flex;align-items:flex-end;gap:8px;height:90px;margin-top:10px;}
+.sb-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;}
+.sb-bar{width:100%;border-radius:7px 7px 4px 4px;background:linear-gradient(to top,var(--deep),#3a7a92);min-height:6px;transition:height .5s ease;}
+.sb-bar.low{background:linear-gradient(to top,var(--accent),#f08a64);}
+.sb-lbl{font-size:.62rem;color:var(--gray);font-weight:700;}
+.sb-val{font-size:.62rem;font-weight:800;color:var(--deep);}
+
+/* ══ RELATIONS ══ */
+.rel-intro{
+  margin-bottom:16px;padding:16px 18px;border-radius:18px;text-align:center;
+  background:linear-gradient(150deg,rgba(5,173,152,.06),rgba(43,207,206,.04));
+  border:1px solid rgba(5,173,152,.14);
+}
+.rel-icon{font-size:1.7rem;}
+.rel-q{font-size:.92rem;font-weight:800;color:var(--primary);margin-top:6px;}
+
+.rel-add-row{display:flex;gap:8px;margin-bottom:16px;}
+.rel-input{flex:1;border:1.5px solid rgba(5,173,152,.18);border-radius:14px;padding:12px 16px;font-family:inherit;font-size:.86rem;outline:none;background:#fff;}
+.rel-input:focus{border-color:var(--primary);}
+.rel-add-btn{background:var(--primary);color:#fff;border:none;border-radius:14px;padding:0 18px;font-weight:800;cursor:pointer;font-size:1.1rem;font-family:inherit;}
+
+.rel-card{
+  display:flex;align-items:center;gap:12px;background:#fff;border-radius:18px;padding:14px 16px;
+  margin-bottom:10px;box-shadow:0 3px 14px rgba(5,173,152,.06);
+}
+.rel-card.contacted{background:rgba(5,173,152,.04);}
+.rel-avatar{
+  width:42px;height:42px;border-radius:50%;background:linear-gradient(150deg,var(--primary-light),var(--primary));
+  color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;flex-shrink:0;
+}
+.rel-info{flex:1;}
+.rel-name{font-size:.86rem;font-weight:800;color:var(--text);}
+.rel-status{font-size:.7rem;color:var(--gray);margin-top:2px;}
+.rel-status.done{color:var(--primary);font-weight:700;}
+.rel-check-btn{
+  width:34px;height:34px;border-radius:50%;border:2px solid rgba(5,173,152,.25);
+  background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;
+  transition:all .2s;
+}
+.rel-check-btn.done{background:var(--primary);border-color:var(--primary);color:#fff;}
+.rel-del{background:none;border:none;cursor:pointer;color:var(--gray-light);font-size:.85rem;flex-shrink:0;}
+
+.empty-rel{text-align:center;padding:30px 20px;color:var(--gray-light);font-size:.82rem;}
+
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--deep);color:#fff;padding:11px 22px;border-radius:14px;font-size:.84rem;font-weight:700;z-index:200;transition:transform .3s;box-shadow:0 8px 24px rgba(0,0,0,.18);max-width:380px;text-align:center;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.cf{position:fixed;width:9px;height:9px;border-radius:2px;pointer-events:none;z-index:300;animation:cfFall linear forwards;}
+@keyframes cfFall{0%{transform:translateY(-20px) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-top:1px solid rgba(5,173,152,.10);display:flex;justify-content:space-around;align-items:center;padding:10px 8px calc(10px + env(safe-area-inset-bottom));box-shadow:0 -6px 24px rgba(5,173,152,.08);z-index:50;}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--gray);cursor:pointer;flex:1;}
+.nav-item.active{color:var(--primary);}
+.nav-item .nav-ic{font-size:1.25rem;}
+.nav-item span:last-child{font-size:.66rem;font-weight:700;}
+.nav-item.active .nav-ic{background:rgba(5,173,152,.10);border-radius:12px;padding:2px 10px;}
+::-webkit-scrollbar{width:0;}
+</style>
+</head>
+<body>
+
+<div class="screen">
+
+  <div class="topbar">
+    <div class="back-btn" onclick="history.back()">←</div>
+    <div class="topbar-title">النوم والعلاقات</div>
+    <div class="topbar-icon">⋯</div>
+  </div>
+
+  <div class="tabs-wrap">
+    <button class="tab-btn active" id="tabSleep" onclick="switchTab('sleep')">😴 النوم</button>
+    <button class="tab-btn" id="tabRel" onclick="switchTab('rel')">👥 دائرة العلاقات</button>
+  </div>
+
+  <!-- SLEEP -->
+  <div class="section active" id="sec-sleep">
+    <div class="section-block" style="margin-top:10px;">
+
+      <div class="sleep-hero">
+        <div class="sleep-stars" id="sleepStars"></div>
+        <div class="sleep-moon">🌙</div>
+        <div class="sleep-hours" id="sleepHoursDisplay">6.5</div>
+        <div class="sleep-hours-label">ساعة نوم الليلة الماضية</div>
+      </div>
+
+      <div class="sleep-alert" id="sleepAlert">
+        😴 لاحظنا أن نومك أقل من 6 ساعات لـ3 أيام متتالية. النوم الكافي أساس كل تطوير شخصي — حاول النوم باكراً الليلة.
+      </div>
+
+      <div class="sleep-input-card">
+        <div class="sleep-row">
+          <div class="sleep-field">
+            <label>🛏️ وقت النوم</label>
+            <input type="time" class="sleep-input" id="sleepTimeInput" value="23:30">
+          </div>
+          <div class="sleep-field">
+            <label>⏰ وقت الاستيقاظ</label>
+            <input type="time" class="sleep-input" id="wakeTimeInput" value="06:00">
+          </div>
+        </div>
+        <button class="sleep-save-btn" onclick="saveSleep()">💾 حفظ نوم الليلة</button>
+      </div>
+
+      <div class="sleep-week-card">
+        <div class="section-head" style="margin-bottom:4px;">📊 آخر 7 ليالٍ</div>
+        <div class="sleep-bars" id="sleepBars"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RELATIONS -->
+  <div class="section" id="sec-rel">
+    <div class="section-block" style="margin-top:10px;">
+
+      <div class="rel-intro">
+        <div class="rel-icon">👥</div>
+        <div class="rel-q">من تواصلت معه هذا الأسبوع؟ من تحتاج تتصل به؟</div>
+      </div>
+
+      <div class="rel-add-row">
+        <input type="text" class="rel-input" id="relInput" placeholder="اسم شخص تريد التواصل معه...">
+        <button class="rel-add-btn" onclick="addRelation()">+</button>
+      </div>
+
+      <div id="relList"></div>
+
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="bottom-nav">
+  <div class="nav-item"><span class="nav-ic">☰</span><span>المزيد</span></div>
+  <div class="nav-item"><span class="nav-ic">📊</span><span>التحليلات</span></div>
+  <div class="nav-item"><span class="nav-ic">🔄</span><span>العادات</span></div>
+  <div class="nav-item"><span class="nav-ic">🎯</span><span>الأهداف</span></div>
+  <div class="nav-item active"><span class="nav-ic">🏠</span><span>الرئيسية</span></div>
+</div>
+
+<script>
+// ══ SLEEP ══
+const sleepDemo = [
+  {day:'السبت', hrs:5.5}, {day:'الأحد', hrs:5.8}, {day:'الاثنين', hrs:5.2},
+  {day:'الثلاثاء', hrs:7.5}, {day:'الأربعاء', hrs:6.8}, {day:'الخميس', hrs:7.0}, {day:'الجمعة', hrs:6.5},
+];
+
+function switchTab(tab){
+  document.getElementById('tabSleep').classList.toggle('active', tab==='sleep');
+  document.getElementById('tabRel').classList.toggle('active', tab==='rel');
+  document.getElementById('tabRel').classList.toggle('rel-active', tab==='rel');
+  document.getElementById('sec-sleep').classList.toggle('active', tab==='sleep');
+  document.getElementById('sec-rel').classList.toggle('active', tab==='rel');
+}
+
+function renderSleepBars(){
+  const wrap = document.getElementById('sleepBars');
+  wrap.innerHTML='';
+  sleepDemo.forEach(d=>{
+    const h = Math.round((d.hrs/9)*70);
+    const low = d.hrs < 6;
+    wrap.innerHTML += `
+      <div class="sb-col">
+        <div class="sb-val">${d.hrs}</div>
+        <div class="sb-bar ${low?'low':''}" style="height:${h}px"></div>
+        <div class="sb-lbl">${d.day.slice(0,3)}</div>
+      </div>`;
+  });
+  checkLowSleepStreak();
+}
+
+function checkLowSleepStreak(){
+  const lastThree = sleepDemo.slice(-3);
+  const allLow = lastThree.every(d=>d.hrs<6);
+  document.getElementById('sleepAlert').classList.toggle('show', allLow);
+}
+
+function saveSleep(){
+  const sleepTime = document.getElementById('sleepTimeInput').value;
+  const wakeTime = document.getElementById('wakeTimeInput').value;
+  if(!sleepTime || !wakeTime){ showToast('⚠️ أدخل وقتي النوم والاستيقاظ'); return; }
+
+  let [sh,sm] = sleepTime.split(':').map(Number);
+  let [wh,wm] = wakeTime.split(':').map(Number);
+  let sleepMinutes = sh*60+sm;
+  let wakeMinutes = wh*60+wm;
+  if(wakeMinutes <= sleepMinutes) wakeMinutes += 24*60;
+  const hours = Math.round((wakeMinutes - sleepMinutes)/60*10)/10;
+
+  document.getElementById('sleepHoursDisplay').textContent = hours;
+  sleepDemo.push({day:'اليوم', hrs:hours});
+  sleepDemo.shift();
+  renderSleepBars();
+  confetti();
+  showToast(`😴 تم تسجيل ${hours} ساعة نوم! +5 XP`);
+}
+
+// ══ RELATIONS ══
+let relations = [
+  {name:'صديقي المحزم سعود', contacted:false},
+  {name:'والدتي', contacted:true},
+  {name:'جاري أبو عبدالله', contacted:false},
+];
+
+function renderRelations(){
+  const wrap = document.getElementById('relList');
+  if(!relations.length){
+    wrap.innerHTML = '<div class="empty-rel">👥 لا أحد في القائمة بعد<br>أضف اسم شخص تريد التواصل معه</div>';
+    return;
+  }
+  wrap.innerHTML = relations.map((r,i)=>`
+    <div class="rel-card ${r.contacted?'contacted':''}">
+      <div class="rel-avatar">${r.name[0]}</div>
+      <div class="rel-info">
+        <div class="rel-name">${r.name}</div>
+        <div class="rel-status ${r.contacted?'done':''}">${r.contacted?'✓ تم التواصل هذا الأسبوع':'لم يتم التواصل بعد'}</div>
+      </div>
+      <button class="rel-check-btn ${r.contacted?'done':''}" onclick="toggleRelation(${i})">${r.contacted?'✓':''}</button>
+      <button class="rel-del" onclick="delRelation(${i})">🗑</button>
+    </div>`).join('');
+}
+
+function addRelation(){
+  const input = document.getElementById('relInput');
+  const name = input.value.trim();
+  if(!name){ showToast('⚠️ اكتب اسم الشخص أولاً'); return; }
+  relations.push({name, contacted:false});
+  input.value='';
+  renderRelations();
+  showToast('👥 أُضيف للقائمة');
+}
+
+function toggleRelation(i){
+  relations[i].contacted = !relations[i].contacted;
+  if(relations[i].contacted){ confetti(); showToast('❤️ رائع! تواصلك يقوّي روابطك +5 XP'); }
+  renderRelations();
+}
+
+function delRelation(i){
+  relations.splice(i,1);
+  renderRelations();
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(window._tt);
+  window._tt = setTimeout(()=>t.classList.remove('show'), 2400);
+}
+function confetti(){
+  const cols = ['#05AD98','#2BCFCE','#245F73','#F5B544'];
+  for(let i=0;i<22;i++){
+    const el = document.createElement('div');
+    el.className='cf';
+    el.style.cssText = `left:${Math.random()*100}vw; top:-10px; background:${cols[Math.floor(Math.random()*cols.length)]};
+      width:${5+Math.random()*7}px; height:${5+Math.random()*7}px;
+      animation-duration:${1.4+Math.random()*1.6}s; animation-delay:${Math.random()*.3}s;
+      border-radius:${Math.random()>.5?'50%':'2px'};`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 2800);
+  }
+}
+
+window.addEventListener('DOMContentLoaded', ()=>{
+  const starsWrap = document.getElementById('sleepStars');
+  for(let i=0;i<12;i++){
+    const s = document.createElement('span');
+    s.style.left = Math.random()*100+'%';
+    s.style.top = Math.random()*100+'%';
+    s.style.animationDelay = (Math.random()*3)+'s';
+    starsWrap.appendChild(s);
+  }
+  renderSleepBars();
+  renderRelations();
+});
+</script>
+</body>
+</html>

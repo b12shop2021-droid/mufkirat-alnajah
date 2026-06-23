@@ -112,6 +112,30 @@ export interface CustomDay {
   exercises: CustomExercise[];
 }
 
+export interface MoodEntry {
+  date: string; // YYYY-MM-DD
+  moodIdx: number; // فهرس ضمن قائمة المزاج (0..7)
+  energy: number; // 1..10
+}
+
+export interface PrideEntry {
+  id: string;
+  text: string;
+  date: string; // YYYY-MM-DD
+}
+
+export interface NoteEntry {
+  id: string;
+  text: string;
+  date: string; // YYYY-MM-DD
+}
+
+export interface GratitudeEntry {
+  id: string;
+  text: string;
+  date: string; // YYYY-MM-DD (حد 3 يومياً)
+}
+
 export interface CoreState {
   profile: Profile;
   xp: number;
@@ -122,6 +146,10 @@ export interface CoreState {
   routine: { morning: RoutineTask[]; evening: RoutineTask[] };
   goals: Goal[];
   customWorkout: CustomDay[];
+  moodLog: MoodEntry[];
+  prideArchive: PrideEntry[];
+  notes: NoteEntry[];
+  gratitudeLog: GratitudeEntry[];
 }
 
 /* ===== المستويات السبعة (المرجع الوحيد) ===== */
@@ -190,6 +218,10 @@ const DEFAULT_STATE: CoreState = {
   routine: { morning: [], evening: [] },
   goals: [],
   customWorkout: [],
+  moodLog: [],
+  prideArchive: [],
+  notes: [],
+  gratitudeLog: [],
 };
 
 /* قراءة الحالة المحفوظة من localStorage مع دمج آمن مع الافتراضي */
@@ -210,6 +242,10 @@ const loadState = (): CoreState => {
       },
       goals: parsed.goals ?? [],
       customWorkout: parsed.customWorkout ?? [],
+      moodLog: parsed.moodLog ?? [],
+      prideArchive: parsed.prideArchive ?? [],
+      notes: parsed.notes ?? [],
+      gratitudeLog: parsed.gratitudeLog ?? [],
     };
   } catch {
     return DEFAULT_STATE;
@@ -258,6 +294,15 @@ interface CoreContextValue {
     patch: Partial<Omit<CustomExercise, 'id'>>,
   ) => void;
   removeCustomExercise: (dayId: string, exId: string) => void;
+  // ===== المزاج والفخر =====
+  saveMood: (moodIdx: number, energy: number) => void;
+  addPride: (text: string) => void;
+  removePride: (id: string) => void;
+  // ===== ملاحظات وشكر =====
+  addNote: (text: string) => void;
+  removeNote: (id: string) => void;
+  addGratitude: (text: string) => boolean; // false إذا اكتمل حد اليوم (3)
+  removeGratitude: (id: string) => void;
 }
 
 const CoreContext = createContext<CoreContextValue | null>(null);
@@ -794,6 +839,104 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     [updateCustom],
   );
 
+  /* حفظ مزاج اليوم وطاقته: تحديث سجل اليوم + احتساب +5 مرة واحدة يومياً */
+  const saveMood = useCallback(
+    (moodIdx: number, energy: number) => {
+      const today = todayStr();
+      const idx = clampNum(moodIdx, 0, 7);
+      const en = clampNum(Math.round(energy), 1, 10);
+      let firstToday = false;
+      setState((s) => {
+        const existing = s.moodLog.find((m) => m.date === today);
+        if (!existing) firstToday = true;
+        const others = s.moodLog.filter((m) => m.date !== today);
+        return {
+          ...s,
+          moodLog: [...others, { date: today, moodIdx: idx, energy: en }],
+        };
+      });
+      if (firstToday) addXP(5);
+    },
+    [addXP],
+  );
+
+  /* إضافة لحظة فخر للأرشيف + احتساب +5 */
+  const addPride = useCallback(
+    (text: string) => {
+      const t = clean(text);
+      if (!t) return;
+      setState((s) => ({
+        ...s,
+        prideArchive: [
+          { id: crypto.randomUUID(), text: t, date: todayStr() },
+          ...s.prideArchive,
+        ],
+      }));
+      addXP(5);
+    },
+    [addXP],
+  );
+
+  /* حذف لحظة فخر (يمرّ عبر ConfirmDialog) */
+  const removePride = useCallback((id: string) => {
+    setState((s) => ({
+      ...s,
+      prideArchive: s.prideArchive.filter((p) => p.id !== id),
+    }));
+  }, []);
+
+  /* إضافة ملاحظة سريعة + احتساب +5 */
+  const addNote = useCallback(
+    (text: string) => {
+      const t = clean(text);
+      if (!t) return;
+      setState((s) => ({
+        ...s,
+        notes: [{ id: crypto.randomUUID(), text: t, date: todayStr() }, ...s.notes],
+      }));
+      addXP(5);
+    },
+    [addXP],
+  );
+
+  /* حذف ملاحظة (يمرّ عبر ConfirmDialog) */
+  const removeNote = useCallback((id: string) => {
+    setState((s) => ({ ...s, notes: s.notes.filter((n) => n.id !== id) }));
+  }, []);
+
+  /* إضافة شكر مع فرض حد 3 يومياً + احتساب +5 (يعيد false إذا اكتمل الحد) */
+  const addGratitude = useCallback(
+    (text: string): boolean => {
+      const t = clean(text);
+      if (!t) return false;
+      const today = todayStr();
+      let added = false;
+      setState((s) => {
+        const todayCount = s.gratitudeLog.filter((g) => g.date === today).length;
+        if (todayCount >= 3) return s;
+        added = true;
+        return {
+          ...s,
+          gratitudeLog: [
+            ...s.gratitudeLog,
+            { id: crypto.randomUUID(), text: t, date: today },
+          ],
+        };
+      });
+      if (added) addXP(5);
+      return added;
+    },
+    [addXP],
+  );
+
+  /* حذف شكر (يمرّ عبر ConfirmDialog) */
+  const removeGratitude = useCallback((id: string) => {
+    setState((s) => ({
+      ...s,
+      gratitudeLog: s.gratitudeLog.filter((g) => g.id !== id),
+    }));
+  }, []);
+
   const value = useMemo<CoreContextValue>(
     () => ({
       state,
@@ -829,6 +972,13 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       addCustomExercise,
       updateCustomExercise,
       removeCustomExercise,
+      saveMood,
+      addPride,
+      removePride,
+      addNote,
+      removeNote,
+      addGratitude,
+      removeGratitude,
     }),
     [
       state,
@@ -864,6 +1014,13 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       addCustomExercise,
       updateCustomExercise,
       removeCustomExercise,
+      saveMood,
+      addPride,
+      removePride,
+      addNote,
+      removeNote,
+      addGratitude,
+      removeGratitude,
     ],
   );
 

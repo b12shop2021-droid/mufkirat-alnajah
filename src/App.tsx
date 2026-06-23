@@ -11,6 +11,8 @@ import { useCore } from './core/useCore';
 import Routine from './pages/Routine';
 import Goals from './pages/Goals';
 import CustomWorkout from './pages/CustomWorkout';
+import Mood from './pages/Mood';
+import NotesGratitude from './pages/NotesGratitude';
 
 /* صفحة ترحيب مؤقتة للتأكد من ربط النواة — تُستبدل بالصفحات الفعلية */
 function HomePlaceholder() {
@@ -61,6 +63,8 @@ export default function App() {
         <Route path="/routine" component={Routine} />
         <Route path="/goals" component={Goals} />
         <Route path="/custom-workout" component={CustomWorkout} />
+        <Route path="/mood" component={Mood} />
+        <Route path="/notes" component={NotesGratitude} />
         <Route component={ComingSoon} />
       </Switch>
       <BottomNav />

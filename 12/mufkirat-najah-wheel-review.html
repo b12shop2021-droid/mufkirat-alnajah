@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>عجلة الحياة - مفكرة النجاح</title>
+<style>
+:root{
+  --primary:#05AD98; --primary-light:#2BCFCE; --deep:#245F73;
+  --accent:#EC4D25; --gray:#878787; --gray-light:#BBBFBF;
+  --bg:#FAFAFA; --white:#FFFFFF; --text:#1A2E2C;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Alyamama','Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--text);direction:rtl;-webkit-font-smoothing:antialiased;}
+.amiri{font-family:'Amiri','Segoe UI',serif;}
+.screen{max-width:430px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;padding-bottom:100px;}
+
+.topbar{display:flex;align-items:center;gap:12px;padding:16px 18px 10px;position:sticky;top:0;z-index:60;background:rgba(250,250,250,.92);backdrop-filter:blur(12px);}
+.back-btn{width:38px;height:38px;border-radius:50%;background:rgba(5,173,152,.08);display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:var(--primary);cursor:pointer;flex-shrink:0;}
+.topbar-title{font-size:1.05rem;font-weight:800;color:var(--deep);flex:1;}
+.topbar-icon{width:38px;height:38px;border-radius:50%;background:rgba(5,173,152,.08);display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;}
+
+.tabs-wrap{display:flex;gap:8px;margin:10px 18px 18px;background:#fff;border-radius:16px;padding:5px;box-shadow:0 2px 10px rgba(5,173,152,.06);}
+.tab-btn{flex:1;text-align:center;padding:10px 0;border-radius:12px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:700;color:var(--gray);transition:all .25s;}
+.tab-btn.active{background:var(--primary);color:#fff;box-shadow:0 4px 12px rgba(5,173,152,.3);}
+.tab-btn.active.review-active{background:var(--deep);box-shadow:0 4px 12px rgba(36,95,115,.35);}
+
+.section{display:none;}
+.section.active{display:block;animation:fadeUp .35s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.section-block{margin:0 18px 20px;}
+.section-head{font-size:.9rem;font-weight:800;color:var(--deep);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+
+/* ══ WHEEL OF LIFE ══ */
+.wheel-card{background:#fff;border-radius:24px;padding:20px;box-shadow:0 4px 20px rgba(5,173,152,.08);margin-bottom:18px;}
+.wheel-svg-wrap{display:flex;justify-content:center;margin-bottom:10px;}
+.wheel-balance-tag{
+  text-align:center;font-size:.84rem;font-weight:800;padding:6px 16px;border-radius:14px;
+  display:inline-block;margin:0 auto 6px;
+}
+.bt-good{background:rgba(5,173,152,.12);color:var(--primary);}
+.bt-mid{background:rgba(245,181,68,.15);color:#92660d;}
+.bt-low{background:rgba(236,77,37,.12);color:var(--accent);}
+.wheel-balance-wrap{text-align:center;margin-bottom:14px;}
+
+.life-areas{display:flex;flex-direction:column;gap:10px;}
+.area-row{display:flex;align-items:center;gap:10px;}
+.area-icon{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;background:rgba(5,173,152,.08);}
+.area-name{font-size:.78rem;font-weight:700;width:78px;flex-shrink:0;}
+.area-slider-wrap{flex:1;}
+.area-slider{
+  -webkit-appearance:none;width:100%;height:8px;border-radius:6px;
+  background:rgba(5,173,152,.12);outline:none;cursor:pointer;
+}
+.area-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;width:20px;height:20px;border-radius:50%;
+  background:var(--primary);box-shadow:0 2px 8px rgba(5,173,152,.4);cursor:pointer;
+}
+.area-val{width:28px;text-align:center;font-size:.82rem;font-weight:800;color:var(--primary);flex-shrink:0;}
+
+.wheel-save-btn{
+  width:100%;margin-top:16px;padding:13px;border-radius:14px;border:none;
+  background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;
+  font-weight:800;font-size:.86rem;cursor:pointer;font-family:inherit;
+  box-shadow:0 6px 18px rgba(5,173,152,.28);
+}
+
+.insight-card{
+  background:linear-gradient(150deg,rgba(236,77,37,.05),rgba(245,181,68,.05));
+  border:1px solid rgba(236,77,37,.15);border-radius:18px;padding:14px 16px;
+  font-size:.8rem;color:var(--text);line-height:1.7;
+}
+.insight-card strong{color:var(--accent);}
+
+/* ══ WEEKLY REVIEW ══ */
+.review-card{background:#fff;border-radius:22px;padding:20px;box-shadow:0 4px 20px rgba(36,95,115,.07);margin-bottom:16px;}
+.review-q-num{
+  width:28px;height:28px;border-radius:50%;background:var(--deep);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;flex-shrink:0;
+}
+.review-q-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.review-q-text{font-size:.88rem;font-weight:800;color:var(--deep);}
+.review-textarea{
+  width:100%;border:1.5px solid rgba(36,95,115,.15);border-radius:14px;padding:13px 16px;
+  font-family:inherit;font-size:.86rem;outline:none;resize:none;margin-bottom:18px;
+  background:rgba(36,95,115,.02);
+}
+.review-textarea:last-of-type{margin-bottom:0;}
+.review-textarea:focus{border-color:var(--deep);}
+
+.review-save-btn{
+  width:100%;margin-top:16px;padding:13px;border-radius:14px;border:none;
+  background:var(--deep);color:#fff;font-weight:800;font-size:.86rem;cursor:pointer;font-family:inherit;
+  box-shadow:0 6px 18px rgba(36,95,115,.28);
+}
+
+.archive-card{background:#fff;border-radius:18px;padding:14px 16px;margin-bottom:10px;box-shadow:0 3px 14px rgba(36,95,115,.05);border-right:3px solid var(--deep);}
+.archive-week{font-size:.74rem;font-weight:800;color:var(--deep);margin-bottom:8px;}
+.archive-qa{font-size:.78rem;color:var(--text);margin-bottom:4px;line-height:1.6;}
+.archive-qa strong{color:var(--gray);}
+
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--deep);color:#fff;padding:11px 22px;border-radius:14px;font-size:.84rem;font-weight:700;z-index:200;transition:transform .3s;box-shadow:0 8px 24px rgba(0,0,0,.18);max-width:380px;text-align:center;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.cf{position:fixed;width:9px;height:9px;border-radius:2px;pointer-events:none;z-index:300;animation:cfFall linear forwards;}
+@keyframes cfFall{0%{transform:translateY(-20px) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-top:1px solid rgba(5,173,152,.10);display:flex;justify-content:space-around;align-items:center;padding:10px 8px calc(10px + env(safe-area-inset-bottom));box-shadow:0 -6px 24px rgba(5,173,152,.08);z-index:50;}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--gray);cursor:pointer;flex:1;}
+.nav-item.active{color:var(--primary);}
+.nav-item .nav-ic{font-size:1.25rem;}
+.nav-item span:last-child{font-size:.66rem;font-weight:700;}
+.nav-item.active .nav-ic{background:rgba(5,173,152,.10);border-radius:12px;padding:2px 10px;}
+::-webkit-scrollbar{width:0;}
+</style>
+</head>
+<body>
+
+<div class="screen">
+
+  <div class="topbar">
+    <div class="back-btn" onclick="history.back()">←</div>
+    <div class="topbar-title">تطوير الذات</div>
+    <div class="topbar-icon">⋯</div>
+  </div>
+
+  <div class="tabs-wrap">
+    <button class="tab-btn active" id="tabWheel" onclick="switchTab('wheel')">🎡 عجلة الحياة</button>
+    <button class="tab-btn" id="tabReview" onclick="switchTab('review')">🪞 مراجعة الأسبوع</button>
+  </div>
+
+  <!-- WHEEL OF LIFE -->
+  <div class="section active" id="sec-wheel">
+    <div class="section-block" style="margin-top:10px;">
+      <div class="wheel-card">
+        <div class="wheel-svg-wrap" id="wheelSvgWrap"></div>
+        <div class="wheel-balance-wrap">
+          <span class="wheel-balance-tag" id="balanceTag">🟢 متوازن</span>
+        </div>
+
+        <div class="life-areas" id="lifeAreas"></div>
+
+        <button class="wheel-save-btn" onclick="saveWheel()">💾 حفظ تقييم هذا الشهر</button>
+      </div>
+
+      <div class="insight-card" id="insightCard"></div>
+    </div>
+  </div>
+
+  <!-- WEEKLY REVIEW -->
+  <div class="section" id="sec-review">
+    <div class="section-block" style="margin-top:10px;">
+      <div class="review-card">
+        <div class="review-q-row">
+          <div class="review-q-num">١</div>
+          <div class="review-q-text amiri">أعظم نجاح هذا الأسبوع؟</div>
+        </div>
+        <textarea class="review-textarea" id="rev1" rows="2" placeholder="اكتب أعظم ما حققته..."></textarea>
+
+        <div class="review-q-row">
+          <div class="review-q-num">٢</div>
+          <div class="review-q-text amiri">أكبر تحدٍ واجهته؟</div>
+        </div>
+        <textarea class="review-textarea" id="rev2" rows="2" placeholder="ما الذي كان صعباً عليك..."></textarea>
+
+        <div class="review-q-row">
+          <div class="review-q-num">٣</div>
+          <div class="review-q-text amiri">ماذا ستفعل مختلفاً الأسبوع القادم؟</div>
+        </div>
+        <textarea class="review-textarea" id="rev3" rows="2" placeholder="خطوة واحدة ستغيّرها..."></textarea>
+
+        <button class="review-save-btn" onclick="saveReview()">📂 حفظ في الأرشيف</button>
+      </div>
+
+      <div class="section-head">📂 أرشيف المراجعات السابقة</div>
+      <div id="reviewArchive"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="bottom-nav">
+  <div class="nav-item"><span class="nav-ic">☰</span><span>المزيد</span></div>
+  <div class="nav-item"><span class="nav-ic">📊</span><span>التحليلات</span></div>
+  <div class="nav-item"><span class="nav-ic">🔄</span><span>العادات</span></div>
+  <div class="nav-item"><span class="nav-ic">🎯</span><span>الأهداف</span></div>
+  <div class="nav-item active"><span class="nav-ic">🏠</span><span>الرئيسية</span></div>
+</div>
+
+<script>
+// ══ WHEEL OF LIFE ══
+let lifeAreas = [
+  {icon:'💼', name:'المهنة', val:7},
+  {icon:'💰', name:'المال', val:5},
+  {icon:'💪', name:'الصحة', val:8},
+  {icon:'❤️', name:'العلاقات', val:6},
+  {icon:'🌱', name:'النمو الشخصي', val:8},
+  {icon:'🎮', name:'الترفيه', val:4},
+  {icon:'🏡', name:'البيئة المحيطة', val:7},
+  {icon:'🕊️', name:'الروحانيات', val:9},
+];
+
+function renderAreas(){
+  const wrap = document.getElementById('lifeAreas');
+  wrap.innerHTML = lifeAreas.map((a,i)=>`
+    <div class="area-row">
+      <div class="area-icon">${a.icon}</div>
+      <div class="area-name">${a.name}</div>
+      <div class="area-slider-wrap">
+        <input type="range" class="area-slider" min="1" max="10" value="${a.val}" oninput="updateArea(${i}, this.value)">
+      </div>
+      <div class="area-val" id="areaVal${i}">${a.val}</div>
+    </div>`).join('');
+  renderWheelSVG();
+}
+
+function updateArea(i, val){
+  lifeAreas[i].val = parseInt(val);
+  document.getElementById('areaVal'+i).textContent = val;
+  renderWheelSVG();
+}
+
+function renderWheelSVG(){
+  const wrap = document.getElementById('wheelSvgWrap');
+  const size = 220, center = size/2, maxR = 85;
+  const n = lifeAreas.length;
+  const angleStep = (2*Math.PI)/n;
+
+  let points = lifeAreas.map((a,i)=>{
+    const angle = -Math.PI/2 + i*angleStep;
+    const r = (a.val/10)*maxR;
+    return {x: center + r*Math.cos(angle), y: center + r*Math.sin(angle)};
+  });
+  let polygon = points.map(p=>`${p.x},${p.y}`).join(' ');
+
+  let gridLines = '';
+  for(let ring=2;ring<=10;ring+=2){
+    let ringPts = [];
+    for(let i=0;i<n;i++){
+      const angle = -Math.PI/2 + i*angleStep;
+      const r = (ring/10)*maxR;
+      ringPts.push(`${center+r*Math.cos(angle)},${center+r*Math.sin(angle)}`);
+    }
+    gridLines += `<polygon points="${ringPts.join(' ')}" fill="none" stroke="rgba(135,135,135,.15)" stroke-width="1"/>`;
+  }
+
+  let axisLines = '';
+  for(let i=0;i<n;i++){
+    const angle = -Math.PI/2 + i*angleStep;
+    const x2 = center + maxR*Math.cos(angle);
+    const y2 = center + maxR*Math.sin(angle);
+    axisLines += `<line x1="${center}" y1="${center}" x2="${x2}" y2="${y2}" stroke="rgba(135,135,135,.15)" stroke-width="1"/>`;
+  }
+
+  wrap.innerHTML = `
+    <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+      ${gridLines}
+      ${axisLines}
+      <polygon points="${polygon}" fill="rgba(5,173,152,.22)" stroke="#05AD98" stroke-width="2.5"/>
+      ${points.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="4" fill="#05AD98"/>`).join('')}
+    </svg>`;
+
+  updateBalanceTag();
+}
+
+function updateBalanceTag(){
+  const vals = lifeAreas.map(a=>a.val);
+  const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
+  const min = Math.min(...vals);
+  const range = Math.max(...vals) - min;
+  const tag = document.getElementById('balanceTag');
+  const insight = document.getElementById('insightCard');
+  const weakest = lifeAreas.find(a=>a.val===min);
+
+  if(range <= 3){
+    tag.className='wheel-balance-tag bt-good'; tag.textContent='🟢 متوازن';
+    insight.innerHTML = `✨ حياتك متوازنة نسبياً بين الجوانب المختلفة. استمر في هذا الانسجام!`;
+  } else if(range <= 5){
+    tag.className='wheel-balance-tag bt-mid'; tag.textContent='🟡 يحتاج انتباه';
+    insight.innerHTML = `💡 لاحظنا تفاوتاً ملحوظاً. جانب <strong>"${weakest.name}"</strong> يحتاج اهتماماً أكبر هذا الشهر لتحقيق توازن أفضل.`;
+  } else {
+    tag.className='wheel-balance-tag bt-low'; tag.textContent='🔴 غير متوازن';
+    insight.innerHTML = `⚠️ هناك فجوة كبيرة بين جوانب حياتك. جانب <strong>"${weakest.name}"</strong> (${weakest.val}/10) متأخر بشكل واضح عن باقي الجوانب — قد يستحق تركيزك الأكبر القادم.`;
+  }
+}
+
+function saveWheel(){
+  confetti();
+  showToast('🎡 تم حفظ تقييم هذا الشهر! +25 XP');
+}
+
+// ══ WEEKLY REVIEW ══
+let reviewArchive = [
+  {week:'الأسبوع الماضي (9 - 15 يونيو)',
+   a1:'التزمت بالروتين الصباحي كل يوم بدون انقطاع',
+   a2:'وقت العمل المتأخر أثّر على نومي وطاقتي',
+   a3:'سأحدد ساعة ثابتة لإيقاف العمل مساءً'},
+];
+
+function saveReview(){
+  const a1 = document.getElementById('rev1').value.trim();
+  const a2 = document.getElementById('rev2').value.trim();
+  const a3 = document.getElementById('rev3').value.trim();
+  if(!a1 && !a2 && !a3){ showToast('⚠️ اكتب إجابة لسؤال واحد على الأقل'); return; }
+
+  reviewArchive.unshift({week:'هذا الأسبوع', a1, a2, a3});
+  document.getElementById('rev1').value='';
+  document.getElementById('rev2').value='';
+  document.getElementById('rev3').value='';
+  renderArchive();
+  confetti();
+  showToast('🪞 تم حفظ مراجعتك! +20 XP');
+}
+
+function renderArchive(){
+  const wrap = document.getElementById('reviewArchive');
+  wrap.innerHTML = reviewArchive.map(r=>`
+    <div class="archive-card">
+      <div class="archive-week">📅 ${r.week}</div>
+      ${r.a1?`<div class="archive-qa"><strong>النجاح:</strong> ${r.a1}</div>`:''}
+      ${r.a2?`<div class="archive-qa"><strong>التحدي:</strong> ${r.a2}</div>`:''}
+      ${r.a3?`<div class="archive-qa"><strong>القادم:</strong> ${r.a3}</div>`:''}
+    </div>`).join('');
+}
+
+function switchTab(tab){
+  document.getElementById('tabWheel').classList.toggle('active', tab==='wheel');
+  document.getElementById('tabReview').classList.toggle('active', tab==='review');
+  document.getElementById('tabReview').classList.toggle('review-active', tab==='review');
+  document.getElementById('sec-wheel').classList.toggle('active', tab==='wheel');
+  document.getElementById('sec-review').classList.toggle('active', tab==='review');
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(window._tt);
+  window._tt = setTimeout(()=>t.classList.remove('show'), 2300);
+}
+function confetti(){
+  const cols = ['#05AD98','#2BCFCE','#245F73','#F5B544'];
+  for(let i=0;i<24;i++){
+    const el = document.createElement('div');
+    el.className='cf';
+    el.style.cssText = `left:${Math.random()*100}vw; top:-10px; background:${cols[Math.floor(Math.random()*cols.length)]};
+      width:${5+Math.random()*7}px; height:${5+Math.random()*7}px;
+      animation-duration:${1.4+Math.random()*1.6}s; animation-delay:${Math.random()*.3}s;
+      border-radius:${Math.random()>.5?'50%':'2px'};`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 2800);
+  }
+}
+
+window.addEventListener('DOMContentLoaded', ()=>{
+  renderAreas();
+  renderArchive();
+});
+</script>
+</body>
+</html>

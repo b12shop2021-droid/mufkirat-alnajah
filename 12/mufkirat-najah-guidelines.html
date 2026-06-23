@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إرشادات أساسية - مفكرة النجاح</title>
+<style>
+:root{
+  --primary:#05AD98; --primary-light:#2BCFCE; --deep:#245F73;
+  --accent:#EC4D25; --gray:#878787; --gray-light:#BBBFBF;
+  --bg:#FAFAFA; --white:#FFFFFF; --text:#1A2E2C;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Alyamama','Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--text);direction:rtl;-webkit-font-smoothing:antialiased;}
+.amiri{font-family:'Amiri','Segoe UI',serif;}
+.screen{max-width:430px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;padding-bottom:100px;}
+
+.topbar{display:flex;align-items:center;gap:12px;padding:16px 18px 10px;position:sticky;top:0;z-index:60;background:rgba(250,250,250,.92);backdrop-filter:blur(12px);}
+.back-btn{width:38px;height:38px;border-radius:50%;background:rgba(5,173,152,.08);display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:var(--primary);cursor:pointer;flex-shrink:0;}
+.topbar-title{font-size:1.05rem;font-weight:800;color:var(--deep);flex:1;}
+.topbar-icon{width:38px;height:38px;border-radius:50%;background:rgba(5,173,152,.08);display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;}
+
+/* ══ HERO ══ */
+.hero{
+  margin:10px 18px 20px;border-radius:24px;padding:26px 22px;position:relative;overflow:hidden;color:#fff;text-align:center;
+  background:linear-gradient(150deg,#06b9a3 0%,#0a8f80 55%,#245F73 100%);box-shadow:0 14px 32px rgba(5,173,152,.25);
+}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 80% -10%, rgba(255,255,255,.25), transparent 55%);}
+.hero-icon{font-size:2.2rem;position:relative;z-index:2;}
+.hero-title{font-size:1.15rem;font-weight:800;margin-top:8px;position:relative;z-index:2;}
+.hero-sub{font-size:.8rem;opacity:.85;margin-top:6px;line-height:1.8;position:relative;z-index:2;}
+
+/* ══ CARD ══ */
+.guide-card{background:#fff;border-radius:20px;padding:18px;margin:0 18px 14px;box-shadow:0 4px 18px rgba(5,173,152,.07);}
+.guide-card-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.guide-icon{
+  width:38px;height:38px;border-radius:13px;display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;flex-shrink:0;background:rgba(5,173,152,.08);
+}
+.guide-title{font-size:.9rem;font-weight:800;color:var(--deep);}
+.guide-body{font-size:.84rem;color:var(--text);line-height:1.85;}
+.guide-body ul{list-style:none;padding:0;}
+.guide-body li{position:relative;padding-right:18px;margin-bottom:8px;}
+.guide-body li::before{content:'●';position:absolute;right:0;top:2px;color:var(--primary);font-size:.6rem;}
+.guide-body li:last-child{margin-bottom:0;}
+.guide-body strong{color:var(--deep);}
+
+/* ══ IMAGE SLOT ══ */
+.img-slot{
+  width:100%;aspect-ratio:16/10;border-radius:16px;border:2px dashed rgba(5,173,152,.3);
+  background:rgba(5,173,152,.03);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;margin-top:12px;cursor:pointer;transition:all .2s;
+}
+.img-slot:hover{background:rgba(5,173,152,.06);border-color:var(--primary);}
+.img-slot-icon{font-size:1.8rem;opacity:.5;}
+.img-slot-text{font-size:.76rem;color:var(--gray);font-weight:700;}
+.img-slot img{width:100%;height:100%;object-fit:cover;border-radius:14px;}
+
+/* ══ NUMBERED SECTION ══ */
+.num-badge{
+  width:26px;height:26px;border-radius:50%;background:var(--deep);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:.74rem;font-weight:800;flex-shrink:0;
+}
+
+/* ══ EXAMPLE BOX ══ */
+.example-box{
+  margin-top:10px;padding:11px 14px;border-radius:12px;background:rgba(36,95,115,.05);
+  border:1px solid rgba(36,95,115,.14);font-size:.78rem;color:var(--deep);line-height:1.7;
+}
+
+/* ══ WARNING NOTE ══ */
+.warn-note{
+  margin:0 18px 18px;padding:14px 16px;border-radius:16px;background:rgba(236,77,37,.06);
+  border:1px solid rgba(236,77,37,.18);font-size:.8rem;color:var(--accent);line-height:1.7;font-weight:700;
+  display:flex;gap:8px;align-items:flex-start;
+}
+
+.section-label{font-size:.78rem;font-weight:800;color:var(--gray);margin:20px 18px 10px;letter-spacing:.02em;}
+
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-top:1px solid rgba(5,173,152,.10);display:flex;justify-content:space-around;align-items:center;padding:10px 8px calc(10px + env(safe-area-inset-bottom));box-shadow:0 -6px 24px rgba(5,173,152,.08);z-index:50;}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--gray);cursor:pointer;flex:1;}
+.nav-item.active{color:var(--primary);}
+.nav-item .nav-ic{font-size:1.25rem;}
+.nav-item span:last-child{font-size:.66rem;font-weight:700;}
+.nav-item.active .nav-ic{background:rgba(5,173,152,.10);border-radius:12px;padding:2px 10px;}
+::-webkit-scrollbar{width:0;}
+</style>
+</head>
+<body>
+
+<div class="screen">
+
+  <div class="topbar">
+    <div class="back-btn" onclick="history.back()">←</div>
+    <div class="topbar-title">📋 إرشادات أساسية</div>
+    <div class="topbar-icon">⋯</div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-icon">💪</div>
+    <div class="hero-title">إرشادات أساسية قبل البدء</div>
+    <div class="hero-sub">نظام المدرب سعود يستهدف عضلات الجسم المختلفة في اليوم نفسه لتحقيق نتائج مضاعفة، مع التركيز على تجنب الإصابات والاستماع إلى إشارات الجسم.</div>
+  </div>
+
+  <div class="warn-note">
+    ⚠️ <span>يجب التوقف فوراً عن أي تمرين يسبب ألماً في المفاصل أو الأوتار.</span>
+  </div>
+
+  <!-- 1. التسخين -->
+  <div class="guide-card">
+    <div class="guide-card-head">
+      <div class="guide-icon">🔥</div>
+      <div class="guide-title">التسخين الإجباري</div>
+    </div>
+    <div class="guide-body">
+      <ul>
+        <li><strong>10 دقائق</strong> كارديو متوسط الشدة لرفع حرارة الجسم.</li>
+        <li>جولة واحدة للعضلة المستهدفة بوزن خفيف جداً (<strong>20 تكرار</strong>).</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 2. جدول التمرين -->
+  <div class="guide-card">
+    <div class="guide-card-head">
+      <div class="guide-icon">🗓️</div>
+      <div class="guide-title">جدول التمرين</div>
+    </div>
+    <div class="guide-body">
+      <ul>
+        <li>إذا كنت تتدرب <strong>3 أيام</strong> أسبوعياً، أكمل الأيام المتبقية في الأسبوع التالي.</li>
+        <li>إذا كنت تتدرب <strong>5 أيام</strong>، قم بتأجيل اليوم السادس للأسبوع التالي لتجنب إجهاد الجسم.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 3. تمارين الاستشفاء -->
+  <div class="guide-card">
+    <div class="guide-card-head">
+      <div class="guide-icon">🧘</div>
+      <div class="guide-title">تمارين الاستشفاء</div>
+    </div>
+    <div class="guide-body">
+      <ul>
+        <li>لا تهمل تمارين <strong>الإطالة</strong> لتقليل آلام ما بعد التمرين.</li>
+        <li>راجع الأوزان وزِدها بشكل <strong>دوري وآمن</strong>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 4. أوقات الراحة -->
+  <div class="guide-card">
+    <div class="guide-card-head">
+      <div class="guide-icon">⏱️</div>
+      <div class="guide-title">أوقات الراحة</div>
+    </div>
+    <div class="guide-body">
+      <strong>دقيقة كاملة كحد أدنى</strong> بين كل جولة لضمان الأداء الفعال بأوزان قوية.
+    </div>
+  </div>
+
+  <!-- 5. الكارديو -->
+  <div class="guide-card">
+    <div class="guide-card-head">
+      <div class="guide-icon">🏃</div>
+      <div class="guide-title">الكارديو</div>
+    </div>
+    <div class="guide-body">
+      <ul>
+        <li>يمكن أداؤه <strong>صباحاً</strong> (مشي سريع 40 دقيقة) أو <strong>بعد التمرين</strong> مباشرة (20 دقيقة).</li>
+        <li>في حال عدم القدرة عليه صباحاً، يمكن تعويضه مساءً لمدة <strong>25 دقيقة</strong>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 6. الوزن الفعال -->
+  <div class="guide-card">
+    <div class="guide-card-head">
+      <div class="guide-icon">🏋️</div>
+      <div class="guide-title">الوزن الفعال</div>
+    </div>
+    <div class="guide-body">
+      ابدأ بوزن خفيف في الجولات الأولى، ثم زد الوزن تدريجياً حتى تصل إلى الوزن الذي يسمح لك بأداء التكرارات المحددة <strong>بصعوبة مناسبة</strong>.
+    </div>
+  </div>
+
+  <!-- 7. تسخين الأرجل -->
+  <div class="guide-card">
+    <div class="guide-card-head">
+      <div class="guide-icon">🦵</div>
+      <div class="guide-title">تسخين خاص بيوم الأرجل</div>
+    </div>
+    <div class="guide-body">
+      <strong>10 دقائق</strong> تسخين للرجل + <strong>5 دقائق</strong> إطالات للجسم كاملاً.
+    </div>
+    <div class="img-slot" onclick="document.getElementById('imgInput1').click()">
+      <div class="img-slot-icon" id="imgIcon1">🏋️</div>
+      <div class="img-slot-text" id="imgText1">اضغط لرفع صورة توضيحية</div>
+    </div>
+    <input type="file" id="imgInput1" accept="image/*" style="display:none;" onchange="handleImage(event,1)">
+  </div>
+
+  <div class="section-label">إضافات احترافية متقدمة</div>
+
+  <!-- 1. تمارين البطن -->
+  <div class="guide-card">
+    <div class="guide-card-head">
+      <span class="num-badge">١</span>
+      <div class="guide-title">تمارين البطن الأساسية (Core Training)</div>
+    </div>
+    <div class="guide-body">
+      <ul>
+        <li><strong>البلانك (Plank):</strong> 3 جولات × 30-60 ثانية.</li>
+        <li><strong>رفع الأرجل المعلقة:</strong> 3 جولات × 10-15 عدة.</li>
+        <li><strong>الدراجة الهوائية (Bicycle Crunches):</strong> 3 جولات × 15-20 عدة لكل جانب.</li>
+      </ul>
+      <div class="example-box">💡 التوصية: أضف هذه التمارين في نهاية أيام Legs A و Legs B.</div>
+    </div>
+  </div>
+
+  <!-- 2. الإحماء الديناميكي -->
+  <div class="guide-card">
+    <div class="guide-card-head">
+      <span class="num-badge">٢</span>
+      <div class="guide-title">تمارين الإحماء الديناميكي</div>
+    </div>
+    <div class="guide-body">
+      <ul>
+        <li>دورانات الكتفين: 10 تكرارات للأمام والخلف.</li>
+        <li>دورانات الجذع: 10 تكرارات لكل جانب.</li>
+        <li>القطة والبقرة (Cat-Cow): 8 تكرارات.</li>
+        <li>طعنات المشي بدون وزن: 10 خطوات لكل رجل.</li>
+        <li>القفز بالحبل (Jumping Jacks): 30 ثانية.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 3. تقنيات الثبات -->
+  <div class="guide-card">
+    <div class="guide-card-head">
+      <span class="num-badge">٣</span>
+      <div class="guide-title">تقنيات متقدمة لتجاوز مرحلة الثبات</div>
+    </div>
+    <div class="guide-body">
+      <ul>
+        <li><strong>مجموعات الإسقاط (Drop Sets):</strong> بعد الفشل العضلي، خفف الوزن 20-30% واستمر بدون راحة.</li>
+        <li><strong>التكرارات السلبية (Negatives):</strong> ركز على الجزء الهابط من الحركة لمدة 3-5 ثوانٍ.</li>
+        <li><strong>الراحة المؤقتة (Rest-Pause):</strong> بعد الفشل، استرح 15 ثانية ثم أكمل 2-3 تكرارات إضافية.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 4. تتبع الأداء -->
+  <div class="guide-card">
+    <div class="guide-card-head">
+      <span class="num-badge">٤</span>
+      <div class="guide-title">نموذج تتبع الأداء (Progressive Overload)</div>
+    </div>
+    <div class="guide-body">
+      سجل الأوزان والتكرارات أسبوعياً لكل تمرين. إذا استطعت أداء <strong>12 تكراراً بسهولة</strong> في جميع الجولات، زد الوزن بنسبة <strong>2.5-5%</strong> في الجلسة التالية.
+      <div class="example-box">📌 مثال: بنش بريس 50 كجم × 12 تكرار في 3 جولات بسهولة؟ ارفع الوزن إلى 52.5 كجم في الجلسة القادمة.</div>
+    </div>
+  </div>
+
+  <!-- 5. التغذية -->
+  <div class="guide-card">
+    <div class="guide-card-head">
+      <span class="num-badge">٥</span>
+      <div class="guide-title">جدول تغذية مبسط</div>
+    </div>
+    <div class="guide-body">
+      <ul>
+        <li><strong>قبل التمرين (30-60 دقيقة):</strong> كربوهيدرات سريعة + بروتين (مثال: موزة + سكوب واي بروتين).</li>
+        <li><strong>بعد التمرين (خلال 30 دقيقة):</strong> بروتين + كربوهيدرات (مثال: 150 جم دجاج + 200 جم أرز).</li>
+        <li><strong>الترطيب:</strong> اشرب 500-750 مل ماء خلال ساعة التمرين على شكل رشفات.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div style="margin:24px 18px 0;padding:18px;border-radius:18px;background:linear-gradient(150deg,rgba(5,173,152,.06),rgba(43,207,206,.04));border:1px solid rgba(5,173,152,.14);text-align:center;">
+    <div class="amiri" style="color:var(--primary);font-size:1rem;font-weight:700;line-height:1.8;">
+      بالتوفيق في تمرينك يا بطل! حافظ على التكنيك الصحيح والاستمرارية. رحلتك للنجاح تبدأ من هنا 💪
+    </div>
+  </div>
+
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-item"><span class="nav-ic">☰</span><span>المزيد</span></div>
+  <div class="nav-item"><span class="nav-ic">📊</span><span>التحليلات</span></div>
+  <div class="nav-item"><span class="nav-ic">🔄</span><span>العادات</span></div>
+  <div class="nav-item"><span class="nav-ic">🎯</span><span>الأهداف</span></div>
+  <div class="nav-item active"><span class="nav-ic">🏠</span><span>الرئيسية</span></div>
+</div>
+
+<script>
+function handleImage(event, slotNum){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const slot = event.target.previousElementSibling.parentElement;
+    slot.innerHTML = `<img src="${e.target.result}" alt="صورة توضيحية">`;
+    slot.style.border = 'none';
+    slot.style.padding = '0';
+  };
+  reader.readAsDataURL(file);
+}
+</script>
+</body>
+</html>

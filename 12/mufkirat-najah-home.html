@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مفكرة النجاح</title>
+<style>
+@font-face {
+  font-family: 'Amiri';
+  src: local('Amiri');
+}
+:root{
+  --primary:#05AD98;
+  --primary-light:#2BCFCE;
+  --deep:#245F73;
+  --accent:#EC4D25;
+  --gray:#878787;
+  --gray-light:#BBBFBF;
+  --bg:#FAFAFA;
+  --white:#FFFFFF;
+  --text:#1A2E2C;
+  --radius:22px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'Alyamama','Segoe UI',Tahoma,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  direction:rtl;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+.amiri{font-family:'Amiri','Segoe UI',serif;}
+
+/* ══ SCREEN WRAP (mobile frame) ══ */
+.screen{
+  max-width:430px;
+  margin:0 auto;
+  min-height:100vh;
+  background:var(--bg);
+  position:relative;
+  padding-bottom:90px;
+}
+
+/* ══ TOP BAR ══ */
+.topbar{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 18px 8px;
+}
+.topbar-title{font-size:1.05rem;font-weight:800;color:var(--deep);}
+.topbar-icon{
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(5,173,152,.08);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem; cursor:pointer;
+}
+
+/* ══ HERO BANNER (glass) ══ */
+.hero{
+  margin:8px 18px 22px;
+  border-radius:28px;
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(135deg, #06b9a3 0%, #0a8f80 55%, #066f63 100%);
+  padding:26px 22px;
+  box-shadow:0 14px 38px rgba(5,173,152,.30);
+}
+.hero::before{
+  content:'';
+  position:absolute; inset:0;
+  background:
+    radial-gradient(circle at 85% -10%, rgba(255,255,255,.35) 0%, transparent 50%),
+    radial-gradient(circle at -10% 110%, rgba(255,255,255,.15) 0%, transparent 45%);
+  pointer-events:none;
+}
+.hero-stars{
+  position:absolute; inset:0; pointer-events:none; opacity:.5;
+}
+.hero-stars span{
+  position:absolute; width:3px; height:3px; background:#fff; border-radius:50%;
+  animation:twinkle 3s infinite ease-in-out;
+}
+@keyframes twinkle{0%,100%{opacity:.2}50%{opacity:.9}}
+.hero-row{
+  display:flex; align-items:center; justify-content:space-between; gap:14px;
+  position:relative; z-index:2;
+}
+.hero-cta{
+  background:rgba(255,255,255,.96);
+  color:var(--primary);
+  font-weight:800;
+  font-size:.88rem;
+  padding:11px 22px;
+  border-radius:30px;
+  border:none;
+  cursor:pointer;
+  box-shadow:0 6px 16px rgba(0,0,0,.12);
+  transition:transform .2s;
+  white-space:nowrap;
+}
+.hero-cta:active{transform:scale(.96);}
+.hero-text{text-align:right;flex:1;}
+.hero-title{color:#fff;font-size:1.18rem;font-weight:800;line-height:1.3;}
+.hero-sub{color:rgba(255,255,255,.85);font-size:.82rem;margin-top:4px;}
+.hero-badge{
+  width:64px;height:64px;border-radius:50%;
+  background:rgba(255,255,255,.18);
+  border:2px solid rgba(255,255,255,.5);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.7rem;
+  flex-shrink:0;
+  backdrop-filter:blur(6px);
+  box-shadow:0 0 0 6px rgba(255,255,255,.08);
+}
+
+/* progress ring under hero */
+.hero-progress-wrap{
+  margin-top:18px; position:relative; z-index:2;
+  display:flex; align-items:center; gap:12px;
+}
+.ring{width:46px;height:46px;flex-shrink:0;}
+.hero-progress-label{color:#fff;font-size:.8rem;font-weight:700;}
+.hero-progress-bar-bg{
+  flex:1; height:8px; border-radius:6px; background:rgba(255,255,255,.25); overflow:hidden;
+}
+.hero-progress-bar-fill{
+  height:100%; border-radius:6px;
+  background:linear-gradient(to left,#fff,rgba(255,255,255,.7));
+  width:45%; transition:width .6s ease;
+}
+
+/* ══ MOOD GREETING STRIP ══ */
+.greet-strip{
+  margin:0 18px 22px;
+  padding:13px 18px;
+  border-radius:18px;
+  background:linear-gradient(135deg, rgba(43,207,206,.12), rgba(5,173,152,.06));
+  border:1px solid rgba(5,173,152,.18);
+  font-size:.85rem;
+  color:var(--primary);
+  font-weight:700;
+  text-align:center;
+  line-height:1.6;
+}
+
+/* ══ SECTION TITLE ══ */
+.section-title{
+  font-size:1rem; font-weight:800; color:var(--deep);
+  margin:0 18px 14px; display:flex; align-items:center; gap:8px;
+}
+
+/* ══ GLASS ICON GRID ══ */
+.grid{
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:18px 12px;
+  padding:0 18px; margin-bottom:8px;
+}
+.tile{
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+  cursor:pointer;
+}
+.tile-circle{
+  width:72px; height:72px; border-radius:26px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.6rem;
+  position:relative;
+  background:rgba(5,173,152,.08);
+  border:1px solid rgba(5,173,152,.14);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,.6),
+    0 6px 16px rgba(5,173,152,.10);
+  transition:transform .2s, box-shadow .2s;
+}
+.tile:active .tile-circle{transform:scale(.92);}
+.tile-circle.glow{
+  background:linear-gradient(150deg, rgba(43,207,206,.30), rgba(5,173,152,.18));
+  border:1px solid rgba(5,173,152,.30);
+  box-shadow:
+    inset 0 1px 2px rgba(255,255,255,.7),
+    0 8px 20px rgba(5,173,152,.22);
+}
+.tile-circle .emoji{position:relative;z-index:2;filter:drop-shadow(0 1px 1px rgba(0,0,0,.05));}
+.tile-shine{
+  position:absolute; top:6px; left:10px; width:22px; height:12px;
+  background:rgba(255,255,255,.55);
+  border-radius:50%;
+  filter:blur(3px);
+  transform:rotate(-20deg);
+}
+.tile-label{font-size:.74rem; font-weight:700; color:var(--text); text-align:center; line-height:1.3;}
+.tile-hint{
+  font-size:.62rem; color:var(--primary); font-weight:800;
+  background:rgba(5,173,152,.10); padding:1px 8px; border-radius:10px;
+  margin-top:-2px;
+}
+.tile-streak-dot{
+  position:absolute; top:-2px; left:-2px;
+  width:14px;height:14px;border-radius:50%;
+  background:var(--accent);
+  border:2px solid var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.55rem; color:#fff; font-weight:800;
+}
+
+/* ══ MOTIVATION CARD ══ */
+.motiv-card{
+  margin:22px 18px;
+  padding:20px;
+  border-radius:24px;
+  background:#fff;
+  box-shadow:0 4px 20px rgba(5,173,152,.08);
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.motiv-card::before{
+  content:'';
+  position:absolute; top:-30px; right:-30px;
+  width:100px;height:100px;border-radius:50%;
+  background:radial-gradient(circle, rgba(43,207,206,.15), transparent 70%);
+}
+.motiv-icon{font-size:1.6rem; margin-bottom:6px;}
+.motiv-text{
+  font-family:'Amiri','Segoe UI',serif;
+  font-size:1.05rem; font-weight:700; color:var(--deep);
+  line-height:1.9;
+  position:relative; z-index:2;
+}
+
+/* ══ WEEK GLANCE CARD ══ */
+.week-card{
+  margin:0 18px 22px;
+  background:linear-gradient(165deg, #fff 0%, #fff 60%, rgba(36,95,115,.04) 100%);
+  border-radius:24px;
+  padding:18px 18px 8px;
+  box-shadow:0 4px 20px rgba(36,95,115,.08);
+  border:1px solid rgba(36,95,115,.06);
+}
+.week-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.week-head-title{font-size:.92rem;font-weight:800;color:var(--deep);}
+.week-head-val{font-size:.78rem;color:#fff;font-weight:800;background:var(--deep);padding:4px 12px;border-radius:12px;}
+.week-bars{display:flex;align-items:flex-end;gap:8px;height:80px;}
+.wb-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;}
+.wb-bar{width:100%;border-radius:8px 8px 4px 4px;background:linear-gradient(to top,var(--primary),var(--primary-light));min-height:6px;transition:height .5s ease;}
+.wb-lbl{font-size:.62rem;color:var(--gray);font-weight:700;}
+
+/* ══ BOTTOM NAV ══ */
+.bottom-nav{
+  position:fixed; bottom:0; left:50%; transform:translateX(-50%);
+  width:100%; max-width:430px;
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+  border-top:1px solid rgba(5,173,152,.10);
+  display:flex; justify-content:space-around; align-items:center;
+  padding:10px 8px calc(10px + env(safe-area-inset-bottom));
+  box-shadow:0 -6px 24px rgba(5,173,152,.08);
+  z-index:50;
+}
+.nav-item{
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  color:var(--gray); cursor:pointer; flex:1;
+  transition:color .2s;
+}
+.nav-item.active{color:var(--primary);}
+.nav-item .nav-ic{font-size:1.25rem;}
+.nav-item span:last-child{font-size:.66rem;font-weight:700;}
+.nav-item.active .nav-ic{
+  background:rgba(5,173,152,.10);
+  border-radius:12px;
+  padding:2px 10px;
+}
+
+/* ══ FADE ANIM ══ */
+.fade-up{animation:fadeUp .5s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.tile:nth-child(1){animation-delay:.02s;}
+.tile:nth-child(2){animation-delay:.06s;}
+.tile:nth-child(3){animation-delay:.10s;}
+.tile:nth-child(4){animation-delay:.14s;}
+.tile:nth-child(5){animation-delay:.18s;}
+.tile:nth-child(6){animation-delay:.22s;}
+.tile:nth-child(7){animation-delay:.26s;}
+.tile:nth-child(8){animation-delay:.30s;}
+.tile:nth-child(9){animation-delay:.34s;}
+
+::-webkit-scrollbar{width:0;}
+</style>
+</head>
+<body>
+
+<div class="screen">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-icon">☰</div>
+    <div class="topbar-title">مفكرة النجاح</div>
+    <div class="topbar-icon">🔔</div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero fade-up">
+    <div class="hero-stars" id="stars"></div>
+    <div class="hero-row">
+      <div class="hero-text">
+        <div class="hero-title">حقق حلمك وكن ملهم ✨</div>
+        <div class="hero-sub">سعود بن عبدالله</div>
+      </div>
+      <div class="hero-badge">🏆</div>
+    </div>
+    <div class="hero-progress-wrap">
+      <span class="hero-progress-label">٪45</span>
+      <div class="hero-progress-bar-bg"><div class="hero-progress-bar-fill" style="width:45%"></div></div>
+      <span class="hero-progress-label">إنجاز اليوم</span>
+    </div>
+  </div>
+
+  <!-- GREETING STRIP -->
+  <div class="greet-strip fade-up">
+    ✨ ارحب يا الناجح، منوّر وكفو عليك استمر 🥇<br>القلب يدعي لك وأنت قدها يا بطل
+  </div>
+
+  <!-- SECTION: MAIN GRID -->
+  <div class="section-title">🧭 رحلتك اليوم</div>
+  <div class="grid">
+
+    <div class="tile fade-up" onclick="go('mufkira')">
+      <div class="tile-circle glow">
+        <div class="tile-shine"></div>
+        <span class="emoji">📖</span>
+        <div class="tile-streak-dot">7</div>
+      </div>
+      <div class="tile-label">مفكرة النجاح</div>
+      <div class="tile-hint">جديد ✦</div>
+    </div>
+
+    <div class="tile fade-up" onclick="go('habits')">
+      <div class="tile-circle">
+        <div class="tile-shine"></div>
+        <span class="emoji">🔄</span>
+      </div>
+      <div class="tile-label">العادات</div>
+    </div>
+
+    <div class="tile fade-up" onclick="go('goals')">
+      <div class="tile-circle">
+        <div class="tile-shine"></div>
+        <span class="emoji">🎯</span>
+      </div>
+      <div class="tile-label">الأهداف</div>
+    </div>
+
+    <div class="tile fade-up" onclick="go('expenses')">
+      <div class="tile-circle">
+        <div class="tile-shine"></div>
+        <span class="emoji">💳</span>
+      </div>
+      <div class="tile-label">المصاريف</div>
+    </div>
+
+    <div class="tile fade-up" onclick="go('exercise')">
+      <div class="tile-circle">
+        <div class="tile-shine"></div>
+        <span class="emoji">🏋️</span>
+      </div>
+      <div class="tile-label">التمارين</div>
+    </div>
+
+    <div class="tile fade-up" onclick="go('meals')">
+      <div class="tile-circle">
+        <div class="tile-shine"></div>
+        <span class="emoji">🍽️</span>
+      </div>
+      <div class="tile-label">الوجبات</div>
+    </div>
+
+    <div class="tile fade-up" onclick="go('analytics')">
+      <div class="tile-circle">
+        <div class="tile-shine"></div>
+        <span class="emoji">📊</span>
+      </div>
+      <div class="tile-label">التحليلات</div>
+    </div>
+
+    <div class="tile fade-up" onclick="go('compass')">
+      <div class="tile-circle">
+        <div class="tile-shine"></div>
+        <span class="emoji">🧭</span>
+      </div>
+      <div class="tile-label">بوصلة النجاح</div>
+    </div>
+
+    <div class="tile fade-up" onclick="go('map')">
+      <div class="tile-circle">
+        <div class="tile-shine"></div>
+        <span class="emoji">🗺️</span>
+      </div>
+      <div class="tile-label">رحلة النجاح</div>
+    </div>
+
+  </div>
+
+  <!-- MOTIVATION -->
+  <div class="motiv-card fade-up">
+    <div class="motiv-icon">✨</div>
+    <div class="motiv-text amiri">كل خطوة تقدّم نحو أحلامك<br>تستحق الاحتفال</div>
+  </div>
+
+  <!-- WEEK GLANCE -->
+  <div class="week-card fade-up">
+    <div class="week-head">
+      <span class="week-head-title">📈 إنجاز الأسبوع</span>
+      <span class="week-head-val">+12% من الماضي</span>
+    </div>
+    <div class="week-bars" id="weekBars"></div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item" onclick="navTo(this,'more')">
+    <span class="nav-ic">☰</span><span>المزيد</span>
+  </div>
+  <div class="nav-item" onclick="navTo(this,'analytics')">
+    <span class="nav-ic">📊</span><span>التحليلات</span>
+  </div>
+  <div class="nav-item" onclick="navTo(this,'habits')">
+    <span class="nav-ic">🔄</span><span>العادات</span>
+  </div>
+  <div class="nav-item" onclick="navTo(this,'goals')">
+    <span class="nav-ic">🎯</span><span>الأهداف</span>
+  </div>
+  <div class="nav-item active" onclick="navTo(this,'home')">
+    <span class="nav-ic">🏠</span><span>الرئيسية</span>
+  </div>
+</div>
+
+<script>
+// stars
+const starsWrap = document.getElementById('stars');
+for(let i=0;i<14;i++){
+  const s=document.createElement('span');
+  s.style.left=Math.random()*100+'%';
+  s.style.top=Math.random()*100+'%';
+  s.style.animationDelay=(Math.random()*3)+'s';
+  starsWrap.appendChild(s);
+}
+
+// week bars demo data
+const weekData=[
+  {d:'الأحد',v:86},{d:'الاثنين',v:60},{d:'الثلاثاء',v:80},
+  {d:'الأربعاء',v:80},{d:'الخميس',v:23},{d:'الجمعة',v:60},{d:'السبت',v:14}
+];
+const wb=document.getElementById('weekBars');
+weekData.forEach(x=>{
+  const col=document.createElement('div');
+  col.className='wb-col';
+  col.innerHTML=`<div style="font-size:.62rem;font-weight:800;color:var(--primary)">${x.v}%</div>
+    <div class="wb-bar" style="height:${Math.max(6,x.v*0.6)}px"></div>
+    <div class="wb-lbl">${x.d.slice(0,3)}</div>`;
+  wb.appendChild(col);
+});
+
+function go(page){ console.log('open page:', page); }
+function navTo(el,page){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  console.log('nav:',page);
+}
+</script>
+</body>
+</html>
