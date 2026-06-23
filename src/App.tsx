@@ -15,6 +15,8 @@ import Mood from './pages/Mood';
 import NotesGratitude from './pages/NotesGratitude';
 import QuranCalendar from './pages/QuranCalendar';
 import Streak from './pages/Streak';
+import SleepRelations from './pages/SleepRelations';
+import WheelReview from './pages/WheelReview';
 
 /* صفحة ترحيب مؤقتة للتأكد من ربط النواة — تُستبدل بالصفحات الفعلية */
 function HomePlaceholder() {
@@ -69,6 +71,8 @@ export default function App() {
         <Route path="/notes" component={NotesGratitude} />
         <Route path="/quran" component={QuranCalendar} />
         <Route path="/streak" component={Streak} />
+        <Route path="/sleep" component={SleepRelations} />
+        <Route path="/wheel" component={WheelReview} />
         <Route component={ComingSoon} />
       </Switch>
       <BottomNav />

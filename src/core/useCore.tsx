@@ -143,6 +143,25 @@ export interface QuranMinutesEntry {
   minutes: number;
 }
 
+export interface SleepEntry {
+  date: string; // YYYY-MM-DD
+  hours: number;
+}
+
+export interface Relation {
+  id: string;
+  name: string;
+  contacted: boolean;
+}
+
+export interface WeeklyReview {
+  id: string;
+  date: string; // YYYY-MM-DD
+  success: string;
+  challenge: string;
+  next: string;
+}
+
 export interface CoreState {
   profile: Profile;
   xp: number;
@@ -160,6 +179,11 @@ export interface CoreState {
   prideArchive: PrideEntry[];
   notes: NoteEntry[];
   gratitudeLog: GratitudeEntry[];
+  sleepLog: SleepEntry[];
+  relations: Relation[];
+  wheelAreas: number[]; // 8 قيم (1..10) لمجالات عجلة الحياة
+  wheelLastMonth: string; // 'YYYY-MM' لمنع تكرار +25 شهرياً
+  weeklyReviews: WeeklyReview[];
 }
 
 /* ===== المستويات السبعة (المرجع الوحيد) ===== */
@@ -235,6 +259,11 @@ const DEFAULT_STATE: CoreState = {
   prideArchive: [],
   notes: [],
   gratitudeLog: [],
+  sleepLog: [],
+  relations: [],
+  wheelAreas: [5, 5, 5, 5, 5, 5, 5, 5],
+  wheelLastMonth: '',
+  weeklyReviews: [],
 };
 
 /* قراءة الحالة المحفوظة من localStorage مع دمج آمن مع الافتراضي */
@@ -262,6 +291,11 @@ const loadState = (): CoreState => {
       prideArchive: parsed.prideArchive ?? [],
       notes: parsed.notes ?? [],
       gratitudeLog: parsed.gratitudeLog ?? [],
+      sleepLog: parsed.sleepLog ?? [],
+      relations: parsed.relations ?? [],
+      wheelAreas: parsed.wheelAreas ?? [5, 5, 5, 5, 5, 5, 5, 5],
+      wheelLastMonth: parsed.wheelLastMonth ?? '',
+      weeklyReviews: parsed.weeklyReviews ?? [],
     };
   } catch {
     return DEFAULT_STATE;
@@ -322,6 +356,16 @@ interface CoreContextValue {
   // ===== القرآن =====
   cycleJuz: (juz: number) => void; // فارغ→مقروء(+20)→محفوظ(+50)→فارغ
   addQuranMinutes: (minutes: number) => void; // +10 وتجميع دقائق اليوم
+  // ===== النوم والعلاقات =====
+  saveSleep: (sleepTime: string, wakeTime: string) => number; // يعيد عدد الساعات
+  addRelation: (name: string) => void;
+  toggleRelation: (id: string) => void;
+  removeRelation: (id: string) => void;
+  // ===== عجلة الحياة + مراجعة الأسبوع =====
+  setWheelArea: (index: number, value: number) => void;
+  saveWheel: () => void; // +25 مرة شهرياً
+  addWeeklyReview: (success: string, challenge: string, next: string) => void; // +20
+  removeWeeklyReview: (id: string) => void;
 }
 
 const CoreContext = createContext<CoreContextValue | null>(null);
@@ -1018,6 +1062,117 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     [addXP],
   );
 
+  /* حفظ نوم الليلة: حساب الساعات مع معالجة عبور منتصف الليل + احتساب +5 */
+  const saveSleep = useCallback(
+    (sleepTime: string, wakeTime: string): number => {
+      const [sh, sm] = sleepTime.split(':').map(Number);
+      const [wh, wm] = wakeTime.split(':').map(Number);
+      if ([sh, sm, wh, wm].some((n) => Number.isNaN(n))) return 0;
+      let sleepMin = sh * 60 + sm;
+      let wakeMin = wh * 60 + wm;
+      if (wakeMin <= sleepMin) wakeMin += 24 * 60; // عبور منتصف الليل
+      const hours = Math.round(((wakeMin - sleepMin) / 60) * 10) / 10;
+      const today = todayStr();
+      setState((s) => {
+        const others = s.sleepLog.filter((e) => e.date !== today);
+        return { ...s, sleepLog: [...others, { date: today, hours }] };
+      });
+      addXP(5);
+      return hours;
+    },
+    [addXP],
+  );
+
+  /* إضافة شخص لدائرة العلاقات */
+  const addRelation = useCallback((name: string) => {
+    const t = clean(name);
+    if (!t) return;
+    setState((s) => ({
+      ...s,
+      relations: [...s.relations, { id: crypto.randomUUID(), name: t, contacted: false }],
+    }));
+  }, []);
+
+  /* تبديل حالة التواصل + احتساب +5 عند تأكيد التواصل */
+  const toggleRelation = useCallback(
+    (id: string) => {
+      let nowContacted = false;
+      setState((s) => ({
+        ...s,
+        relations: s.relations.map((r) => {
+          if (r.id !== id) return r;
+          nowContacted = !r.contacted;
+          return { ...r, contacted: !r.contacted };
+        }),
+      }));
+      if (nowContacted) addXP(5);
+    },
+    [addXP],
+  );
+
+  /* حذف شخص (يمرّ عبر ConfirmDialog) */
+  const removeRelation = useCallback((id: string) => {
+    setState((s) => ({ ...s, relations: s.relations.filter((r) => r.id !== id) }));
+  }, []);
+
+  /* تعديل قيمة مجال في عجلة الحياة (1..10) */
+  const setWheelArea = useCallback((index: number, value: number) => {
+    const v = clampNum(Math.round(value), 1, 10);
+    setState((s) => {
+      const next = [...s.wheelAreas];
+      if (index >= 0 && index < next.length) next[index] = v;
+      return { ...s, wheelAreas: next };
+    });
+  }, []);
+
+  /* حفظ تقييم العجلة: +25 مرة واحدة شهرياً (يمنع التكرار) */
+  const saveWheel = useCallback(() => {
+    const month = monthStr();
+    let award = false;
+    setState((s) => {
+      if (s.wheelLastMonth === month) return s;
+      award = true;
+      return { ...s, wheelLastMonth: month };
+    });
+    if (award) {
+      addXP(25);
+      fireConfetti();
+    }
+  }, [addXP]);
+
+  /* إضافة مراجعة أسبوعية للأرشيف + احتساب +20 */
+  const addWeeklyReview = useCallback(
+    (success: string, challenge: string, next: string) => {
+      const s1 = clean(success);
+      const s2 = clean(challenge);
+      const s3 = clean(next);
+      if (!s1 && !s2 && !s3) return;
+      setState((s) => ({
+        ...s,
+        weeklyReviews: [
+          {
+            id: crypto.randomUUID(),
+            date: todayStr(),
+            success: s1,
+            challenge: s2,
+            next: s3,
+          },
+          ...s.weeklyReviews,
+        ],
+      }));
+      addXP(20);
+    },
+    [addXP],
+  );
+
+  /* حذف مراجعة (يمرّ عبر ConfirmDialog) */
+  const removeWeeklyReview = useCallback((id: string) => {
+    setState((s) => ({
+      ...s,
+      weeklyReviews: s.weeklyReviews.filter((r) => r.id !== id),
+    }));
+  }, []);
+
   const value = useMemo<CoreContextValue>(
     () => ({
       state,
@@ -1062,6 +1217,14 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       removeGratitude,
       cycleJuz,
       addQuranMinutes,
+      saveSleep,
+      addRelation,
+      toggleRelation,
+      removeRelation,
+      setWheelArea,
+      saveWheel,
+      addWeeklyReview,
+      removeWeeklyReview,
     }),
     [
       state,
@@ -1106,6 +1269,14 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       removeGratitude,
       cycleJuz,
       addQuranMinutes,
+      saveSleep,
+      addRelation,
+      toggleRelation,
+      removeRelation,
+      setWheelArea,
+      saveWheel,
+      addWeeklyReview,
+      removeWeeklyReview,
     ],
   );
 
