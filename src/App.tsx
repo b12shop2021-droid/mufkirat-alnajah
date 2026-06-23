@@ -3,15 +3,17 @@
    الصفحات الفعلية تُضاف لاحقاً صفحة-صفحة وفق منهجية العمل.
    =================================================================== */
 
-import { Route, Switch } from 'wouter';
+import { Route, Switch, useLocation } from 'wouter';
 import BottomNav from './components/BottomNav';
 import XPBar from './components/XPBar';
 import Confetti from './components/Confetti';
 import { useCore } from './core/useCore';
+import Routine from './pages/Routine';
 
 /* صفحة ترحيب مؤقتة للتأكد من ربط النواة — تُستبدل بالصفحات الفعلية */
 function HomePlaceholder() {
   const { state } = useCore();
+  const [, navigate] = useLocation();
   const greeting = state.profile.nickname || 'بكل خير';
   return (
     <div className="page">
@@ -20,9 +22,16 @@ function HomePlaceholder() {
         <h1 className="section-title">مفكرة النجاح</h1>
         <p style={{ color: 'var(--text-secondary)', lineHeight: 1.7 }}>
           أهلاً {greeting} 👋 — البنية التحتية جاهزة (النواة المركزية، الهوية
-          البصرية، المكوّنات المشتركة). الصفحات الفعلية ستُضاف صفحة-صفحة وفق
+          البصرية، المكوّنات المشتركة). الصفحات الفعلية تُضاف صفحة-صفحة وفق
           منهجية العمل المعتمدة.
         </p>
+        <button
+          className="btn-primary"
+          style={{ marginTop: 12 }}
+          onClick={() => navigate('/routine')}
+        >
+          ☀️ الروتين الصباحي/المسائي
+        </button>
       </div>
     </div>
   );
@@ -47,6 +56,7 @@ export default function App() {
     <>
       <Switch>
         <Route path="/" component={HomePlaceholder} />
+        <Route path="/routine" component={Routine} />
         <Route component={ComingSoon} />
       </Switch>
       <BottomNav />

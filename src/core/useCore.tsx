@@ -13,6 +13,7 @@ import {
   useMemo,
   type ReactNode,
 } from 'react';
+import { fireConfetti } from '../components/Confetti';
 
 /* ===== الأنواع المشتركة ===== */
 
@@ -61,6 +62,24 @@ export interface RecurringItem {
   text: string;
 }
 
+export type Priority = 'high' | 'med' | 'low';
+
+export interface SubTask {
+  id: string;
+  text: string;
+  doneDate: string; // YYYY-MM-DD لآخر يوم أُنجزت فيه
+}
+
+export interface RoutineTask {
+  id: string;
+  text: string;
+  priority: Priority;
+  doneDate: string; // YYYY-MM-DD لآخر يوم أُنجزت فيه
+  subtasks: SubTask[];
+}
+
+export type RoutineSection = 'morning' | 'evening';
+
 export interface CoreState {
   profile: Profile;
   xp: number;
@@ -68,6 +87,7 @@ export interface CoreState {
   accent: AccentName; // اسم الثيم (لا اللون المباشر)
   dark: boolean;
   countedMemorizedJuz: number[]; // أجزاء حُسبت +50 لمنع التكرار
+  routine: { morning: RoutineTask[]; evening: RoutineTask[] };
 }
 
 /* ===== المستويات السبعة (المرجع الوحيد) ===== */
@@ -95,7 +115,7 @@ export const clampNum = (n: number, min: number, max: number): number => {
 };
 
 /* تاريخ اليوم بصيغة YYYY-MM-DD آمنة للمنطقة الزمنية المحلية */
-const todayStr = (): string => {
+export const todayStr = (): string => {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
     d.getDate(),
@@ -133,6 +153,7 @@ const DEFAULT_STATE: CoreState = {
   accent: 'emerald',
   dark: false,
   countedMemorizedJuz: [],
+  routine: { morning: [], evening: [] },
 };
 
 /* قراءة الحالة المحفوظة من localStorage مع دمج آمن مع الافتراضي */
@@ -147,6 +168,10 @@ const loadState = (): CoreState => {
       profile: { ...DEFAULT_STATE.profile, ...parsed.profile },
       streak: { ...DEFAULT_STATE.streak, ...parsed.streak },
       countedMemorizedJuz: parsed.countedMemorizedJuz ?? [],
+      routine: {
+        morning: parsed.routine?.morning ?? [],
+        evening: parsed.routine?.evening ?? [],
+      },
     };
   } catch {
     return DEFAULT_STATE;
@@ -165,6 +190,16 @@ interface CoreContextValue {
   setAccent: (accent: AccentName) => void;
   toggleDark: () => void;
   markMemorizedJuz: (juz: number) => boolean; // true إذا احتُسبت لأول مرة
+  // ===== الروتين =====
+  addRoutineTask: (section: RoutineSection, text: string) => void;
+  editRoutineText: (section: RoutineSection, id: string, text: string) => void;
+  cyclePriority: (section: RoutineSection, id: string) => void;
+  toggleRoutineDone: (section: RoutineSection, id: string) => void;
+  removeRoutineTask: (section: RoutineSection, id: string) => void;
+  addSubTask: (section: RoutineSection, taskId: string, text: string) => void;
+  editSubText: (section: RoutineSection, taskId: string, subId: string, text: string) => void;
+  toggleSubDone: (section: RoutineSection, taskId: string, subId: string) => void;
+  removeSubTask: (section: RoutineSection, taskId: string, subId: string) => void;
 }
 
 const CoreContext = createContext<CoreContextValue | null>(null);
@@ -286,6 +321,170 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     return counted;
   }, []);
 
+  /* تعديل قائمة قسم روتين معيّن بدالة محوِّلة (يمنع تكرار منطق الوصول للقسم) */
+  const updateSection = useCallback(
+    (section: RoutineSection, fn: (list: RoutineTask[]) => RoutineTask[]) => {
+      setState((s) => ({
+        ...s,
+        routine: { ...s.routine, [section]: fn(s.routine[section]) },
+      }));
+    },
+    [],
+  );
+
+  /* إضافة مهمة روتين دائمة (لا تُحذف يومياً) */
+  const addRoutineTask = useCallback(
+    (section: RoutineSection, text: string) => {
+      const t = clean(text);
+      if (!t) return;
+      updateSection(section, (list) => [
+        ...list,
+        { id: crypto.randomUUID(), text: t, priority: 'med', doneDate: '', subtasks: [] },
+      ]);
+    },
+    [updateSection],
+  );
+
+  /* تعديل نص مهمة بالضغط المباشر */
+  const editRoutineText = useCallback(
+    (section: RoutineSection, id: string, text: string) => {
+      const t = clean(text);
+      if (!t) return;
+      updateSection(section, (list) =>
+        list.map((task) => (task.id === id ? { ...task, text: t } : task)),
+      );
+    },
+    [updateSection],
+  );
+
+  /* تدوير الأولوية: متوسطة → عالية → منخفضة → متوسطة */
+  const cyclePriority = useCallback(
+    (section: RoutineSection, id: string) => {
+      const next: Record<Priority, Priority> = { med: 'high', high: 'low', low: 'med' };
+      updateSection(section, (list) =>
+        list.map((task) =>
+          task.id === id ? { ...task, priority: next[task.priority] } : task,
+        ),
+      );
+    },
+    [updateSection],
+  );
+
+  /* تبديل حالة "تم اليوم" لمهمة + احتساب +5 مرة واحدة عند الإنجاز + احتفال إذا اكتمل القسم */
+  const toggleRoutineDone = useCallback(
+    (section: RoutineSection, id: string) => {
+      const today = todayStr();
+      let earned = false;
+      setState((s) => {
+        const list = s.routine[section];
+        const nextList = list.map((task) => {
+          if (task.id !== id) return task;
+          const wasDone = task.doneDate === today;
+          if (!wasDone) earned = true;
+          return { ...task, doneDate: wasDone ? '' : today };
+        });
+        const allDone =
+          nextList.length > 0 && nextList.every((t) => t.doneDate === today);
+        if (earned && allDone) fireConfetti();
+        return { ...s, routine: { ...s.routine, [section]: nextList } };
+      });
+      if (earned) {
+        addXP(5);
+        markStreakToday();
+      }
+    },
+    [addXP, markStreakToday],
+  );
+
+  /* حذف مهمة روتين نهائياً (يمرّ عبر ConfirmDialog في الواجهة) */
+  const removeRoutineTask = useCallback(
+    (section: RoutineSection, id: string) => {
+      updateSection(section, (list) => list.filter((task) => task.id !== id));
+    },
+    [updateSection],
+  );
+
+  /* إضافة مهمة فرعية تحت مهمة */
+  const addSubTask = useCallback(
+    (section: RoutineSection, taskId: string, text: string) => {
+      const t = clean(text);
+      if (!t) return;
+      updateSection(section, (list) =>
+        list.map((task) =>
+          task.id === taskId
+            ? {
+                ...task,
+                subtasks: [
+                  ...task.subtasks,
+                  { id: crypto.randomUUID(), text: t, doneDate: '' },
+                ],
+              }
+            : task,
+        ),
+      );
+    },
+    [updateSection],
+  );
+
+  /* تعديل نص مهمة فرعية */
+  const editSubText = useCallback(
+    (section: RoutineSection, taskId: string, subId: string, text: string) => {
+      const t = clean(text);
+      if (!t) return;
+      updateSection(section, (list) =>
+        list.map((task) =>
+          task.id === taskId
+            ? {
+                ...task,
+                subtasks: task.subtasks.map((sub) =>
+                  sub.id === subId ? { ...sub, text: t } : sub,
+                ),
+              }
+            : task,
+        ),
+      );
+    },
+    [updateSection],
+  );
+
+  /* تبديل "تم اليوم" لمهمة فرعية + احتساب +3 مرة واحدة عند الإنجاز */
+  const toggleSubDone = useCallback(
+    (section: RoutineSection, taskId: string, subId: string) => {
+      const today = todayStr();
+      let earned = false;
+      updateSection(section, (list) =>
+        list.map((task) => {
+          if (task.id !== taskId) return task;
+          return {
+            ...task,
+            subtasks: task.subtasks.map((sub) => {
+              if (sub.id !== subId) return sub;
+              const wasDone = sub.doneDate === today;
+              if (!wasDone) earned = true;
+              return { ...sub, doneDate: wasDone ? '' : today };
+            }),
+          };
+        }),
+      );
+      if (earned) addXP(3);
+    },
+    [updateSection, addXP],
+  );
+
+  /* حذف مهمة فرعية (يمرّ عبر ConfirmDialog في الواجهة) */
+  const removeSubTask = useCallback(
+    (section: RoutineSection, taskId: string, subId: string) => {
+      updateSection(section, (list) =>
+        list.map((task) =>
+          task.id === taskId
+            ? { ...task, subtasks: task.subtasks.filter((sub) => sub.id !== subId) }
+            : task,
+        ),
+      );
+    },
+    [updateSection],
+  );
+
   const value = useMemo<CoreContextValue>(
     () => ({
       state,
@@ -298,6 +497,15 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       setAccent,
       toggleDark,
       markMemorizedJuz,
+      addRoutineTask,
+      editRoutineText,
+      cyclePriority,
+      toggleRoutineDone,
+      removeRoutineTask,
+      addSubTask,
+      editSubText,
+      toggleSubDone,
+      removeSubTask,
     }),
     [
       state,
@@ -310,6 +518,15 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       setAccent,
       toggleDark,
       markMemorizedJuz,
+      addRoutineTask,
+      editRoutineText,
+      cyclePriority,
+      toggleRoutineDone,
+      removeRoutineTask,
+      addSubTask,
+      editSubText,
+      toggleSubDone,
+      removeSubTask,
     ],
   );
 

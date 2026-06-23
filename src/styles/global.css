@@ -328,3 +328,139 @@ select {
 .pulse {
   animation: pulse-soft 0.4s ease;
 }
+
+/* ===== صفحة الروتين ===== */
+.routine-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.routine-tab {
+  flex: 1;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-weight: 700;
+  box-shadow: var(--shadow-card);
+}
+
+.routine-tab.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+.task-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.task-row:last-child {
+  border-bottom: none;
+}
+
+.prio-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.prio-high { background: var(--danger); }
+.prio-med { background: var(--warning); }
+.prio-low { background: var(--success); }
+
+.task-check {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.9rem;
+  color: #fff;
+}
+
+.task-check.done {
+  background: var(--primary);
+}
+
+.task-text {
+  flex: 1;
+  text-align: right;
+  font-size: 1rem;
+  color: var(--text);
+  padding: 2px 0;
+}
+
+.task-text.done {
+  text-decoration: line-through;
+  color: var(--text-secondary);
+}
+
+.icon-btn {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  padding: 4px;
+  flex-shrink: 0;
+}
+
+.subtask-wrap {
+  padding: 6px 28px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.subtask-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sub-check {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 2px solid var(--primary-light);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  color: #fff;
+}
+
+.sub-check.done {
+  background: var(--primary-light);
+}
+
+.add-sub-btn {
+  color: var(--primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: right;
+  padding: 2px 0;
+}
+
+.add-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.add-row .input-field {
+  flex: 1;
+}
+
+.section-progress {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
