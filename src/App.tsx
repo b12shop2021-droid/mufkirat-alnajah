@@ -9,6 +9,7 @@ import XPBar from './components/XPBar';
 import Confetti from './components/Confetti';
 import { useCore } from './core/useCore';
 import Routine from './pages/Routine';
+import Goals from './pages/Goals';
 
 /* صفحة ترحيب مؤقتة للتأكد من ربط النواة — تُستبدل بالصفحات الفعلية */
 function HomePlaceholder() {
@@ -57,6 +58,7 @@ export default function App() {
       <Switch>
         <Route path="/" component={HomePlaceholder} />
         <Route path="/routine" component={Routine} />
+        <Route path="/goals" component={Goals} />
         <Route component={ComingSoon} />
       </Switch>
       <BottomNav />

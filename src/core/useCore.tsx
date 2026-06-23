@@ -80,6 +80,20 @@ export interface RoutineTask {
 
 export type RoutineSection = 'morning' | 'evening';
 
+export interface GoalStep {
+  id: string;
+  text: string;
+  done: boolean;
+}
+
+export interface Goal {
+  id: string;
+  title: string;
+  steps: GoalStep[];
+  completed: boolean;
+  createdDate: string; // YYYY-MM-DD
+}
+
 export interface CoreState {
   profile: Profile;
   xp: number;
@@ -88,6 +102,7 @@ export interface CoreState {
   dark: boolean;
   countedMemorizedJuz: number[]; // أجزاء حُسبت +50 لمنع التكرار
   routine: { morning: RoutineTask[]; evening: RoutineTask[] };
+  goals: Goal[];
 }
 
 /* ===== المستويات السبعة (المرجع الوحيد) ===== */
@@ -154,6 +169,7 @@ const DEFAULT_STATE: CoreState = {
   dark: false,
   countedMemorizedJuz: [],
   routine: { morning: [], evening: [] },
+  goals: [],
 };
 
 /* قراءة الحالة المحفوظة من localStorage مع دمج آمن مع الافتراضي */
@@ -172,6 +188,7 @@ const loadState = (): CoreState => {
         morning: parsed.routine?.morning ?? [],
         evening: parsed.routine?.evening ?? [],
       },
+      goals: parsed.goals ?? [],
     };
   } catch {
     return DEFAULT_STATE;
@@ -200,6 +217,14 @@ interface CoreContextValue {
   editSubText: (section: RoutineSection, taskId: string, subId: string, text: string) => void;
   toggleSubDone: (section: RoutineSection, taskId: string, subId: string) => void;
   removeSubTask: (section: RoutineSection, taskId: string, subId: string) => void;
+  // ===== الأهداف =====
+  addGoal: (title: string) => void;
+  editGoalTitle: (goalId: string, title: string) => void;
+  removeGoal: (goalId: string) => void;
+  addGoalStep: (goalId: string, text: string) => void;
+  editGoalStep: (goalId: string, stepId: string, text: string) => void;
+  toggleGoalStep: (goalId: string, stepId: string) => void;
+  removeGoalStep: (goalId: string, stepId: string) => void;
 }
 
 const CoreContext = createContext<CoreContextValue | null>(null);
@@ -485,6 +510,141 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     [updateSection],
   );
 
+  /* تعديل قائمة الأهداف بدالة محوِّلة (يمنع تكرار منطق الوصول) */
+  const updateGoals = useCallback(
+    (fn: (list: Goal[]) => Goal[]) => {
+      setState((s) => ({ ...s, goals: fn(s.goals) }));
+    },
+    [],
+  );
+
+  /* إضافة هدف جديد */
+  const addGoal = useCallback(
+    (title: string) => {
+      const t = clean(title);
+      if (!t) return;
+      updateGoals((list) => [
+        ...list,
+        {
+          id: crypto.randomUUID(),
+          title: t,
+          steps: [],
+          completed: false,
+          createdDate: todayStr(),
+        },
+      ]);
+    },
+    [updateGoals],
+  );
+
+  /* تعديل عنوان هدف */
+  const editGoalTitle = useCallback(
+    (goalId: string, title: string) => {
+      const t = clean(title);
+      if (!t) return;
+      updateGoals((list) =>
+        list.map((g) => (g.id === goalId ? { ...g, title: t } : g)),
+      );
+    },
+    [updateGoals],
+  );
+
+  /* حذف هدف (يمرّ عبر ConfirmDialog) */
+  const removeGoal = useCallback(
+    (goalId: string) => {
+      updateGoals((list) => list.filter((g) => g.id !== goalId));
+    },
+    [updateGoals],
+  );
+
+  /* إضافة خطوة (مهمة فرعية) لهدف */
+  const addGoalStep = useCallback(
+    (goalId: string, text: string) => {
+      const t = clean(text);
+      if (!t) return;
+      updateGoals((list) =>
+        list.map((g) =>
+          g.id === goalId
+            ? {
+                ...g,
+                steps: [
+                  ...g.steps,
+                  { id: crypto.randomUUID(), text: t, done: false },
+                ],
+              }
+            : g,
+        ),
+      );
+    },
+    [updateGoals],
+  );
+
+  /* تعديل نص خطوة */
+  const editGoalStep = useCallback(
+    (goalId: string, stepId: string, text: string) => {
+      const t = clean(text);
+      if (!t) return;
+      updateGoals((list) =>
+        list.map((g) =>
+          g.id === goalId
+            ? {
+                ...g,
+                steps: g.steps.map((st) =>
+                  st.id === stepId ? { ...st, text: t } : st,
+                ),
+              }
+            : g,
+        ),
+      );
+    },
+    [updateGoals],
+  );
+
+  /* تبديل إنجاز خطوة + احتساب +3 عند الإنجاز + إكمال الهدف تلقائياً (+25 واحتفال) */
+  const toggleGoalStep = useCallback(
+    (goalId: string, stepId: string) => {
+      let earnedStep = false;
+      let goalJustCompleted = false;
+      updateGoals((list) =>
+        list.map((g) => {
+          if (g.id !== goalId) return g;
+          const steps = g.steps.map((st) => {
+            if (st.id !== stepId) return st;
+            if (!st.done) earnedStep = true;
+            return { ...st, done: !st.done };
+          });
+          const allDone = steps.length > 0 && steps.every((st) => st.done);
+          let completed = g.completed;
+          if (allDone && !g.completed) {
+            completed = true; // يُقفل عند الاكتمال لمنع تكرار +25
+            goalJustCompleted = true;
+          }
+          return { ...g, steps, completed };
+        }),
+      );
+      if (earnedStep) addXP(3);
+      if (goalJustCompleted) {
+        addXP(25);
+        fireConfetti();
+      }
+    },
+    [updateGoals, addXP],
+  );
+
+  /* حذف خطوة من هدف */
+  const removeGoalStep = useCallback(
+    (goalId: string, stepId: string) => {
+      updateGoals((list) =>
+        list.map((g) =>
+          g.id === goalId
+            ? { ...g, steps: g.steps.filter((st) => st.id !== stepId) }
+            : g,
+        ),
+      );
+    },
+    [updateGoals],
+  );
+
   const value = useMemo<CoreContextValue>(
     () => ({
       state,
@@ -506,6 +666,13 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       editSubText,
       toggleSubDone,
       removeSubTask,
+      addGoal,
+      editGoalTitle,
+      removeGoal,
+      addGoalStep,
+      editGoalStep,
+      toggleGoalStep,
+      removeGoalStep,
     }),
     [
       state,
@@ -527,6 +694,13 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       editSubText,
       toggleSubDone,
       removeSubTask,
+      addGoal,
+      editGoalTitle,
+      removeGoal,
+      addGoalStep,
+      editGoalStep,
+      toggleGoalStep,
+      removeGoalStep,
     ],
   );
 
