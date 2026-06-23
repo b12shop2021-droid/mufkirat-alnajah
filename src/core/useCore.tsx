@@ -189,12 +189,34 @@ export interface CoreState {
   notifMaster: boolean; // مفتاح الإشعارات العام
   notifItems: NotifItem[]; // تفضيلات أنواع التذكيرات (واجهة فقط)
   guidelinesImage: string | null; // صورة يوم الأرجل التوضيحية (اختيارية)
+  pledges: Pledge[];
+  timeCapsule: TimeCapsule | null;
+  futureLetters: FutureLetter[];
 }
 
 export interface NotifItem {
   id: string;
   enabled: boolean;
   time: string; // 'HH:MM' أو وصف تلقائي
+}
+
+export interface Pledge {
+  id: string;
+  habit: string;
+  startDate: string; // YYYY-MM-DD لبداية العهد الحالي
+  bestDays: number; // أطول مدة التزام
+  resets: number; // عدد مرات إعادة البدء (سجل صامت)
+}
+
+export interface TimeCapsule {
+  message: string;
+  lockDate: string; // YYYY-MM-DD وقت الإغلاق (تُفتح بعد 30 يوماً)
+}
+
+export interface FutureLetter {
+  id: string;
+  date: string; // YYYY-MM-DD
+  text: string;
 }
 
 /* ===== المستويات السبعة (المرجع الوحيد) ===== */
@@ -287,6 +309,9 @@ const DEFAULT_STATE: CoreState = {
     { id: 'streak', enabled: true, time: '23:00' },
   ],
   guidelinesImage: null,
+  pledges: [],
+  timeCapsule: null,
+  futureLetters: [],
 };
 
 /* قراءة الحالة المحفوظة من localStorage مع دمج آمن مع الافتراضي */
@@ -324,6 +349,9 @@ const loadState = (): CoreState => {
       notifMaster: parsed.notifMaster ?? true,
       notifItems: parsed.notifItems ?? DEFAULT_STATE.notifItems,
       guidelinesImage: parsed.guidelinesImage ?? null,
+      pledges: parsed.pledges ?? [],
+      timeCapsule: parsed.timeCapsule ?? null,
+      futureLetters: parsed.futureLetters ?? [],
     };
   } catch {
     return DEFAULT_STATE;
@@ -403,6 +431,12 @@ interface CoreContextValue {
   toggleNotif: (id: string) => void;
   setNotifTime: (id: string, time: string) => void;
   setGuidelinesImage: (image: string | null) => void;
+  // ===== العهود + صندوق الزمن + رسائل المستقبل =====
+  addPledge: (habit: string) => void;
+  resetPledge: (id: string) => void; // إعادة بدء دون عقاب
+  removePledge: (id: string) => void;
+  lockCapsule: (message: string) => void;
+  addFutureLetter: (text: string) => void;
 }
 
 const CoreContext = createContext<CoreContextValue | null>(null);
@@ -1267,6 +1301,68 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     setState((s) => ({ ...s, guidelinesImage: image }));
   }, []);
 
+  /* عدد الأيام منذ تاريخ معيّن (YYYY-MM-DD) */
+  const daysSinceDate = (dateStr: string): number => {
+    const start = new Date(dateStr + 'T00:00:00').getTime();
+    const now = new Date(todayStr() + 'T00:00:00').getTime();
+    return Math.max(0, Math.round((now - start) / 86400000));
+  };
+
+  /* إضافة عهد جديد (يبدأ العداد اليوم) */
+  const addPledge = useCallback((habit: string) => {
+    const t = clean(habit);
+    if (!t) return;
+    setState((s) => ({
+      ...s,
+      pledges: [
+        ...s.pledges,
+        { id: crypto.randomUUID(), habit: t, startDate: todayStr(), bestDays: 0, resets: 0 },
+      ],
+    }));
+  }, []);
+
+  /* إعادة بدء عهد بعد انكسار — دون عقاب، تحديث أطول مدة وعدد المرات */
+  const resetPledge = useCallback((id: string) => {
+    setState((s) => ({
+      ...s,
+      pledges: s.pledges.map((p) => {
+        if (p.id !== id) return p;
+        const days = daysSinceDate(p.startDate);
+        return {
+          ...p,
+          bestDays: Math.max(p.bestDays, days),
+          resets: p.resets + 1,
+          startDate: todayStr(),
+        };
+      }),
+    }));
+  }, []);
+
+  /* حذف عهد (يمرّ عبر ConfirmDialog) */
+  const removePledge = useCallback((id: string) => {
+    setState((s) => ({ ...s, pledges: s.pledges.filter((p) => p.id !== id) }));
+  }, []);
+
+  /* إغلاق كبسولة زمنية لـ30 يوماً */
+  const lockCapsule = useCallback((message: string) => {
+    const t = clean(message);
+    if (!t) return;
+    setState((s) => ({ ...s, timeCapsule: { message: t, lockDate: todayStr() } }));
+  }, []);
+
+  /* إضافة رسالة مستقبلية للأرشيف */
+  const addFutureLetter = useCallback((text: string) => {
+    const t = clean(text);
+    if (!t) return;
+    setState((s) => ({
+      ...s,
+      futureLetters: [
+        { id: crypto.randomUUID(), date: todayStr(), text: t },
+        ...s.futureLetters,
+      ],
+    }));
+  }, []);
+
   const value = useMemo<CoreContextValue>(
     () => ({
       state,
@@ -1326,6 +1422,11 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       toggleNotif,
       setNotifTime,
       setGuidelinesImage,
+      addPledge,
+      resetPledge,
+      removePledge,
+      lockCapsule,
+      addFutureLetter,
     }),
     [
       state,
@@ -1385,6 +1486,11 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       toggleNotif,
       setNotifTime,
       setGuidelinesImage,
+      addPledge,
+      resetPledge,
+      removePledge,
+      lockCapsule,
+      addFutureLetter,
     ],
   );
 

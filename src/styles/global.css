@@ -2436,3 +2436,233 @@ select {
   margin: 20px 0 10px;
   letter-spacing: 0.02em;
 }
+
+/* ===== العهود ===== */
+.intro-card {
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+  font-size: 0.8rem;
+  color: var(--deep);
+  line-height: 1.7;
+  font-weight: 600;
+}
+
+.pledge-card {
+  border-radius: var(--radius);
+  padding: 22px;
+  color: #fff;
+  margin-bottom: 16px;
+  background: linear-gradient(150deg, var(--deep), #122f3b);
+  box-shadow: var(--shadow-soft);
+}
+
+.pledge-oath {
+  font-family: var(--font-formal);
+  font-size: 1rem;
+  line-height: 1.9;
+  text-align: center;
+}
+
+.pledge-name {
+  color: var(--primary-light);
+}
+
+.pledge-habit {
+  color: var(--warning);
+}
+
+.pledge-counter {
+  font-size: 2.6rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.pledge-counter-label {
+  font-size: 0.78rem;
+  opacity: 0.85;
+  margin-top: 2px;
+}
+
+.pledge-milestones {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.ms-dot {
+  flex: 1;
+  max-width: 42px;
+  padding: 7px 4px;
+  border-radius: 10px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 0.6rem;
+  font-weight: 800;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+}
+
+.ms-dot.passed {
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--deep);
+  border-color: transparent;
+}
+
+.pledge-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.pledge-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 0.78rem;
+}
+
+.pb-reset {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.pb-stats {
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--deep);
+}
+
+.milestone-msg {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+/* ===== صندوق الزمن ===== */
+.capsule-hero {
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  text-align: center;
+  color: #fff;
+  background: linear-gradient(150deg, var(--primary), var(--deep));
+  box-shadow: var(--shadow-soft);
+  margin-bottom: 16px;
+}
+
+.capsule-icon {
+  font-size: 2.6rem;
+}
+
+.capsule-status {
+  font-size: 0.92rem;
+  font-weight: 800;
+  margin-top: 8px;
+}
+
+.capsule-days-left {
+  font-size: 0.76rem;
+  opacity: 0.85;
+}
+
+.capsule-progress-bg {
+  height: 7px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.25);
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+.capsule-progress-fill {
+  height: 100%;
+  border-radius: 6px;
+  background: #fff;
+  transition: width 0.6s ease;
+}
+
+.capsule-msg-box {
+  margin-top: 14px;
+  padding: 18px;
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  font-family: var(--font-formal);
+  font-size: 0.92rem;
+  color: var(--deep);
+  line-height: 1.9;
+  text-align: right;
+}
+
+/* ===== رسائل المستقبل ===== */
+.future-letter-card {
+  border-radius: var(--radius);
+  padding: 22px;
+  color: #fff;
+  margin-bottom: 16px;
+  background: linear-gradient(150deg, var(--deep), #122f3b);
+  box-shadow: var(--shadow-soft);
+}
+
+.future-letter-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  opacity: 0.85;
+  text-align: center;
+}
+
+.future-letter-body {
+  font-family: var(--font-formal);
+  font-size: 0.92rem;
+  line-height: 1.9;
+  margin-top: 12px;
+  text-align: right;
+}
+
+.future-letter-date {
+  font-size: 0.68rem;
+  opacity: 0.7;
+  text-align: center;
+  margin-top: 12px;
+}
+
+.future-archive-item {
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: 13px 15px;
+  margin-bottom: 9px;
+  box-shadow: var(--shadow-card);
+  border-right: 3px solid var(--deep);
+}
+
+.future-archive-date {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--deep);
+  margin-bottom: 5px;
+}
+
+.future-archive-text {
+  font-size: 0.78rem;
+  line-height: 1.6;
+}
+
+.stats-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.84rem;
+}
+
+.stats-row:last-child {
+  border-bottom: none;
+}
+
+.stats-row span:last-child {
+  font-weight: 800;
+  color: var(--deep);
+}
