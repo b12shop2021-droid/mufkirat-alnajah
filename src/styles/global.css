@@ -1776,3 +1776,278 @@ select {
 .archive-qa strong {
   color: var(--text-secondary);
 }
+
+/* ===== بطاقة الهوية ===== */
+.id-card {
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  color: #fff;
+  background: linear-gradient(150deg, var(--primary), var(--deep));
+  box-shadow: var(--shadow-soft);
+}
+
+.id-chip {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  padding: 4px 12px;
+  border-radius: 10px;
+  font-size: 0.66rem;
+  font-weight: 800;
+  margin-bottom: 14px;
+}
+
+.id-statement {
+  font-family: var(--font-formal);
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.9;
+  text-align: center;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.linked-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.linked-tag {
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 14px;
+  padding: 6px 14px;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+/* ===== دستور الذات ===== */
+.const-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow-card);
+}
+
+.const-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--deep);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.const-text {
+  flex: 1;
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+/* ===== قصة الشهر (Wrapped) ===== */
+.wrap-card {
+  border-radius: var(--radius);
+  padding: 28px 22px;
+  color: #fff;
+  background: linear-gradient(160deg, var(--primary), var(--deep));
+  box-shadow: var(--shadow-soft);
+  text-align: center;
+}
+
+.wrap-month {
+  font-size: 0.8rem;
+  opacity: 0.8;
+  font-weight: 700;
+}
+
+.wrap-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin-top: 4px;
+}
+
+.wrap-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.wrap-stat {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-sm);
+  padding: 14px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.wrap-stat-num {
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.wrap-stat-label {
+  font-size: 0.68rem;
+  opacity: 0.85;
+  margin-top: 2px;
+}
+
+.wrap-highlight {
+  margin-top: 18px;
+  padding: 14px;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  color: var(--deep);
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.6;
+}
+
+/* ===== محطات الطريق ===== */
+.road-path {
+  position: relative;
+  padding-right: 30px;
+}
+
+.road-line {
+  position: absolute;
+  right: 14px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.road-line-fill {
+  position: absolute;
+  right: 14px;
+  top: 8px;
+  width: 3px;
+  background: linear-gradient(to bottom, var(--primary), var(--primary-light));
+  border-radius: 3px;
+  transition: height 0.6s ease;
+}
+
+.station {
+  position: relative;
+  padding-bottom: 28px;
+}
+
+.station:last-child {
+  padding-bottom: 0;
+}
+
+.station-dot {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  z-index: 2;
+  background: var(--bg);
+  border: 2px solid var(--border);
+}
+
+.station-dot.reached {
+  background: linear-gradient(150deg, var(--primary-light), var(--primary));
+  border-color: transparent;
+  color: #fff;
+}
+
+.station-dot.current {
+  background: linear-gradient(150deg, var(--warning), var(--celebrate));
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--celebrate) 15%, transparent);
+}
+
+.station-content {
+  margin-right: 42px;
+}
+
+.station-title {
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.station-title.reached-text {
+  color: var(--primary);
+}
+
+.station-sub {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.station-badge {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: var(--celebrate);
+  background: var(--bg);
+  padding: 2px 8px;
+  border-radius: 8px;
+  display: inline-block;
+  margin-top: 4px;
+}
+
+/* ===== معرض الإنجازات ===== */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.gallery-item {
+  border-radius: var(--radius-sm);
+  padding: 18px 14px;
+  text-align: center;
+  box-shadow: var(--shadow-card);
+  background: var(--surface);
+  border: 1.5px solid transparent;
+}
+
+.gallery-item.earned {
+  border-color: var(--celebrate);
+}
+
+.gallery-item.locked {
+  opacity: 0.5;
+}
+
+.gallery-emoji {
+  font-size: 2rem;
+}
+
+.gallery-title {
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: var(--deep);
+  margin-top: 8px;
+}
+
+.gallery-date {
+  font-size: 0.62rem;
+  color: var(--text-secondary);
+  margin-top: 3px;
+}

@@ -17,6 +17,8 @@ import QuranCalendar from './pages/QuranCalendar';
 import Streak from './pages/Streak';
 import SleepRelations from './pages/SleepRelations';
 import WheelReview from './pages/WheelReview';
+import Identity from './pages/Identity';
+import JourneyGallery from './pages/JourneyGallery';
 
 /* صفحة ترحيب مؤقتة للتأكد من ربط النواة — تُستبدل بالصفحات الفعلية */
 function HomePlaceholder() {
@@ -73,6 +75,8 @@ export default function App() {
         <Route path="/streak" component={Streak} />
         <Route path="/sleep" component={SleepRelations} />
         <Route path="/wheel" component={WheelReview} />
+        <Route path="/identity" component={Identity} />
+        <Route path="/gallery" component={JourneyGallery} />
         <Route component={ComingSoon} />
       </Switch>
       <BottomNav />

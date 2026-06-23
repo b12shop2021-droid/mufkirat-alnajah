@@ -184,6 +184,8 @@ export interface CoreState {
   wheelAreas: number[]; // 8 قيم (1..10) لمجالات عجلة الحياة
   wheelLastMonth: string; // 'YYYY-MM' لمنع تكرار +25 شهرياً
   weeklyReviews: WeeklyReview[];
+  identityStatement: string; // "أنا شخص ..."
+  constitution: RecurringItem[]; // دستور الذات (حد 5 قواعد)
 }
 
 /* ===== المستويات السبعة (المرجع الوحيد) ===== */
@@ -264,6 +266,8 @@ const DEFAULT_STATE: CoreState = {
   wheelAreas: [5, 5, 5, 5, 5, 5, 5, 5],
   wheelLastMonth: '',
   weeklyReviews: [],
+  identityStatement: '',
+  constitution: [],
 };
 
 /* قراءة الحالة المحفوظة من localStorage مع دمج آمن مع الافتراضي */
@@ -296,6 +300,8 @@ const loadState = (): CoreState => {
       wheelAreas: parsed.wheelAreas ?? [5, 5, 5, 5, 5, 5, 5, 5],
       wheelLastMonth: parsed.wheelLastMonth ?? '',
       weeklyReviews: parsed.weeklyReviews ?? [],
+      identityStatement: parsed.identityStatement ?? '',
+      constitution: parsed.constitution ?? [],
     };
   } catch {
     return DEFAULT_STATE;
@@ -366,6 +372,10 @@ interface CoreContextValue {
   saveWheel: () => void; // +25 مرة شهرياً
   addWeeklyReview: (success: string, challenge: string, next: string) => void; // +20
   removeWeeklyReview: (id: string) => void;
+  // ===== الهوية + الدستور =====
+  setIdentity: (text: string) => void;
+  addConstRule: (text: string) => boolean; // false إذا اكتمل الحد (5)
+  removeConstRule: (id: string) => void;
 }
 
 const CoreContext = createContext<CoreContextValue | null>(null);
@@ -1173,6 +1183,35 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
+  /* حفظ جملة بطاقة الهوية */
+  const setIdentity = useCallback((text: string) => {
+    setState((s) => ({ ...s, identityStatement: clean(text) }));
+  }, []);
+
+  /* إضافة قاعدة للدستور بحد أقصى 5 (يعيد false إذا اكتمل) */
+  const addConstRule = useCallback((text: string): boolean => {
+    const t = clean(text);
+    if (!t) return false;
+    let added = false;
+    setState((s) => {
+      if (s.constitution.length >= 5) return s;
+      added = true;
+      return {
+        ...s,
+        constitution: [...s.constitution, { id: crypto.randomUUID(), text: t }],
+      };
+    });
+    return added;
+  }, []);
+
+  /* حذف قاعدة من الدستور (يمرّ عبر ConfirmDialog) */
+  const removeConstRule = useCallback((id: string) => {
+    setState((s) => ({
+      ...s,
+      constitution: s.constitution.filter((r) => r.id !== id),
+    }));
+  }, []);
+
   const value = useMemo<CoreContextValue>(
     () => ({
       state,
@@ -1225,6 +1264,9 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       saveWheel,
       addWeeklyReview,
       removeWeeklyReview,
+      setIdentity,
+      addConstRule,
+      removeConstRule,
     }),
     [
       state,
@@ -1277,6 +1319,9 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       saveWheel,
       addWeeklyReview,
       removeWeeklyReview,
+      setIdentity,
+      addConstRule,
+      removeConstRule,
     ],
   );
 
