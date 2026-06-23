@@ -2931,3 +2931,245 @@ select {
   font-size: 1.3rem;
   flex-shrink: 0;
 }
+
+/* ===== التحليلات ===== */
+.harmony-card {
+  border-radius: var(--radius);
+  padding: 22px;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 16px;
+  background: linear-gradient(150deg, var(--primary), var(--deep));
+  box-shadow: var(--shadow-soft);
+}
+
+.harmony-label {
+  font-size: 0.78rem;
+  opacity: 0.85;
+  font-weight: 700;
+}
+
+.harmony-status {
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin-top: 6px;
+}
+
+.harmony-detail {
+  font-size: 0.78rem;
+  opacity: 0.85;
+  margin-top: 8px;
+  line-height: 1.7;
+}
+
+.stats-grid-4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat-tile {
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: 16px 14px;
+  box-shadow: var(--shadow-card);
+  text-align: center;
+}
+
+.stat-tile-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  margin: 0 auto 8px;
+}
+
+.stat-tile-num {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--deep);
+}
+
+.stat-tile-label {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.filter-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.filter-btn {
+  flex: 1;
+  padding: 9px 0;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.filter-btn.active {
+  background: var(--primary);
+  border-color: transparent;
+  color: #fff;
+}
+
+.chart-legend-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.chart-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.dist-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.dist-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  background: var(--bg);
+}
+
+.dist-name {
+  font-size: 0.8rem;
+  font-weight: 700;
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.dist-bar-bg {
+  flex: 1;
+  height: 9px;
+  border-radius: 6px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.dist-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.5s ease;
+}
+
+.dist-val {
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: var(--deep);
+  width: 40px;
+  text-align: left;
+  flex-shrink: 0;
+}
+
+.habit-activity-grid {
+  display: flex;
+  gap: 6px;
+  justify-content: space-between;
+}
+
+.ha-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.ha-bar-wrap {
+  height: 70px;
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  justify-content: center;
+}
+
+.ha-bar {
+  width: 60%;
+  border-radius: 6px 6px 3px 3px;
+  background: linear-gradient(to top, var(--primary), var(--primary-light));
+  min-height: 4px;
+  transition: height 0.5s ease;
+}
+
+.ha-day {
+  font-size: 0.62rem;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.ha-val {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: var(--deep);
+}
+
+.badges-row {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.badge-tile {
+  flex-shrink: 0;
+  width: 88px;
+  text-align: center;
+  padding: 14px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+
+.badge-tile.earned {
+  border: 1.5px solid var(--celebrate);
+}
+
+.badge-tile.locked {
+  opacity: 0.45;
+}
+
+.badge-tile-emoji {
+  font-size: 1.5rem;
+}
+
+.badge-tile-name {
+  font-size: 0.66rem;
+  font-weight: 800;
+  color: var(--deep);
+  margin-top: 5px;
+  line-height: 1.3;
+}

@@ -24,6 +24,7 @@ import Notifications from './pages/Notifications';
 import Guidelines from './pages/Guidelines';
 import Pledges from './pages/Pledges';
 import Expenses from './pages/Expenses';
+import Analytics from './pages/Analytics';
 
 /* صفحة ترحيب مؤقتة للتأكد من ربط النواة — تُستبدل بالصفحات الفعلية */
 function HomePlaceholder() {
@@ -87,6 +88,7 @@ export default function App() {
         <Route path="/guidelines" component={Guidelines} />
         <Route path="/pledges" component={Pledges} />
         <Route path="/expenses" component={Expenses} />
+        <Route path="/analytics" component={Analytics} />
         <Route component={ComingSoon} />
       </Switch>
       <BottomNav />
