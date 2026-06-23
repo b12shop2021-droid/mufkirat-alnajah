@@ -6,6 +6,8 @@
 import { Route, Switch } from 'wouter';
 import BottomNav from './components/BottomNav';
 import Confetti from './components/Confetti';
+import { useCore } from './core/useCore';
+import Login from './pages/Login';
 import Home from './pages/Home';
 import Hub from './pages/Hub';
 import Routine from './pages/Routine';
@@ -40,6 +42,18 @@ function NotFound() {
 }
 
 export default function App() {
+  const { state } = useCore();
+
+  /* بوابة المصادقة: بدون تسجيل دخول تُعرض صفحة الدخول فقط */
+  if (!state.session.loggedIn) {
+    return (
+      <>
+        <Login />
+        <Confetti />
+      </>
+    );
+  }
+
   return (
     <>
       <Switch>

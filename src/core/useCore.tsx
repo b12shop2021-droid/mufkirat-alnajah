@@ -163,7 +163,13 @@ export interface WeeklyReview {
   next: string;
 }
 
+export interface Session {
+  loggedIn: boolean;
+  email: string;
+}
+
 export interface CoreState {
+  session: Session;
   profile: Profile;
   xp: number;
   streak: Streak;
@@ -325,6 +331,7 @@ const monthStr = (): string => {
 
 /* الحالة الافتراضية — صفر ألوان ثابتة، فقط اسم الثيم */
 const DEFAULT_STATE: CoreState = {
+  session: { loggedIn: false, email: '' },
   profile: {
     name: '',
     nickname: '',
@@ -399,6 +406,7 @@ const loadState = (): CoreState => {
     return {
       ...DEFAULT_STATE,
       ...parsed,
+      session: { ...DEFAULT_STATE.session, ...parsed.session },
       profile: { ...DEFAULT_STATE.profile, ...parsed.profile },
       streak: { ...DEFAULT_STATE.streak, ...parsed.streak },
       countedMemorizedJuz: parsed.countedMemorizedJuz ?? [],
@@ -541,6 +549,9 @@ interface CoreContextValue {
   removeFavorite: (id: string) => void;
   setWaterCups: (cups: number) => void; // لليوم الحالي
   setCalorieGoal: (goal: number) => void;
+  // ===== الجلسة (تُربط بمصادقة Manus لاحقاً) =====
+  login: (email: string) => void;
+  logout: () => void;
 }
 
 const CoreContext = createContext<CoreContextValue | null>(null);
@@ -1657,6 +1668,16 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     setState((s) => ({ ...s, calorieGoal: clampNum(goal, 0, 20000) }));
   }, []);
 
+  /* تسجيل الدخول — حالياً جلسة محلية، تُستبدل بمصادقة Manus عند الرفع */
+  const login = useCallback((email: string) => {
+    setState((s) => ({ ...s, session: { loggedIn: true, email: clean(email) } }));
+  }, []);
+
+  /* تسجيل الخروج */
+  const logout = useCallback(() => {
+    setState((s) => ({ ...s, session: { loggedIn: false, email: '' } }));
+  }, []);
+
   const value = useMemo<CoreContextValue>(
     () => ({
       state,
@@ -1735,6 +1756,8 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       removeFavorite,
       setWaterCups,
       setCalorieGoal,
+      login,
+      logout,
     }),
     [
       state,
@@ -1813,6 +1836,8 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       removeFavorite,
       setWaterCups,
       setCalorieGoal,
+      login,
+      logout,
     ],
   );
 

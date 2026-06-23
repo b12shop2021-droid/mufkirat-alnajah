@@ -253,6 +253,24 @@ export default function Settings() {
       </div>
 
       {hint && <div className="hint-msg ok">{hint}</div>}
+
+      {/* الحساب */}
+      <div className="section-title">الحساب</div>
+      <div className="settings-card">
+        <div className="settings-row">
+          <div className="settings-icon">📧</div>
+          <div className="settings-text">
+            <div className="settings-label">{core.state.session.email || 'مسجّل دخول'}</div>
+            <div className="settings-sub">حسابك الحالي</div>
+          </div>
+        </div>
+        <button className="settings-row" style={{ width: '100%', textAlign: 'right' }} onClick={core.logout}>
+          <div className="settings-icon">🚪</div>
+          <div className="settings-text">
+            <div className="settings-label" style={{ color: 'var(--danger)' }}>تسجيل الخروج</div>
+          </div>
+        </button>
+      </div>
     </div>
   );
 }
