@@ -5,7 +5,6 @@
    =================================================================== */
 
 import { useState, useRef, useEffect } from 'react';
-import { useLocation } from 'wouter';
 import { useCore } from '../core/useCore';
 import { useWorkoutTimer } from '../core/useWorkoutTimer';
 import { WORKOUT_DAYS, type CaptainExercise } from '../data/workoutDays';
@@ -23,7 +22,6 @@ interface SetEntry {
 
 export default function CaptainWorkout({ embedded = false }: { embedded?: boolean }) {
   const core = useCore();
-  const [, navigate] = useLocation();
   const [dayIdx, setDayIdx] = useState(0);
   const [sets, setSets] = useState<Record<string, SetEntry[]>>({});
   const [restKey, setRestKey] = useState<string | null>(null);
@@ -148,10 +146,6 @@ export default function CaptainWorkout({ embedded = false }: { embedded?: boolea
           );
         })}
       </div>
-
-      <button className="btn-ghost" style={{ width: '100%', marginBottom: 14 }} onClick={() => navigate('/guidelines')}>
-        ⓘ الإرشادات الأساسية
-      </button>
 
       {day.warmup && (
         <div className="warmup-note">

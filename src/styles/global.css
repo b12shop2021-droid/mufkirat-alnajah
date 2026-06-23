@@ -1649,76 +1649,6 @@ select {
   border-color: var(--primary);
 }
 
-/* ===== عجلة الحياة ===== */
-.wheel-svg-wrap {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 10px;
-}
-
-.balance-tag {
-  text-align: center;
-  font-size: 0.84rem;
-  font-weight: 800;
-  padding: 6px 16px;
-  border-radius: 14px;
-  display: inline-block;
-  margin: 0 auto 10px;
-}
-
-.balance-wrap {
-  text-align: center;
-}
-
-.bt-good { background: color-mix(in srgb, var(--success) 12%, transparent); color: var(--primary); }
-.bt-mid { background: color-mix(in srgb, var(--warning) 16%, transparent); color: var(--warning); }
-.bt-low { background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger); }
-
-.life-areas {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.area-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.area-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 11px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  flex-shrink: 0;
-  background: var(--bg);
-}
-
-.area-name {
-  font-size: 0.78rem;
-  font-weight: 700;
-  width: 84px;
-  flex-shrink: 0;
-}
-
-.area-slider {
-  flex: 1;
-  accent-color: var(--primary);
-}
-
-.area-val {
-  width: 28px;
-  text-align: center;
-  font-size: 0.82rem;
-  font-weight: 800;
-  color: var(--primary);
-  flex-shrink: 0;
-}
-
 .insight-card {
   background: var(--bg);
   border: 1px solid var(--border);
@@ -2225,21 +2155,6 @@ select {
 .sw-rose { background: #e0457b; }
 .sw-amber { background: #e0902a; }
 
-.dev-note {
-  border-radius: var(--radius-sm);
-  padding: 16px 18px;
-  background: var(--deep);
-  color: #fff;
-  font-size: 0.78rem;
-  line-height: 1.8;
-  font-weight: 700;
-  margin-bottom: 16px;
-}
-
-.dev-note strong {
-  color: var(--warning);
-}
-
 .reminder-row {
   display: flex;
   align-items: center;
@@ -2605,59 +2520,6 @@ select {
   color: var(--deep);
   line-height: 1.9;
   text-align: right;
-}
-
-/* ===== رسائل المستقبل ===== */
-.future-letter-card {
-  border-radius: var(--radius);
-  padding: 22px;
-  color: #fff;
-  margin-bottom: 16px;
-  background: linear-gradient(150deg, var(--deep), #122f3b);
-  box-shadow: var(--shadow-soft);
-}
-
-.future-letter-title {
-  font-size: 0.82rem;
-  font-weight: 800;
-  opacity: 0.85;
-  text-align: center;
-}
-
-.future-letter-body {
-  font-family: var(--font-formal);
-  font-size: 0.92rem;
-  line-height: 1.9;
-  margin-top: 12px;
-  text-align: right;
-}
-
-.future-letter-date {
-  font-size: 0.68rem;
-  opacity: 0.7;
-  text-align: center;
-  margin-top: 12px;
-}
-
-.future-archive-item {
-  background: var(--surface);
-  border-radius: var(--radius-sm);
-  padding: 13px 15px;
-  margin-bottom: 9px;
-  box-shadow: var(--shadow-card);
-  border-right: 3px solid var(--deep);
-}
-
-.future-archive-date {
-  font-size: 0.68rem;
-  font-weight: 800;
-  color: var(--deep);
-  margin-bottom: 5px;
-}
-
-.future-archive-text {
-  font-size: 0.78rem;
-  line-height: 1.6;
 }
 
 .stats-row {
