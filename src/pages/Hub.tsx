@@ -34,8 +34,7 @@ const TABS: { id: Tab; label: string; links: Link[] }[] = [
     links: [
       { icon: '🔥', label: 'السلسلة والرفيق الذكي', to: '/streak' },
       { icon: '😴', label: 'النوم ودائرة العلاقات', to: '/sleep' },
-      { icon: '🎡', label: 'عجلة الحياة ومراجعة الأسبوع', to: '/wheel' },
-      { icon: '🗺️', label: 'محطات الطريق', to: '/gallery' },
+      { icon: '🪞', label: 'مراجعة الأسبوع', to: '/wheel' },
     ],
   },
   {
@@ -43,17 +42,15 @@ const TABS: { id: Tab; label: string; links: Link[] }[] = [
     label: '🌱 رحلتي العميقة',
     links: [
       { icon: '🪪', label: 'بطاقة الهوية ودستور الذات', to: '/identity' },
-      { icon: '🎡', label: 'عجلة الحياة', to: '/wheel' },
-      { icon: '📦', label: 'صندوق الزمن ورسائل المستقبل', to: '/pledges' },
-      { icon: '🏷️', label: 'الألقاب والمستويات', to: '/streak' },
+      { icon: '📦', label: 'العهود وصندوق الزمن', to: '/pledges' },
     ],
   },
   {
     id: 'achievements',
     label: '🏆 إنجازاتي',
     links: [
-      { icon: '🖼️', label: 'معرض الإنجازات وقصة الشهر', to: '/gallery' },
-      { icon: '🏷️', label: 'الألقاب المكتسبة', to: '/streak' },
+      { icon: '🖼️', label: 'معرض الإنجازات والمحطات وقصة الشهر', to: '/gallery' },
+      { icon: '🏆', label: 'الألقاب والمستويات', to: '/streak' },
       { icon: '📊', label: 'التحليلات', to: '/analytics' },
     ],
   },

@@ -10,7 +10,7 @@ import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { fireConfetti } from '../components/Confetti';
 
-type Tab = 'pledges' | 'capsule' | 'future';
+type Tab = 'pledges' | 'capsule';
 
 const MILESTONES = [3, 7, 14, 30, 90];
 
@@ -23,13 +23,6 @@ const MILESTONE_MSG: Record<number, string> = {
   90: '👑 90 يوماً! إنجاز استثنائي — أنت قدوة لمن حولك',
 };
 
-/* 3 قوالب ثابتة لرسائل المستقبل (تُختار عشوائياً، لا AI) */
-const FUTURE_TEMPLATES = [
-  'أكتب لك اليوم وأنا أنظر للوراء بفخر كبير. تلك العادات الصغيرة التي بدأتها بصعوبة، أصبحت جزءاً من شخصيتك الآن. استمر، فالقادم أجمل.',
-  'بعد سنة من اليوم، أصبحت الشخص الذي كنت تطمح أن تكونه. السلسلة، العهود، اللحظات الصعبة — كل ذلك صنع منك إنساناً أقوى.',
-  'مرّت سنة كاملة، وأنت لا زلت تسير. ربما لم تصل لكل ما خططت له، لكنك أصبحت أفضل نسخة ممكنة من نفسك اليوم. استمر بثقة.',
-];
-
 const daysSince = (dateStr: string): number => {
   const start = new Date(dateStr + 'T00:00:00').getTime();
   const now = new Date(todayStr() + 'T00:00:00').getTime();
@@ -38,7 +31,7 @@ const daysSince = (dateStr: string): number => {
 
 export default function Pledges() {
   const core = useCore();
-  const { pledges, timeCapsule, futureLetters, profile } = core.state;
+  const { pledges, timeCapsule, profile } = core.state;
   const userName = profile.name || 'أنا';
 
   const [tab, setTab] = useState<Tab>('pledges');
@@ -70,12 +63,6 @@ export default function Pledges() {
     setCapsuleText('');
     fireConfetti();
     setHint('🔒 أُغلقت الكبسولة! ستُفتح بعد 30 يوماً');
-  };
-
-  const handleGenerateFuture = () => {
-    const text = FUTURE_TEMPLATES[Math.floor(Math.random() * FUTURE_TEMPLATES.length)];
-    core.addFutureLetter(text);
-    fireConfetti();
   };
 
   /* حالة الكبسولة */
@@ -145,9 +132,6 @@ export default function Pledges() {
         </button>
         <button className={tab === 'capsule' ? 'subtab active' : 'subtab'} onClick={() => setTab('capsule')}>
           📦 صندوق الزمن
-        </button>
-        <button className={tab === 'future' ? 'subtab active' : 'subtab'} onClick={() => setTab('future')}>
-          ✉️ رسائل المستقبل
         </button>
       </div>
 
@@ -242,37 +226,6 @@ export default function Pledges() {
               🔒 إغلاق الكبسولة لـ30 يوماً
             </button>
           </div>
-        </>
-      )}
-
-      {tab === 'future' && (
-        <>
-          <div className="intro-card">
-            ✉️ رسالة تخيلية من نسختك بعد سنة كاملة — تذكير عاطفي بمن تطمح أن تصبح.
-          </div>
-          <button className="btn-primary" style={{ width: '100%', marginBottom: 16 }} onClick={handleGenerateFuture}>
-            ✨ توليد رسالة من نسختي المستقبلية
-          </button>
-
-          {futureLetters.length > 0 && (
-            <div className="future-letter-card">
-              <div className="future-letter-title">رسالة من {userName}، بعد سنة من الآن</div>
-              <div className="future-letter-body">{futureLetters[0].text}</div>
-              <div className="future-letter-date">📅 {futureLetters[0].date}</div>
-            </div>
-          )}
-
-          {futureLetters.length > 1 && (
-            <>
-              <h2 className="section-title">📂 أرشيف الرسائل السابقة</h2>
-              {futureLetters.slice(1).map((f) => (
-                <div className="future-archive-item" key={f.id}>
-                  <div className="future-archive-date">📅 {f.date}</div>
-                  <div className="future-archive-text">{f.text}</div>
-                </div>
-              ))}
-            </>
-          )}
         </>
       )}
 

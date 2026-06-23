@@ -188,8 +188,6 @@ export interface CoreState {
   gratitudeLog: GratitudeEntry[];
   sleepLog: SleepEntry[];
   relations: Relation[];
-  wheelAreas: number[]; // 8 قيم (1..10) لمجالات عجلة الحياة
-  wheelLastMonth: string; // 'YYYY-MM' لمنع تكرار +25 شهرياً
   weeklyReviews: WeeklyReview[];
   identityStatement: string; // "أنا شخص ..."
   constitution: RecurringItem[]; // دستور الذات (حد 5 قواعد)
@@ -198,7 +196,6 @@ export interface CoreState {
   guidelinesImage: string | null; // صورة يوم الأرجل التوضيحية (اختيارية)
   pledges: Pledge[];
   timeCapsule: TimeCapsule | null;
-  futureLetters: FutureLetter[];
   expenses: ExpenseEntry[];
   customCategories: CustomCategory[];
   budgets: Record<string, number>; // اسم الفئة → السقف الشهري
@@ -274,12 +271,6 @@ export interface Pledge {
 export interface TimeCapsule {
   message: string;
   lockDate: string; // YYYY-MM-DD وقت الإغلاق (تُفتح بعد 30 يوماً)
-}
-
-export interface FutureLetter {
-  id: string;
-  date: string; // YYYY-MM-DD
-  text: string;
 }
 
 /* ===== المستويات السبعة (المرجع الوحيد) ===== */
@@ -358,8 +349,6 @@ const DEFAULT_STATE: CoreState = {
   gratitudeLog: [],
   sleepLog: [],
   relations: [],
-  wheelAreas: [5, 5, 5, 5, 5, 5, 5, 5],
-  wheelLastMonth: '',
   weeklyReviews: [],
   identityStatement: '',
   constitution: [],
@@ -375,7 +364,6 @@ const DEFAULT_STATE: CoreState = {
   guidelinesImage: null,
   pledges: [],
   timeCapsule: null,
-  futureLetters: [],
   expenses: [],
   customCategories: [],
   budgets: {
@@ -425,8 +413,6 @@ const loadState = (): CoreState => {
       gratitudeLog: parsed.gratitudeLog ?? [],
       sleepLog: parsed.sleepLog ?? [],
       relations: parsed.relations ?? [],
-      wheelAreas: parsed.wheelAreas ?? [5, 5, 5, 5, 5, 5, 5, 5],
-      wheelLastMonth: parsed.wheelLastMonth ?? '',
       weeklyReviews: parsed.weeklyReviews ?? [],
       identityStatement: parsed.identityStatement ?? '',
       constitution: parsed.constitution ?? [],
@@ -435,7 +421,6 @@ const loadState = (): CoreState => {
       guidelinesImage: parsed.guidelinesImage ?? null,
       pledges: parsed.pledges ?? [],
       timeCapsule: parsed.timeCapsule ?? null,
-      futureLetters: parsed.futureLetters ?? [],
       expenses: parsed.expenses ?? [],
       customCategories: parsed.customCategories ?? [],
       budgets: parsed.budgets ?? DEFAULT_STATE.budgets,
@@ -512,9 +497,7 @@ interface CoreContextValue {
   addRelation: (name: string) => void;
   toggleRelation: (id: string) => void;
   removeRelation: (id: string) => void;
-  // ===== عجلة الحياة + مراجعة الأسبوع =====
-  setWheelArea: (index: number, value: number) => void;
-  saveWheel: () => void; // +25 مرة شهرياً
+  // ===== مراجعة الأسبوع =====
   addWeeklyReview: (success: string, challenge: string, next: string) => void; // +20
   removeWeeklyReview: (id: string) => void;
   // ===== الهوية + الدستور =====
@@ -531,7 +514,6 @@ interface CoreContextValue {
   resetPledge: (id: string) => void; // إعادة بدء دون عقاب
   removePledge: (id: string) => void;
   lockCapsule: (message: string) => void;
-  addFutureLetter: (text: string) => void;
   // ===== المصاريف =====
   addExpense: (entry: Omit<ExpenseEntry, 'id'>) => void;
   removeExpense: (id: string) => void;
@@ -1301,31 +1283,6 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     setState((s) => ({ ...s, relations: s.relations.filter((r) => r.id !== id) }));
   }, []);
 
-  /* تعديل قيمة مجال في عجلة الحياة (1..10) */
-  const setWheelArea = useCallback((index: number, value: number) => {
-    const v = clampNum(Math.round(value), 1, 10);
-    setState((s) => {
-      const next = [...s.wheelAreas];
-      if (index >= 0 && index < next.length) next[index] = v;
-      return { ...s, wheelAreas: next };
-    });
-  }, []);
-
-  /* حفظ تقييم العجلة: +25 مرة واحدة شهرياً (يمنع التكرار) */
-  const saveWheel = useCallback(() => {
-    const month = monthStr();
-    let award = false;
-    setState((s) => {
-      if (s.wheelLastMonth === month) return s;
-      award = true;
-      return { ...s, wheelLastMonth: month };
-    });
-    if (award) {
-      addXP(25);
-      fireConfetti();
-    }
-  }, [addXP]);
-
   /* إضافة مراجعة أسبوعية للأرشيف + احتساب +20 */
   const addWeeklyReview = useCallback(
     (success: string, challenge: string, next: string) => {
@@ -1463,19 +1420,6 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     const t = clean(message);
     if (!t) return;
     setState((s) => ({ ...s, timeCapsule: { message: t, lockDate: todayStr() } }));
-  }, []);
-
-  /* إضافة رسالة مستقبلية للأرشيف */
-  const addFutureLetter = useCallback((text: string) => {
-    const t = clean(text);
-    if (!t) return;
-    setState((s) => ({
-      ...s,
-      futureLetters: [
-        { id: crypto.randomUUID(), date: todayStr(), text: t },
-        ...s.futureLetters,
-      ],
-    }));
   }, []);
 
   /* إضافة حركة مالية (دخل/مصروف) مع تنظيف وحصر القيم */
@@ -1726,8 +1670,6 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       addRelation,
       toggleRelation,
       removeRelation,
-      setWheelArea,
-      saveWheel,
       addWeeklyReview,
       removeWeeklyReview,
       setIdentity,
@@ -1741,7 +1683,6 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       resetPledge,
       removePledge,
       lockCapsule,
-      addFutureLetter,
       addExpense,
       removeExpense,
       addCustomCategory,
@@ -1806,8 +1747,6 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       addRelation,
       toggleRelation,
       removeRelation,
-      setWheelArea,
-      saveWheel,
       addWeeklyReview,
       removeWeeklyReview,
       setIdentity,
@@ -1821,7 +1760,6 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       resetPledge,
       removePledge,
       lockCapsule,
-      addFutureLetter,
       addExpense,
       removeExpense,
       addCustomCategory,

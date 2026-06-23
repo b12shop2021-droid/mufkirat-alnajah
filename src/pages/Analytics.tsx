@@ -33,14 +33,26 @@ export default function Analytics() {
     ? Math.round((doneToday / routineToday.length) * 100)
     : 0;
 
-  /* مرصد الانسجام من عجلة الحياة */
-  const range = Math.max(...s.wheelAreas) - Math.min(...s.wheelAreas);
+  /* مرصد الانسجام — يُقاس تلقائياً من نشاطك الفعلي عبر مجالات التطبيق (آخر 7 أيام) */
+  const within7 = (date: string) => date >= dateBefore(6);
+  const domains = [
+    { name: 'العبادة', active: s.quranMinutes.some((q) => within7(q.date)) },
+    { name: 'الصحة', active: s.workoutLogs.some((l) => within7(l.date)) || s.sleepLog.some((e) => within7(e.date)) },
+    { name: 'الامتنان', active: s.gratitudeLog.some((g) => within7(g.date)) },
+    { name: 'المزاج', active: s.moodLog.some((m) => within7(m.date)) },
+    { name: 'الإنتاجية', active: [...s.routine.morning, ...s.routine.evening].some((t) => within7(t.doneDate)) },
+    { name: 'المال', active: s.expenses.some((e) => within7(e.date)) },
+    { name: 'العلاقات', active: s.relations.some((r) => r.contacted) },
+  ];
+  const activeDomains = domains.filter((d) => d.active).length;
+  const coverage = Math.round((activeDomains / domains.length) * 100);
+  const weakest = domains.find((d) => !d.active);
   const harmony =
-    range <= 3
-      ? { txt: '🟢 متوازن', detail: 'جوانب حياتك متناسقة، استمر بهذا الإيقاع!' }
-      : range <= 5
-        ? { txt: '🟡 يحتاج انتباه', detail: 'بعض الجوانب متقدمة على غيرها، راجع الأقل نشاطاً.' }
-        : { txt: '🔴 غير متوازن', detail: 'هناك فجوة واضحة بين جوانب حياتك تحتاج تركيزاً أكبر.' };
+    coverage >= 70
+      ? { txt: '🟢 متوازن', detail: 'نشاطك موزّع جيداً عبر جوانب حياتك — استمر بهذا الإيقاع!' }
+      : coverage >= 40
+        ? { txt: '🟡 يحتاج انتباه', detail: `بعض الجوانب مهملة هذا الأسبوع${weakest ? ` — جرّب الاهتمام بـ"${weakest.name}"` : ''}.` }
+        : { txt: '🔴 غير متوازن', detail: `معظم الجوانب غير نشطة${weakest ? ` — ابدأ بـ"${weakest.name}"` : ''}.` };
 
   /* نشاط آخر 7 أيام (عدد الإشارات في كل يوم) */
   const hasOn = (date: string) =>
