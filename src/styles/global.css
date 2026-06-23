@@ -1,0 +1,330 @@
+/* ===================================================================
+   global.css — كل الأنماط المشتركة في مكان واحد (صفر تكرار)
+   كل الألوان معرّفة كمتغيرات في :root — ممنوع لون ثابت داخل المكوّنات
+   =================================================================== */
+
+:root {
+  /* الهوية البصرية المعتمدة */
+  --primary: #05ad98;          /* تركوازي أساسي (النشط) */
+  --primary-light: #2bcfce;    /* تركوازي فاتح (خلفيات دائرية) */
+  --deep: #245f73;             /* أزرق عميق (العناوين الكبيرة، العهود، النوم) */
+  --celebrate: #ec4d25;        /* برتقالي احتفالي (الشارات والاحتفالات فقط) */
+  --text: #1a1a1a;             /* النص الأساسي */
+  --text-secondary: #878787;   /* النص الثانوي */
+  --bg: #fafafa;               /* الخلفية */
+  --surface: #ffffff;          /* البطاقات */
+  --border: #ececec;           /* الحدود الناعمة */
+
+  /* ألوان وظيفية (مشتقة من الهوية) */
+  --success: #05ad98;
+  --warning: #f5a623;
+  --danger: #ec4d25;
+
+  /* ظلال خفيفة تركوازية (لا rgba ثابت داخل المكوّنات) */
+  --shadow-soft: 0 4px 16px rgba(5, 173, 152, 0.08);
+  --shadow-card: 0 2px 10px rgba(36, 95, 115, 0.06);
+  --overlay: rgba(36, 95, 115, 0.45);
+
+  /* أبعاد موحّدة */
+  --radius: 22px;
+  --radius-sm: 14px;
+  --nav-height: 64px;
+
+  /* خطوط */
+  --font-ui: 'Alyamama', 'Segoe UI', 'Tahoma', sans-serif;
+  --font-formal: 'Amiri', serif;
+}
+
+/* الوضع الليلي — يُطبّق عبر سمة data-theme على <html> */
+:root[data-dark='true'] {
+  --text: #f2f2f2;
+  --text-secondary: #a8a8a8;
+  --bg: #14191c;
+  --surface: #1e262b;
+  --border: #2c363c;
+  --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.3);
+  --overlay: rgba(0, 0, 0, 0.6);
+}
+
+/* مبدّل الثيمات (5 ألوان) — يغيّر --primary فقط، يُحفظ بالاسم */
+:root[data-accent='emerald'] { --primary: #05ad98; --primary-light: #2bcfce; }
+:root[data-accent='ocean']   { --primary: #2a7de1; --primary-light: #67b3ff; }
+:root[data-accent='violet']  { --primary: #7c5cff; --primary-light: #b9a6ff; }
+:root[data-accent='rose']    { --primary: #e0457b; --primary-light: #ff8fb3; }
+:root[data-accent='amber']   { --primary: #e0902a; --primary-light: #ffc06b; }
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  -webkit-tap-highlight-color: transparent;
+}
+
+#root {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+  color: var(--text);
+}
+
+/* ===== أصناف مشتركة (تُعاد عبر كل الصفحات) ===== */
+
+.page {
+  padding: 16px 16px calc(var(--nav-height) + 24px);
+}
+
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.section-title {
+  color: var(--deep);
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  padding: 12px 18px;
+  font-weight: 700;
+  font-size: 1rem;
+  transition: opacity 0.15s ease;
+}
+
+.btn-primary:active {
+  opacity: 0.8;
+}
+
+.btn-ghost {
+  background: var(--bg);
+  color: var(--deep);
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  font-weight: 600;
+}
+
+.input-field {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.input-field:focus {
+  border-color: var(--primary);
+}
+
+.formal-text {
+  font-family: var(--font-formal);
+  color: var(--deep);
+}
+
+/* ===== شريط النقاط XPBar ===== */
+.xpbar {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+
+.xpbar-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.xpbar-level {
+  color: var(--deep);
+}
+
+.xpbar-xp {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.xpbar-track {
+  height: 10px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.xpbar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+/* ===== التنقل السفلي الثابت ===== */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  height: var(--nav-height);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 50;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  flex: 1;
+  padding: 6px 0;
+}
+
+.nav-item.active {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.nav-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+/* ===== زر الرجوع الموحّد ===== */
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--deep);
+  font-weight: 600;
+  padding: 6px 0;
+  margin-bottom: 8px;
+}
+
+/* ===== نافذة التأكيد ConfirmDialog ===== */
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 100;
+}
+
+.dialog-box {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 22px;
+  width: 100%;
+  max-width: 340px;
+  box-shadow: var(--shadow-soft);
+}
+
+.dialog-title {
+  color: var(--deep);
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.dialog-msg {
+  color: var(--text-secondary);
+  margin-bottom: 18px;
+  line-height: 1.6;
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.dialog-actions > button {
+  flex: 1;
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-weight: 700;
+}
+
+/* ===== الاحتفال (Confetti) ===== */
+.confetti-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 200;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -12px;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  animation: confetti-fall linear forwards;
+}
+
+@keyframes confetti-fall {
+  to {
+    transform: translateY(105vh) rotate(540deg);
+    opacity: 0;
+  }
+}
+
+/* نبضة خفيفة عند إكمال قسم */
+@keyframes pulse-soft {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+.pulse {
+  animation: pulse-soft 0.4s ease;
+}
