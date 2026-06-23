@@ -26,6 +26,7 @@ import Pledges from './pages/Pledges';
 import Expenses from './pages/Expenses';
 import Analytics from './pages/Analytics';
 import CaptainWorkout from './pages/CaptainWorkout';
+import Meals from './pages/Meals';
 
 /* صفحة عامة لأي مسار غير معروف */
 function NotFound() {
@@ -62,6 +63,7 @@ export default function App() {
         <Route path="/expenses" component={Expenses} />
         <Route path="/analytics" component={Analytics} />
         <Route path="/captain-workout" component={CaptainWorkout} />
+        <Route path="/meals" component={Meals} />
         <Route component={NotFound} />
       </Switch>
       <BottomNav />

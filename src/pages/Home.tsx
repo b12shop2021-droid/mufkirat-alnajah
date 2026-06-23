@@ -67,7 +67,7 @@ export default function Home() {
     { icon: '🎯', label: 'الأهداف', to: '/goals' },
     { icon: '💳', label: 'المصاريف', to: '/expenses' },
     { icon: '🏋️', label: 'التمارين', to: '/captain-workout' },
-    { icon: '📖', label: 'القرآن', to: '/quran' },
+    { icon: '🍽️', label: 'الوجبات', to: '/meals' },
     { icon: '📊', label: 'التحليلات', to: '/analytics' },
     { icon: '🛡️', label: 'العهود', to: '/pledges' },
     { icon: '🗺️', label: 'رحلتي', to: '/gallery' },

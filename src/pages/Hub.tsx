@@ -61,6 +61,7 @@ const TABS: { id: Tab; label: string; links: Link[] }[] = [
 
 const EXTRA: Link[] = [
   { icon: '💳', label: 'المصاريف', to: '/expenses' },
+  { icon: '🍽️', label: 'الوجبات', to: '/meals' },
   { icon: '🏋️', label: 'جدول الكابتن سعود', to: '/captain-workout' },
   { icon: '🛠️', label: 'صمّم جدول تمارينك', to: '/custom-workout' },
   { icon: '📋', label: 'الإرشادات الأساسية', to: '/guidelines' },

@@ -200,12 +200,41 @@ export interface CoreState {
   workoutImages: Record<string, string>; // مفتاح التمرين → صورة
   completedExercises: string[]; // مفاتيح التمارين المكتملة
   workoutLogs: WorkoutLog[];
+  meals: MealEntry[];
+  favoriteMeals: FavoriteMeal[];
+  waterLog: WaterEntry[];
+  calorieGoal: number;
 }
 
 export interface NotifItem {
   id: string;
   enabled: boolean;
   time: string; // 'HH:MM' أو وصف تلقائي
+}
+
+export type MealType = 'إفطار' | 'غداء' | 'عشاء' | 'وجبة خفيفة';
+
+export interface MealEntry {
+  id: string;
+  date: string; // YYYY-MM-DD
+  type: MealType;
+  name: string;
+  ingredients: string;
+  calories: number;
+  notes: string;
+}
+
+export interface FavoriteMeal {
+  id: string;
+  type: MealType;
+  name: string;
+  ingredients: string;
+  calories: number;
+}
+
+export interface WaterEntry {
+  date: string; // YYYY-MM-DD
+  cups: number; // 0..8
 }
 
 export type ExpenseType = 'income' | 'expense';
@@ -355,6 +384,10 @@ const DEFAULT_STATE: CoreState = {
   workoutImages: {},
   completedExercises: [],
   workoutLogs: [],
+  meals: [],
+  favoriteMeals: [],
+  waterLog: [],
+  calorieGoal: 2000,
 };
 
 /* قراءة الحالة المحفوظة من localStorage مع دمج آمن مع الافتراضي */
@@ -402,6 +435,10 @@ const loadState = (): CoreState => {
       workoutImages: parsed.workoutImages ?? {},
       completedExercises: parsed.completedExercises ?? [],
       workoutLogs: parsed.workoutLogs ?? [],
+      meals: parsed.meals ?? [],
+      favoriteMeals: parsed.favoriteMeals ?? [],
+      waterLog: parsed.waterLog ?? [],
+      calorieGoal: parsed.calorieGoal ?? 2000,
     };
   } catch {
     return DEFAULT_STATE;
@@ -498,6 +535,12 @@ interface CoreContextValue {
   setWorkoutImage: (key: string, image: string) => void;
   recordPR: (key: string, weight: number) => boolean; // true إذا رقم شخصي جديد
   logWorkoutDay: (dayId: string, durationSec: number, doneIds: string[]) => void; // +10 إضافية
+  // ===== الوجبات =====
+  addMeal: (entry: Omit<MealEntry, 'id'>, saveFavorite: boolean) => void;
+  removeMeal: (id: string) => void;
+  removeFavorite: (id: string) => void;
+  setWaterCups: (cups: number) => void; // لليوم الحالي
+  setCalorieGoal: (goal: number) => void;
 }
 
 const CoreContext = createContext<CoreContextValue | null>(null);
@@ -1554,6 +1597,66 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     [addXP],
   );
 
+  /* إضافة وجبة + حفظها اختيارياً في "أكلاتي المفضلة" (دون تكرار) */
+  const addMeal = useCallback((entry: Omit<MealEntry, 'id'>, saveFavorite: boolean) => {
+    const name = clean(entry.name);
+    if (!name) return;
+    const ingredients = clean(entry.ingredients);
+    const calories = clampNum(entry.calories, 0, 20000);
+    setState((s) => {
+      const next: CoreState = {
+        ...s,
+        meals: [
+          ...s.meals,
+          {
+            id: crypto.randomUUID(),
+            date: entry.date || todayStr(),
+            type: entry.type,
+            name,
+            ingredients,
+            calories,
+            notes: clean(entry.notes),
+          },
+        ],
+      };
+      if (saveFavorite) {
+        const dup = s.favoriteMeals.some((f) => f.name === name && f.type === entry.type);
+        if (!dup) {
+          next.favoriteMeals = [
+            ...s.favoriteMeals,
+            { id: crypto.randomUUID(), type: entry.type, name, ingredients, calories },
+          ];
+        }
+      }
+      return next;
+    });
+  }, []);
+
+  /* حذف وجبة (يمرّ عبر ConfirmDialog) */
+  const removeMeal = useCallback((id: string) => {
+    setState((s) => ({ ...s, meals: s.meals.filter((m) => m.id !== id) }));
+  }, []);
+
+  /* حذف وجبة مفضلة */
+  const removeFavorite = useCallback((id: string) => {
+    setState((s) => ({ ...s, favoriteMeals: s.favoriteMeals.filter((f) => f.id !== id) }));
+  }, []);
+
+  /* ضبط عدد أكواب الماء لليوم (0..8) */
+  const setWaterCups = useCallback((cups: number) => {
+    const c = clampNum(cups, 0, 8);
+    const today = todayStr();
+    setState((s) => {
+      const others = s.waterLog.filter((w) => w.date !== today);
+      return { ...s, waterLog: [...others, { date: today, cups: c }] };
+    });
+  }, []);
+
+  /* ضبط هدف السعرات اليومي */
+  const setCalorieGoal = useCallback((goal: number) => {
+    setState((s) => ({ ...s, calorieGoal: clampNum(goal, 0, 20000) }));
+  }, []);
+
   const value = useMemo<CoreContextValue>(
     () => ({
       state,
@@ -1627,6 +1730,11 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       setWorkoutImage,
       recordPR,
       logWorkoutDay,
+      addMeal,
+      removeMeal,
+      removeFavorite,
+      setWaterCups,
+      setCalorieGoal,
     }),
     [
       state,
@@ -1700,6 +1808,11 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       setWorkoutImage,
       recordPR,
       logWorkoutDay,
+      addMeal,
+      removeMeal,
+      removeFavorite,
+      setWaterCups,
+      setCalorieGoal,
     ],
   );
 
