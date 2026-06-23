@@ -19,6 +19,9 @@ import SleepRelations from './pages/SleepRelations';
 import WheelReview from './pages/WheelReview';
 import Identity from './pages/Identity';
 import JourneyGallery from './pages/JourneyGallery';
+import Settings from './pages/Settings';
+import Notifications from './pages/Notifications';
+import Guidelines from './pages/Guidelines';
 
 /* صفحة ترحيب مؤقتة للتأكد من ربط النواة — تُستبدل بالصفحات الفعلية */
 function HomePlaceholder() {
@@ -77,6 +80,9 @@ export default function App() {
         <Route path="/wheel" component={WheelReview} />
         <Route path="/identity" component={Identity} />
         <Route path="/gallery" component={JourneyGallery} />
+        <Route path="/settings" component={Settings} />
+        <Route path="/notifications" component={Notifications} />
+        <Route path="/guidelines" component={Guidelines} />
         <Route component={ComingSoon} />
       </Switch>
       <BottomNav />

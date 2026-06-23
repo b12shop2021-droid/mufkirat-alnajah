@@ -186,6 +186,15 @@ export interface CoreState {
   weeklyReviews: WeeklyReview[];
   identityStatement: string; // "أنا شخص ..."
   constitution: RecurringItem[]; // دستور الذات (حد 5 قواعد)
+  notifMaster: boolean; // مفتاح الإشعارات العام
+  notifItems: NotifItem[]; // تفضيلات أنواع التذكيرات (واجهة فقط)
+  guidelinesImage: string | null; // صورة يوم الأرجل التوضيحية (اختيارية)
+}
+
+export interface NotifItem {
+  id: string;
+  enabled: boolean;
+  time: string; // 'HH:MM' أو وصف تلقائي
 }
 
 /* ===== المستويات السبعة (المرجع الوحيد) ===== */
@@ -268,6 +277,16 @@ const DEFAULT_STATE: CoreState = {
   weeklyReviews: [],
   identityStatement: '',
   constitution: [],
+  notifMaster: true,
+  notifItems: [
+    { id: 'morning', enabled: true, time: '07:00' },
+    { id: 'evening', enabled: true, time: '21:30' },
+    { id: 'meal', enabled: true, time: 'تلقائي' },
+    { id: 'water', enabled: false, time: 'كل 3 ساعات' },
+    { id: 'gratitude', enabled: true, time: '20:00' },
+    { id: 'streak', enabled: true, time: '23:00' },
+  ],
+  guidelinesImage: null,
 };
 
 /* قراءة الحالة المحفوظة من localStorage مع دمج آمن مع الافتراضي */
@@ -302,6 +321,9 @@ const loadState = (): CoreState => {
       weeklyReviews: parsed.weeklyReviews ?? [],
       identityStatement: parsed.identityStatement ?? '',
       constitution: parsed.constitution ?? [],
+      notifMaster: parsed.notifMaster ?? true,
+      notifItems: parsed.notifItems ?? DEFAULT_STATE.notifItems,
+      guidelinesImage: parsed.guidelinesImage ?? null,
     };
   } catch {
     return DEFAULT_STATE;
@@ -376,6 +398,11 @@ interface CoreContextValue {
   setIdentity: (text: string) => void;
   addConstRule: (text: string) => boolean; // false إذا اكتمل الحد (5)
   removeConstRule: (id: string) => void;
+  // ===== الإشعارات (واجهة فقط) =====
+  setNotifMaster: (on: boolean) => void;
+  toggleNotif: (id: string) => void;
+  setNotifTime: (id: string, time: string) => void;
+  setGuidelinesImage: (image: string | null) => void;
 }
 
 const CoreContext = createContext<CoreContextValue | null>(null);
@@ -1212,6 +1239,34 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
+  /* تفعيل/إيقاف الإشعارات العام */
+  const setNotifMaster = useCallback((on: boolean) => {
+    setState((s) => ({ ...s, notifMaster: on }));
+  }, []);
+
+  /* تبديل تفعيل نوع تذكير */
+  const toggleNotif = useCallback((id: string) => {
+    setState((s) => ({
+      ...s,
+      notifItems: s.notifItems.map((n) =>
+        n.id === id ? { ...n, enabled: !n.enabled } : n,
+      ),
+    }));
+  }, []);
+
+  /* ضبط وقت تذكير (HH:MM) */
+  const setNotifTime = useCallback((id: string, time: string) => {
+    setState((s) => ({
+      ...s,
+      notifItems: s.notifItems.map((n) => (n.id === id ? { ...n, time } : n)),
+    }));
+  }, []);
+
+  /* تعيين/إزالة صورة الإرشادات */
+  const setGuidelinesImage = useCallback((image: string | null) => {
+    setState((s) => ({ ...s, guidelinesImage: image }));
+  }, []);
+
   const value = useMemo<CoreContextValue>(
     () => ({
       state,
@@ -1267,6 +1322,10 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       setIdentity,
       addConstRule,
       removeConstRule,
+      setNotifMaster,
+      toggleNotif,
+      setNotifTime,
+      setGuidelinesImage,
     }),
     [
       state,
@@ -1322,6 +1381,10 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       setIdentity,
       addConstRule,
       removeConstRule,
+      setNotifMaster,
+      toggleNotif,
+      setNotifTime,
+      setGuidelinesImage,
     ],
   );
 
