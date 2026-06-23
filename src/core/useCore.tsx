@@ -47,6 +47,7 @@ export interface Exercise {
 
 export interface WorkoutLog {
   date: string; // YYYY-MM-DD
+  dayId: string; // معرّف اليوم (push_a ...)
   durationSec: number;
   doneIds: string[];
 }
@@ -195,6 +196,10 @@ export interface CoreState {
   expenses: ExpenseEntry[];
   customCategories: CustomCategory[];
   budgets: Record<string, number>; // اسم الفئة → السقف الشهري
+  workoutPRs: Record<string, number>; // مفتاح التمرين → أعلى وزن
+  workoutImages: Record<string, string>; // مفتاح التمرين → صورة
+  completedExercises: string[]; // مفاتيح التمارين المكتملة
+  workoutLogs: WorkoutLog[];
 }
 
 export interface NotifItem {
@@ -346,6 +351,10 @@ const DEFAULT_STATE: CoreState = {
     أخرى: 150,
     'صندوق الخير': 0,
   },
+  workoutPRs: {},
+  workoutImages: {},
+  completedExercises: [],
+  workoutLogs: [],
 };
 
 /* قراءة الحالة المحفوظة من localStorage مع دمج آمن مع الافتراضي */
@@ -389,6 +398,10 @@ const loadState = (): CoreState => {
       expenses: parsed.expenses ?? [],
       customCategories: parsed.customCategories ?? [],
       budgets: parsed.budgets ?? DEFAULT_STATE.budgets,
+      workoutPRs: parsed.workoutPRs ?? {},
+      workoutImages: parsed.workoutImages ?? {},
+      completedExercises: parsed.completedExercises ?? [],
+      workoutLogs: parsed.workoutLogs ?? [],
     };
   } catch {
     return DEFAULT_STATE;
@@ -480,6 +493,11 @@ interface CoreContextValue {
   addCustomCategory: (name: string, icon: string, note: string) => boolean;
   removeCustomCategory: (id: string, name: string) => void;
   setBudget: (category: string, amount: number) => void;
+  // ===== جدول الكابتن سعود =====
+  toggleExerciseDone: (key: string) => void; // +15 عند الإكمال
+  setWorkoutImage: (key: string, image: string) => void;
+  recordPR: (key: string, weight: number) => boolean; // true إذا رقم شخصي جديد
+  logWorkoutDay: (dayId: string, durationSec: number, doneIds: string[]) => void; // +10 إضافية
 }
 
 const CoreContext = createContext<CoreContextValue | null>(null);
@@ -1476,6 +1494,66 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
+  /* تبديل إكمال تمرين + احتساب +15 مرة عند الإكمال */
+  const toggleExerciseDone = useCallback(
+    (key: string) => {
+      let earned = false;
+      setState((s) => {
+        const done = s.completedExercises.includes(key);
+        if (done) {
+          return { ...s, completedExercises: s.completedExercises.filter((k) => k !== key) };
+        }
+        earned = true;
+        return { ...s, completedExercises: [...s.completedExercises, key] };
+      });
+      if (earned) addXP(15);
+    },
+    [addXP],
+  );
+
+  /* حفظ صورة تمرين */
+  const setWorkoutImage = useCallback((key: string, image: string) => {
+    setState((s) => ({ ...s, workoutImages: { ...s.workoutImages, [key]: image } }));
+  }, []);
+
+  /* تسجيل رقم شخصي إذا تجاوز الأعلى السابق */
+  const recordPR = useCallback((key: string, weight: number): boolean => {
+    const w = clampNum(weight, 0, 100000);
+    if (w <= 0) return false;
+    let isPR = false;
+    setState((s) => {
+      const prev = s.workoutPRs[key] ?? 0;
+      if (w > prev) {
+        isPR = true;
+        return { ...s, workoutPRs: { ...s.workoutPRs, [key]: w } };
+      }
+      return s;
+    });
+    return isPR;
+  }, []);
+
+  /* تسجيل إكمال يوم تمرين في السجل التاريخي + احتساب +10 إضافية (مرة لكل يوم تاريخي) */
+  const logWorkoutDay = useCallback(
+    (dayId: string, durationSec: number, doneIds: string[]) => {
+      const today = todayStr();
+      let award = false;
+      setState((s) => {
+        const exists = s.workoutLogs.some((l) => l.date === today && l.dayId === dayId);
+        if (exists) return s;
+        award = true;
+        return {
+          ...s,
+          workoutLogs: [
+            ...s.workoutLogs,
+            { date: today, dayId, durationSec: clampNum(durationSec, 0, 86400), doneIds },
+          ],
+        };
+      });
+      if (award) addXP(10);
+    },
+    [addXP],
+  );
+
   const value = useMemo<CoreContextValue>(
     () => ({
       state,
@@ -1545,6 +1623,10 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       addCustomCategory,
       removeCustomCategory,
       setBudget,
+      toggleExerciseDone,
+      setWorkoutImage,
+      recordPR,
+      logWorkoutDay,
     }),
     [
       state,
@@ -1614,6 +1696,10 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       addCustomCategory,
       removeCustomCategory,
       setBudget,
+      toggleExerciseDone,
+      setWorkoutImage,
+      recordPR,
+      logWorkoutDay,
     ],
   );
 

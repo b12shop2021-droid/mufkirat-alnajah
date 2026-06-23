@@ -25,6 +25,7 @@ import Guidelines from './pages/Guidelines';
 import Pledges from './pages/Pledges';
 import Expenses from './pages/Expenses';
 import Analytics from './pages/Analytics';
+import CaptainWorkout from './pages/CaptainWorkout';
 
 /* صفحة ترحيب مؤقتة للتأكد من ربط النواة — تُستبدل بالصفحات الفعلية */
 function HomePlaceholder() {
@@ -89,6 +90,7 @@ export default function App() {
         <Route path="/pledges" component={Pledges} />
         <Route path="/expenses" component={Expenses} />
         <Route path="/analytics" component={Analytics} />
+        <Route path="/captain-workout" component={CaptainWorkout} />
         <Route component={ComingSoon} />
       </Switch>
       <BottomNav />
