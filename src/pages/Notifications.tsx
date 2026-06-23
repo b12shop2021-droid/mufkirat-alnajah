@@ -30,12 +30,6 @@ export default function Notifications({ embedded = false }: { embedded?: boolean
 
       <h1 className="section-title">🔔 الإشعارات والتذكيرات</h1>
 
-      <div className="dev-note">
-        ⚠️ <strong>ملاحظة تقنية:</strong> هذه واجهة التحكم فقط (الأوقات والتفعيل).
-        الإشعارات الفعلية (Push) تتطلب بنية خادم خلفي وصلاحيات نظام — تُربط لاحقاً
-        بنظام الإشعارات على Manus.
-      </div>
-
       <div className="settings-card">
         <div className="settings-row">
           <div className="settings-icon">🔔</div>

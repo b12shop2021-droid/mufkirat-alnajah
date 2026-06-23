@@ -33,7 +33,6 @@ const TABS: { id: Tab; label: string; links: Link[] }[] = [
     id: 'journey',
     label: '🔥 التزامي',
     links: [
-      { icon: '🔥', label: 'السلسلة والرفيق الذكي', to: '/achievements' },
       { icon: '😴', label: 'النوم ودائرة العلاقات', to: '/sleep' },
       { icon: '🛡️', label: 'العهود وصندوق الزمن', to: '/pledges' },
       { icon: '🏋️', label: 'التمارين', to: '/workouts' },
