@@ -1,1 +1,0 @@
-{"root":["./src/app.tsx","./src/main.tsx","./src/components/backbutton.tsx","./src/components/bottomnav.tsx","./src/components/confetti.tsx","./src/components/confirmdialog.tsx","./src/components/xpbar.tsx","./src/core/usecore.tsx","./src/core/useworkouttimer.tsx"],"errors":true,"version":"5.9.3"}
