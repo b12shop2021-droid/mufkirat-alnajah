@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>رحلتي وإنجازاتي - مفكرة النجاح</title>
+<style>
+:root{
+  --primary:#05AD98; --primary-light:#2BCFCE; --deep:#245F73;
+  --accent:#EC4D25; --gray:#878787; --gray-light:#BBBFBF;
+  --bg:#FAFAFA; --white:#FFFFFF; --text:#1A2E2C;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Alyamama','Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--text);direction:rtl;-webkit-font-smoothing:antialiased;}
+.amiri{font-family:'Amiri','Segoe UI',serif;}
+.screen{max-width:430px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;padding-bottom:100px;}
+
+.topbar{display:flex;align-items:center;gap:10px;padding:16px 18px 10px;position:sticky;top:0;z-index:60;background:rgba(250,250,250,.94);backdrop-filter:blur(12px);}
+.back-btn{width:36px;height:36px;border-radius:50%;background:rgba(5,173,152,.08);display:flex;align-items:center;justify-content:center;font-size:1.05rem;color:var(--primary);cursor:pointer;flex-shrink:0;}
+.topbar-title{font-size:.98rem;font-weight:800;color:var(--deep);flex:1;}
+
+.tabs-wrap{display:flex;gap:5px;margin:10px 18px 16px;background:#fff;border-radius:16px;padding:5px;box-shadow:0 2px 10px rgba(5,173,152,.06);overflow-x:auto;scrollbar-width:none;}
+.tabs-wrap::-webkit-scrollbar{display:none;}
+.tab-btn{flex-shrink:0;min-width:70px;text-align:center;padding:9px 10px;border-radius:11px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:.68rem;font-weight:700;color:var(--gray);transition:all .25s;}
+.tab-btn.active{background:var(--primary);color:#fff;box-shadow:0 4px 12px rgba(5,173,152,.3);}
+.tab-btn.active.deep{background:var(--deep);box-shadow:0 4px 12px rgba(36,95,115,.35);}
+
+.section{display:none;}
+.section.active{display:block;animation:fadeUp .35s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.section-block{margin:0 18px 20px;}
+.section-head{font-size:.9rem;font-weight:800;color:var(--deep);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+
+/* ══ MONTHLY WRAP ══ */
+.wrap-card{border-radius:28px;padding:30px 24px;position:relative;overflow:hidden;color:#fff;background:linear-gradient(160deg,#06b9a3 0%,#0a8f80 35%,#245F73 75%,#1a3a52 100%);box-shadow:0 16px 36px rgba(5,173,152,.3);text-align:center;}
+.wrap-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 0%, rgba(255,255,255,.2), transparent 50%),radial-gradient(circle at 90% 100%, rgba(255,255,255,.12), transparent 45%);}
+.wrap-month{font-size:.8rem;opacity:.8;position:relative;z-index:2;font-weight:700;}
+.wrap-title{font-size:1.3rem;font-weight:800;margin-top:4px;position:relative;z-index:2;}
+.wrap-stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px;position:relative;z-index:2;}
+.wrap-stat{background:rgba(255,255,255,.14);border-radius:16px;padding:14px 8px;border:1px solid rgba(255,255,255,.2);}
+.wrap-stat-num{font-size:1.5rem;font-weight:800;}
+.wrap-stat-label{font-size:.68rem;opacity:.85;margin-top:2px;}
+.wrap-highlight{margin-top:18px;padding:14px;background:rgba(255,255,255,.92);border-radius:14px;color:var(--deep);font-size:.82rem;font-weight:800;position:relative;z-index:2;line-height:1.6;}
+.wrap-share-btn{width:100%;margin-top:16px;padding:12px;border-radius:14px;border:1.5px solid rgba(255,255,255,.35);background:rgba(255,255,255,.18);color:#fff;font-weight:800;font-size:.82rem;cursor:pointer;font-family:inherit;position:relative;z-index:2;}
+
+/* ══ ROAD MAP ══ */
+.roadmap-card{background:#fff;border-radius:24px;padding:24px 20px;box-shadow:0 4px 20px rgba(5,173,152,.07);}
+.road-path{position:relative;padding-right:30px;}
+.road-line{position:absolute;right:14px;top:8px;bottom:8px;width:3px;background:rgba(5,173,152,.15);border-radius:3px;}
+.station{position:relative;padding-bottom:28px;}
+.station:last-child{padding-bottom:0;}
+.station-dot{position:absolute;right:0;top:0;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.95rem;z-index:2;background:rgba(5,173,152,.08);border:2px solid rgba(5,173,152,.2);}
+.station-dot.reached{background:linear-gradient(150deg,var(--primary-light),var(--primary));border-color:transparent;color:#fff;}
+.station-dot.current{background:linear-gradient(150deg,#F5B544,var(--accent));border-color:transparent;color:#fff;box-shadow:0 0 0 4px rgba(236,77,37,.15);}
+.station-content{margin-right:42px;}
+.station-title{font-size:.84rem;font-weight:800;color:var(--text);}
+.station-title.reached-text{color:var(--primary);}
+.station-sub{font-size:.7rem;color:var(--gray);margin-top:2px;}
+.station-badge{font-size:.62rem;font-weight:800;color:var(--accent);background:rgba(236,77,37,.08);padding:2px 8px;border-radius:8px;display:inline-block;margin-top:4px;}
+
+/* ══ GALLERY ══ */
+.gallery-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+.gallery-item{border-radius:20px;padding:18px 14px;text-align:center;position:relative;overflow:hidden;box-shadow:0 4px 16px rgba(5,173,152,.08);}
+.gallery-item.earned{background:linear-gradient(155deg,#fff,rgba(236,77,37,.04));border:1.5px solid rgba(236,77,37,.18);}
+.gallery-item.locked{background:#fff;opacity:.5;}
+.gallery-emoji{font-size:2rem;}
+.gallery-title{font-size:.76rem;font-weight:800;color:var(--deep);margin-top:8px;}
+.gallery-date{font-size:.62rem;color:var(--gray);margin-top:3px;}
+
+/* ══ FAMILY CIRCLE ══ */
+.privacy-note{margin-bottom:14px;padding:13px 16px;border-radius:14px;background:rgba(5,173,152,.06);border:1px solid rgba(5,173,152,.16);font-size:.76rem;color:var(--deep);line-height:1.7;display:flex;gap:8px;align-items:flex-start;}
+.family-card{background:#fff;border-radius:22px;padding:20px;box-shadow:0 4px 20px rgba(5,173,152,.07);margin-bottom:16px;}
+.family-toggle-row{display:flex;align-items:center;justify-content:space-between;}
+.family-toggle-text{font-size:.86rem;font-weight:800;color:var(--text);}
+.family-toggle-sub{font-size:.72rem;color:var(--gray);margin-top:2px;}
+.switch{position:relative;width:50px;height:28px;flex-shrink:0;}
+.switch input{display:none;}
+.switch-slider{position:absolute;inset:0;background:var(--gray-light);border-radius:20px;cursor:pointer;transition:.3s;}
+.switch-slider::before{content:'';position:absolute;width:22px;height:22px;border-radius:50%;background:#fff;top:3px;right:3px;transition:.3s;box-shadow:0 2px 6px rgba(0,0,0,.2);}
+.switch input:checked + .switch-slider{background:var(--primary);}
+.switch input:checked + .switch-slider::before{transform:translateX(-22px);}
+.share-preview{margin-top:18px;padding:18px;border-radius:18px;text-align:center;background:linear-gradient(150deg,#06b9a3,#0a8f80);color:#fff;display:none;}
+.share-preview.show{display:block;animation:fadeUp .3s ease;}
+.share-preview-num{font-size:2.2rem;font-weight:800;}
+.share-preview-label{font-size:.78rem;opacity:.85;margin-top:2px;}
+.share-preview-note{font-size:.68rem;opacity:.75;margin-top:10px;}
+.family-add-row{display:flex;gap:8px;margin-top:16px;}
+.family-input{flex:1;border:1.5px solid rgba(5,173,152,.18);border-radius:12px;padding:11px 14px;font-family:inherit;font-size:.85rem;outline:none;}
+.family-add-btn{background:var(--primary);color:#fff;border:none;border-radius:12px;padding:0 16px;font-weight:800;cursor:pointer;font-size:1rem;font-family:inherit;}
+.family-member{display:flex;align-items:center;gap:10px;background:rgba(5,173,152,.04);border-radius:14px;padding:10px 14px;margin-top:8px;}
+.family-avatar{width:32px;height:32px;border-radius:50%;background:var(--primary-light);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800;flex-shrink:0;}
+.family-member-name{flex:1;font-size:.82rem;font-weight:700;}
+.family-member-badge{font-size:.66rem;color:var(--primary);font-weight:800;background:rgba(5,173,152,.08);padding:2px 8px;border-radius:8px;}
+
+/* ══ EXPORT ══ */
+.export-card{background:#fff;border-radius:22px;padding:24px;box-shadow:0 4px 20px rgba(36,95,115,.07);text-align:center;margin-bottom:16px;}
+.export-icon{font-size:2.6rem;}
+.export-title{font-size:.96rem;font-weight:800;color:var(--deep);margin-top:8px;}
+.export-sub{font-size:.78rem;color:var(--gray);margin-top:4px;line-height:1.7;}
+.export-btn{width:100%;margin-top:18px;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--deep),#3a7a92);color:#fff;font-weight:800;font-size:.88rem;cursor:pointer;font-family:inherit;box-shadow:0 8px 20px rgba(36,95,115,.3);}
+.quote-card{background:linear-gradient(150deg,rgba(5,173,152,.06),rgba(43,207,206,.04));border:1px solid rgba(5,173,152,.16);border-radius:20px;padding:20px;text-align:center;}
+.quote-text{font-family:'Amiri','Segoe UI',serif;font-size:1rem;font-weight:700;color:var(--primary);line-height:1.9;}
+.quote-btn{margin-top:12px;padding:9px 18px;border-radius:12px;border:1.5px solid rgba(5,173,152,.3);background:none;color:var(--primary);font-weight:800;font-size:.78rem;cursor:pointer;font-family:inherit;}
+.backup-row{display:flex;gap:10px;margin-top:14px;}
+.backup-btn{flex:1;padding:11px;border-radius:12px;border:1.5px solid rgba(5,173,152,.2);background:#fff;color:var(--primary);font-weight:800;font-size:.78rem;cursor:pointer;font-family:inherit;}
+
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--deep);color:#fff;padding:11px 22px;border-radius:14px;font-size:.84rem;font-weight:700;z-index:200;transition:transform .3s;box-shadow:0 8px 24px rgba(0,0,0,.18);max-width:380px;text-align:center;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.cf{position:fixed;width:9px;height:9px;border-radius:2px;pointer-events:none;z-index:300;animation:cfFall linear forwards;}
+@keyframes cfFall{0%{transform:translateY(-20px) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-top:1px solid rgba(5,173,152,.10);display:flex;justify-content:space-around;align-items:center;padding:10px 8px calc(10px + env(safe-area-inset-bottom));box-shadow:0 -6px 24px rgba(5,173,152,.08);z-index:50;}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--gray);cursor:pointer;flex:1;}
+.nav-item.active{color:var(--primary);}
+.nav-item .nav-ic{font-size:1.25rem;}
+.nav-item span:last-child{font-size:.66rem;font-weight:700;}
+.nav-item.active .nav-ic{background:rgba(5,173,152,.10);border-radius:12px;padding:2px 10px;}
+::-webkit-scrollbar{width:0;}
+</style>
+</head>
+<body>
+
+<div class="screen">
+
+  <div class="topbar">
+    <div class="back-btn" onclick="history.back()">←</div>
+    <div class="topbar-title">رحلتي وإنجازاتي</div>
+  </div>
+
+  <div class="tabs-wrap">
+    <button class="tab-btn active" id="tabWrap" onclick="switchTab('wrap')">🎬 قصة الشهر</button>
+    <button class="tab-btn" id="tabRoad" onclick="switchTab('road')">🛣️ المحطات</button>
+    <button class="tab-btn" id="tabGallery" onclick="switchTab('gallery')">🖼️ المعرض</button>
+    <button class="tab-btn" id="tabFamily" onclick="switchTab('family')">👨‍👩‍👧 العائلة</button>
+    <button class="tab-btn" id="tabExport" onclick="switchTab('export')">📤 التصدير</button>
+  </div>
+
+  <!-- ══ MONTHLY WRAP ══ -->
+  <div class="section active" id="sec-wrap">
+    <div class="section-block" style="margin-top:10px;">
+      <div class="wrap-card">
+        <div class="wrap-month">يونيو 2026</div>
+        <div class="wrap-title">شهرك بالأرقام ✨</div>
+        <div class="wrap-stats-grid">
+          <div class="wrap-stat"><div class="wrap-stat-num">22</div><div class="wrap-stat-label">يوم منضبط</div></div>
+          <div class="wrap-stat"><div class="wrap-stat-num">340</div><div class="wrap-stat-label">نقطة XP</div></div>
+          <div class="wrap-stat"><div class="wrap-stat-num">7</div><div class="wrap-stat-label">أجزاء قرآن</div></div>
+          <div class="wrap-stat"><div class="wrap-stat-num">3</div><div class="wrap-stat-label">ألقاب جديدة</div></div>
+        </div>
+        <div class="wrap-highlight">🏆 أقوى أسبوع لك كان الأسبوع الثالث بإنجاز 91%!</div>
+        <button class="wrap-share-btn" onclick="shareWrap()">📤 مشاركة ملخص الشهر</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ROAD MAP ══ -->
+  <div class="section" id="sec-road">
+    <div class="section-block" style="margin-top:10px;">
+      <div class="roadmap-card">
+        <div class="road-path">
+          <div class="road-line"></div>
+          <div id="stationsList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ GALLERY ══ -->
+  <div class="section" id="sec-gallery">
+    <div class="section-block" style="margin-top:10px;">
+      <div class="gallery-grid" id="galleryGrid"></div>
+    </div>
+  </div>
+
+  <!-- ══ FAMILY CIRCLE ══ -->
+  <div class="section" id="sec-family">
+    <div class="section-block" style="margin-top:10px;">
+      <div class="privacy-note">🔒 <span>خصوصية كاملة: لن تُشارك أي تفاصيل عن عاداتك أو أهدافك، فقط رقم سلسلتك الحالية إن اختياري.</span></div>
+      <div class="family-card">
+        <div class="family-toggle-row">
+          <div>
+            <div class="family-toggle-text">مشاركة سلسلتي مع المقربين</div>
+            <div class="family-toggle-sub">اختياري بالكامل، يمكن إيقافه في أي وقت</div>
+          </div>
+          <label class="switch"><input type="checkbox" id="familyToggle" onchange="toggleFamilyShare()"><span class="switch-slider"></span></label>
+        </div>
+        <div class="share-preview" id="sharePreview">
+          <div class="share-preview-num">🔥 7</div>
+          <div class="share-preview-label">أيام متتالية من النجاح</div>
+          <div class="share-preview-note">هذا فقط ما سيراه من تختاره</div>
+        </div>
+        <div class="family-add-row" id="familyAddRow" style="display:none;">
+          <input type="text" class="family-input" id="familyInput" placeholder="اسم الشخص المقرّب...">
+          <button class="family-add-btn" onclick="addFamilyMember()">+</button>
+        </div>
+        <div id="familyMembers"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ EXPORT ══ -->
+  <div class="section" id="sec-export">
+    <div class="section-block" style="margin-top:10px;">
+      <div class="export-card">
+        <div class="export-icon">📄</div>
+        <div class="export-title">تقرير PDF احترافي شامل</div>
+        <div class="export-sub">تقرير أسبوعي كامل بشعار مفكرة النجاح، يضم الروتين، السلسلة، الأهداف، والإنجازات</div>
+        <button class="export-btn" onclick="exportPDF()">🖨️ تصدير تقرير الأسبوع</button>
+      </div>
+      <div class="backup-row">
+        <button class="backup-btn" onclick="showToast('💾 سيتم حفظ نسخة احتياطية من كل بياناتك')">💾 نسخة احتياطية</button>
+        <button class="backup-btn" onclick="showToast('📥 اختر ملف JSON لاستيراد بياناتك')">📥 استيراد بيانات</button>
+      </div>
+      <div class="quote-card" style="margin-top:16px;">
+        <div class="quote-text" id="quoteText">✨ كل مرٍّ سيمر، واستمر في رحلتك نحو النجاح ✨</div>
+        <button class="quote-btn" onclick="nextQuote()">🔄 كلمة أخرى</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="bottom-nav">
+  <div class="nav-item"><span class="nav-ic">☰</span><span>المزيد</span></div>
+  <div class="nav-item"><span class="nav-ic">📊</span><span>التحليلات</span></div>
+  <div class="nav-item"><span class="nav-ic">🔄</span><span>العادات</span></div>
+  <div class="nav-item"><span class="nav-ic">🎯</span><span>الأهداف</span></div>
+  <div class="nav-item active"><span class="nav-ic">🏠</span><span>الرئيسية</span></div>
+</div>
+
+<script>
+function switchTab(tab){
+  ['wrap','road','gallery','family','export'].forEach(t=>{
+    const tabEl = document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1));
+    tabEl.classList.toggle('active', t===tab);
+    document.getElementById('sec-'+t).classList.toggle('active', t===tab);
+  });
+}
+
+/* ══ ROAD MAP ══ */
+const stations = [
+  {days:7, title:'المحطة الأولى', sub:'أسبوع كامل من الانضباط', reached:true},
+  {days:30, title:'المحطة الثانية', sub:'شهر كامل — عادة تكوّنت', reached:true},
+  {days:100, title:'محطة الأبطال', sub:'100 يوم — إنجاز استثنائي', reached:false},
+  {days:365, title:'المحطة الكبرى', sub:'سنة كاملة من النجاح', reached:false},
+];
+const currentDays = 47;
+function renderStations(){
+  document.getElementById('stationsList').innerHTML = stations.map(s=>{
+    const isCurrent = !s.reached && stations.find(x=>!x.reached)===s;
+    const cls = s.reached ? 'reached' : (isCurrent ? 'current' : '');
+    return `
+    <div class="station">
+      <div class="station-dot ${cls}">${s.reached?'✓':isCurrent?'🚩':s.days}</div>
+      <div class="station-content">
+        <div class="station-title ${s.reached?'reached-text':''}">${s.title} (${s.days} يوم)</div>
+        <div class="station-sub">${s.sub}</div>
+        ${isCurrent ? `<div class="station-badge">باقي ${s.days-currentDays} يوم</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ══ GALLERY ══ */
+const achievements = [
+  {emoji:'🔥', title:'أول سلسلة 7 أيام', date:'15 مايو 2026', earned:true},
+  {emoji:'📖', title:'أول ختمة جزء', date:'2 يونيو 2026', earned:true},
+  {emoji:'🎯', title:'صانع القرار', date:'10 يونيو 2026', earned:true},
+  {emoji:'🏆', title:'بطل النجاح', date:'يحتاج 1800 XP', earned:false},
+  {emoji:'👑', title:'90 يوم عهد', date:'يحتاج إكمال العهد', earned:false},
+  {emoji:'🌳', title:'شجرة مزهرة', date:'يحتاج 90 يوم سلسلة', earned:false},
+];
+function renderGallery(){
+  document.getElementById('galleryGrid').innerHTML = achievements.map(a=>`
+    <div class="gallery-item ${a.earned?'earned':'locked'}">
+      <div class="gallery-emoji">${a.emoji}</div>
+      <div class="gallery-title">${a.title}</div>
+      <div class="gallery-date">${a.earned?'📅 '+a.date:'🔒 '+a.date}</div>
+    </div>`).join('');
+}
+
+function shareWrap(){ confetti(); showToast('📤 جاهز للمشاركة! (سيُحفظ كصورة قابلة للمشاركة)'); }
+
+/* ══ FAMILY CIRCLE ══ */
+let familyMembers = [];
+function toggleFamilyShare(){
+  const checked = document.getElementById('familyToggle').checked;
+  document.getElementById('sharePreview').classList.toggle('show', checked);
+  document.getElementById('familyAddRow').style.display = checked ? 'flex' : 'none';
+  showToast(checked ? '✅ تفعّلت المشاركة' : '🔒 تم إيقاف المشاركة');
+}
+function addFamilyMember(){
+  const input = document.getElementById('familyInput');
+  const name = input.value.trim();
+  if(!name){ showToast('⚠️ اكتب اسم الشخص أولاً'); return; }
+  familyMembers.push(name);
+  input.value='';
+  renderFamily();
+  showToast('👨‍👩‍👧 أُضيف! سيرى سلسلتك فقط');
+}
+function renderFamily(){
+  document.getElementById('familyMembers').innerHTML = familyMembers.map(n=>`
+    <div class="family-member">
+      <div class="family-avatar">${n[0]}</div>
+      <div class="family-member-name">${n}</div>
+      <span class="family-member-badge">يرى السلسلة فقط</span>
+    </div>`).join('');
+}
+
+/* ══ EXPORT ══ */
+function exportPDF(){ showToast('📄 جاري إنشاء التقرير...'); }
+const QUOTES = ['✨ كل مرٍّ سيمر، واستمر في رحلتك نحو النجاح ✨','🚀 اليوم الذي تتألم فيه هو اليوم الذي تنمو فيه','💪 الانضباط هو الجسر بين الأحلام والإنجازات','🌟 لا تقارن بدايتك بمنتصف رحلة غيرك','🔥 كل يوم تنضبط هو انتصار على النسخة القديمة منك'];
+let qIdx = 0;
+function nextQuote(){ qIdx=(qIdx+1)%QUOTES.length; document.getElementById('quoteText').textContent = QUOTES[qIdx]; }
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(window._tt);
+  window._tt = setTimeout(()=>t.classList.remove('show'), 2400);
+}
+function confetti(){
+  const cols = ['#05AD98','#2BCFCE','#245F73','#F5B544'];
+  for(let i=0;i<22;i++){
+    const el = document.createElement('div');
+    el.className='cf';
+    el.style.cssText = `left:${Math.random()*100}vw; top:-10px; background:${cols[Math.floor(Math.random()*cols.length)]};
+      width:${5+Math.random()*7}px; height:${5+Math.random()*7}px;
+      animation-duration:${1.4+Math.random()*1.6}s; animation-delay:${Math.random()*.3}s;
+      border-radius:${Math.random()>.5?'50%':'2px'};`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 2800);
+  }
+}
+
+window.addEventListener('DOMContentLoaded', ()=>{
+  renderStations();
+  renderGallery();
+});
+</script>
+</body>
+</html>

@@ -94,6 +94,24 @@ export interface Goal {
   createdDate: string; // YYYY-MM-DD
 }
 
+export type Difficulty = 'سهل' | 'متوسط' | 'متقدم';
+
+export interface CustomExercise {
+  id: string;
+  name: string;
+  sets: number;
+  reps: string; // نطاق نصي مثل "8-12"
+  difficulty: Difficulty;
+  notes: string;
+}
+
+export interface CustomDay {
+  id: string;
+  name: string;
+  image: string | null; // dataURL اختياري
+  exercises: CustomExercise[];
+}
+
 export interface CoreState {
   profile: Profile;
   xp: number;
@@ -103,6 +121,7 @@ export interface CoreState {
   countedMemorizedJuz: number[]; // أجزاء حُسبت +50 لمنع التكرار
   routine: { morning: RoutineTask[]; evening: RoutineTask[] };
   goals: Goal[];
+  customWorkout: CustomDay[];
 }
 
 /* ===== المستويات السبعة (المرجع الوحيد) ===== */
@@ -170,6 +189,7 @@ const DEFAULT_STATE: CoreState = {
   countedMemorizedJuz: [],
   routine: { morning: [], evening: [] },
   goals: [],
+  customWorkout: [],
 };
 
 /* قراءة الحالة المحفوظة من localStorage مع دمج آمن مع الافتراضي */
@@ -189,6 +209,7 @@ const loadState = (): CoreState => {
         evening: parsed.routine?.evening ?? [],
       },
       goals: parsed.goals ?? [],
+      customWorkout: parsed.customWorkout ?? [],
     };
   } catch {
     return DEFAULT_STATE;
@@ -225,6 +246,18 @@ interface CoreContextValue {
   editGoalStep: (goalId: string, stepId: string, text: string) => void;
   toggleGoalStep: (goalId: string, stepId: string) => void;
   removeGoalStep: (goalId: string, stepId: string) => void;
+  // ===== الجدول المخصص =====
+  addCustomDay: () => void;
+  renameCustomDay: (dayId: string, name: string) => void;
+  removeCustomDay: (dayId: string) => void;
+  setCustomDayImage: (dayId: string, image: string | null) => void;
+  addCustomExercise: (dayId: string) => void;
+  updateCustomExercise: (
+    dayId: string,
+    exId: string,
+    patch: Partial<Omit<CustomExercise, 'id'>>,
+  ) => void;
+  removeCustomExercise: (dayId: string, exId: string) => void;
 }
 
 const CoreContext = createContext<CoreContextValue | null>(null);
@@ -645,6 +678,122 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     [updateGoals],
   );
 
+  /* تعديل قائمة أيام الجدول المخصص بدالة محوِّلة (يمنع تكرار منطق الوصول) */
+  const updateCustom = useCallback(
+    (fn: (list: CustomDay[]) => CustomDay[]) => {
+      setState((s) => ({ ...s, customWorkout: fn(s.customWorkout) }));
+    },
+    [],
+  );
+
+  /* إضافة يوم تمرين مخصص جديد */
+  const addCustomDay = useCallback(() => {
+    updateCustom((list) => [
+      ...list,
+      {
+        id: crypto.randomUUID(),
+        name: clean(`يوم تمرين ${list.length + 1}`),
+        image: null,
+        exercises: [],
+      },
+    ]);
+  }, [updateCustom]);
+
+  /* إعادة تسمية يوم */
+  const renameCustomDay = useCallback(
+    (dayId: string, name: string) => {
+      const t = clean(name);
+      updateCustom((list) =>
+        list.map((d) => (d.id === dayId ? { ...d, name: t } : d)),
+      );
+    },
+    [updateCustom],
+  );
+
+  /* حذف يوم (يمرّ عبر ConfirmDialog) */
+  const removeCustomDay = useCallback(
+    (dayId: string) => {
+      updateCustom((list) => list.filter((d) => d.id !== dayId));
+    },
+    [updateCustom],
+  );
+
+  /* تعيين/إزالة صورة اليوم */
+  const setCustomDayImage = useCallback(
+    (dayId: string, image: string | null) => {
+      updateCustom((list) =>
+        list.map((d) => (d.id === dayId ? { ...d, image } : d)),
+      );
+    },
+    [updateCustom],
+  );
+
+  /* إضافة تمرين فارغ ليوم */
+  const addCustomExercise = useCallback(
+    (dayId: string) => {
+      updateCustom((list) =>
+        list.map((d) =>
+          d.id === dayId
+            ? {
+                ...d,
+                exercises: [
+                  ...d.exercises,
+                  {
+                    id: crypto.randomUUID(),
+                    name: '',
+                    sets: 0,
+                    reps: '',
+                    difficulty: 'متوسط',
+                    notes: '',
+                  },
+                ],
+              }
+            : d,
+        ),
+      );
+    },
+    [updateCustom],
+  );
+
+  /* تحديث حقول تمرين مع تنظيف النصوص وحصر الأرقام */
+  const updateCustomExercise = useCallback(
+    (dayId: string, exId: string, patch: Partial<Omit<CustomExercise, 'id'>>) => {
+      updateCustom((list) =>
+        list.map((d) => {
+          if (d.id !== dayId) return d;
+          return {
+            ...d,
+            exercises: d.exercises.map((ex) => {
+              if (ex.id !== exId) return ex;
+              const next: CustomExercise = { ...ex };
+              if (patch.name !== undefined) next.name = clean(patch.name);
+              if (patch.reps !== undefined) next.reps = clean(patch.reps);
+              if (patch.notes !== undefined) next.notes = clean(patch.notes);
+              if (patch.difficulty !== undefined) next.difficulty = patch.difficulty;
+              if (patch.sets !== undefined) next.sets = clampNum(patch.sets, 0, 100);
+              return next;
+            }),
+          };
+        }),
+      );
+    },
+    [updateCustom],
+  );
+
+  /* حذف تمرين من يوم */
+  const removeCustomExercise = useCallback(
+    (dayId: string, exId: string) => {
+      updateCustom((list) =>
+        list.map((d) =>
+          d.id === dayId
+            ? { ...d, exercises: d.exercises.filter((ex) => ex.id !== exId) }
+            : d,
+        ),
+      );
+    },
+    [updateCustom],
+  );
+
   const value = useMemo<CoreContextValue>(
     () => ({
       state,
@@ -673,6 +822,13 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       editGoalStep,
       toggleGoalStep,
       removeGoalStep,
+      addCustomDay,
+      renameCustomDay,
+      removeCustomDay,
+      setCustomDayImage,
+      addCustomExercise,
+      updateCustomExercise,
+      removeCustomExercise,
     }),
     [
       state,
@@ -701,6 +857,13 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       editGoalStep,
       toggleGoalStep,
       removeGoalStep,
+      addCustomDay,
+      renameCustomDay,
+      removeCustomDay,
+      setCustomDayImage,
+      addCustomExercise,
+      updateCustomExercise,
+      removeCustomExercise,
     ],
   );
 

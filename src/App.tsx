@@ -10,6 +10,7 @@ import Confetti from './components/Confetti';
 import { useCore } from './core/useCore';
 import Routine from './pages/Routine';
 import Goals from './pages/Goals';
+import CustomWorkout from './pages/CustomWorkout';
 
 /* صفحة ترحيب مؤقتة للتأكد من ربط النواة — تُستبدل بالصفحات الفعلية */
 function HomePlaceholder() {
@@ -59,6 +60,7 @@ export default function App() {
         <Route path="/" component={HomePlaceholder} />
         <Route path="/routine" component={Routine} />
         <Route path="/goals" component={Goals} />
+        <Route path="/custom-workout" component={CustomWorkout} />
         <Route component={ComingSoon} />
       </Switch>
       <BottomNav />

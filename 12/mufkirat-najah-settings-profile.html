@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الإعدادات - مفكرة النجاح</title>
+<style>
+:root{
+  --primary:#05AD98; --primary-light:#2BCFCE; --deep:#245F73;
+  --accent:#EC4D25; --gray:#878787; --gray-light:#BBBFBF;
+  --bg:#FAFAFA; --white:#FFFFFF; --text:#1A2E2C;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Alyamama','Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--text);direction:rtl;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s;}
+.amiri{font-family:'Amiri','Segoe UI',serif;}
+.screen{max-width:430px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;padding-bottom:100px;transition:background .3s;}
+
+/* ══ DARK MODE ══ */
+body.dark{--bg:#0F1B1A; --white:#16241F; --text:#E8F4F2; --gray:#8A9B98; --gray-light:#3A4D49;}
+body.dark .screen{background:var(--bg);}
+
+.topbar{display:flex;align-items:center;gap:10px;padding:16px 18px 10px;position:sticky;top:0;z-index:60;background:rgba(250,250,250,.94);backdrop-filter:blur(12px);}
+body.dark .topbar{background:rgba(15,27,26,.92);}
+.back-btn{width:36px;height:36px;border-radius:50%;background:rgba(5,173,152,.08);display:flex;align-items:center;justify-content:center;font-size:1.05rem;color:var(--primary);cursor:pointer;flex-shrink:0;}
+.topbar-title{font-size:.98rem;font-weight:800;color:var(--deep);flex:1;}
+body.dark .topbar-title{color:var(--primary-light);}
+
+.section-block{margin:14px 18px 18px;}
+.section-head{font-size:.85rem;font-weight:800;color:var(--gray);margin-bottom:10px;letter-spacing:.02em;}
+
+/* ══ PROFILE HERO ══ */
+.profile-hero{
+  border-radius:24px;padding:24px;text-align:center;color:#fff;position:relative;overflow:hidden;margin:10px 18px 18px;
+  background:linear-gradient(150deg,#06b9a3 0%,#0a8f80 55%,#245F73 100%);box-shadow:0 14px 30px rgba(5,173,152,.25);
+}
+.profile-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 80% -10%, rgba(255,255,255,.22), transparent 55%);}
+.profile-avatar{
+  width:74px;height:74px;border-radius:50%;background:rgba(255,255,255,.18);border:3px solid rgba(255,255,255,.4);
+  display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;margin:0 auto 12px;
+  position:relative;z-index:2;
+}
+.profile-greeting{font-size:1.05rem;font-weight:800;position:relative;z-index:2;}
+.profile-meta{font-size:.78rem;opacity:.85;margin-top:4px;position:relative;z-index:2;}
+.profile-level-badge{
+  display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);
+  border-radius:20px;padding:6px 16px;font-size:.78rem;font-weight:800;margin-top:12px;position:relative;z-index:2;
+}
+
+/* ══ SETTINGS CARD ══ */
+.settings-card{background:#fff;border-radius:20px;padding:6px;box-shadow:0 4px 18px rgba(5,173,152,.07);}
+body.dark .settings-card{background:var(--white);box-shadow:0 4px 18px rgba(0,0,0,.2);}
+
+.settings-row{display:flex;align-items:center;gap:12px;padding:14px 14px;border-bottom:1px solid rgba(0,0,0,.04);cursor:pointer;}
+body.dark .settings-row{border-bottom-color:rgba(255,255,255,.06);}
+.settings-row:last-child{border-bottom:none;}
+.settings-icon{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;background:rgba(5,173,152,.08);}
+.settings-text{flex:1;}
+.settings-label{font-size:.86rem;font-weight:700;color:var(--text);}
+.settings-sub{font-size:.7rem;color:var(--gray);margin-top:2px;}
+.settings-arrow{color:var(--gray-light);font-size:.85rem;}
+.settings-val{font-size:.78rem;color:var(--primary);font-weight:700;}
+
+/* ══ DARK MODE TOGGLE ══ */
+.dm-toggle-row{display:flex;align-items:center;gap:12px;padding:14px;}
+.switch{position:relative;width:50px;height:28px;flex-shrink:0;}
+.switch input{display:none;}
+.switch-slider{position:absolute;inset:0;background:var(--gray-light);border-radius:20px;cursor:pointer;transition:.3s;}
+.switch-slider::before{content:'';position:absolute;width:22px;height:22px;border-radius:50%;background:#fff;top:3px;right:3px;transition:.3s;box-shadow:0 2px 6px rgba(0,0,0,.2);}
+.switch input:checked + .switch-slider{background:var(--primary);}
+.switch input:checked + .switch-slider::before{transform:translateX(-22px);}
+
+/* ══ PROFILE EDIT MODAL ══ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:18px;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:#fff;border-radius:24px;padding:24px;width:100%;max-width:400px;box-shadow:0 20px 50px rgba(0,0,0,.25);max-height:88vh;overflow-y:auto;}
+body.dark .modal-box{background:var(--white);}
+.modal-title{font-size:1rem;font-weight:800;color:var(--deep);margin-bottom:16px;text-align:center;}
+body.dark .modal-title{color:var(--primary-light);}
+.form-field{margin-bottom:14px;}
+.form-field:last-child{margin-bottom:0;}
+.form-label{font-size:.8rem;font-weight:700;color:var(--text);margin-bottom:6px;display:block;}
+.form-input, .form-select{width:100%;border:1.5px solid rgba(5,173,152,.15);border-radius:12px;padding:11px 14px;font-family:inherit;font-size:.86rem;outline:none;background:#fff;color:var(--text);}
+body.dark .form-input, body.dark .form-select{background:#1c2e29;border-color:rgba(43,207,206,.2);color:var(--text);}
+.form-input:focus, .form-select:focus{border-color:var(--primary);}
+.gender-pick{display:flex;gap:8px;}
+.gender-btn{flex:1;padding:10px;border-radius:12px;border:1.5px solid rgba(5,173,152,.15);background:#fff;font-family:inherit;font-size:.84rem;font-weight:700;color:var(--gray);cursor:pointer;}
+body.dark .gender-btn{background:#1c2e29;}
+.gender-btn.sel{background:var(--primary);border-color:transparent;color:#fff;}
+.form-actions{display:flex;gap:8px;margin-top:16px;}
+.btn-save{flex:1;background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;border:none;border-radius:12px;padding:13px;font-weight:800;font-size:.86rem;cursor:pointer;font-family:inherit;}
+.btn-cancel{background:rgba(0,0,0,.04);color:var(--gray);border:none;border-radius:12px;padding:13px 18px;font-weight:700;font-size:.86rem;cursor:pointer;font-family:inherit;}
+
+.note-box{
+  margin-top:12px;padding:10px 14px;border-radius:12px;background:rgba(5,173,152,.05);
+  font-size:.72rem;color:var(--deep);line-height:1.6;
+}
+
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--deep);color:#fff;padding:11px 22px;border-radius:14px;font-size:.84rem;font-weight:700;z-index:200;transition:transform .3s;box-shadow:0 8px 24px rgba(0,0,0,.18);max-width:380px;text-align:center;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-top:1px solid rgba(5,173,152,.10);display:flex;justify-content:space-around;align-items:center;padding:10px 8px calc(10px + env(safe-area-inset-bottom));box-shadow:0 -6px 24px rgba(5,173,152,.08);z-index:50;}
+body.dark .bottom-nav{background:rgba(22,36,31,.92);}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--gray);cursor:pointer;flex:1;}
+.nav-item.active{color:var(--primary);}
+.nav-item .nav-ic{font-size:1.25rem;}
+.nav-item span:last-child{font-size:.66rem;font-weight:700;}
+.nav-item.active .nav-ic{background:rgba(5,173,152,.10);border-radius:12px;padding:2px 10px;}
+::-webkit-scrollbar{width:0;}
+</style>
+</head>
+<body>
+
+<div class="screen">
+
+  <div class="topbar">
+    <div class="back-btn" onclick="history.back()">←</div>
+    <div class="topbar-title">⚙️ الإعدادات</div>
+  </div>
+
+  <!-- PROFILE HERO -->
+  <div class="profile-hero">
+    <div class="profile-avatar" id="profileAvatar">س</div>
+    <div class="profile-greeting" id="profileGreeting">سعود</div>
+    <div class="profile-meta" id="profileMeta">مهندس برمجيات</div>
+    <div class="profile-level-badge" id="profileLevelBadge">🌱 مبتدئ · 0 XP</div>
+  </div>
+
+  <!-- PROFILE SETTINGS -->
+  <div class="section-block">
+    <div class="section-head">الملف الشخصي</div>
+    <div class="settings-card">
+      <div class="settings-row" onclick="openProfileModal()">
+        <div class="settings-icon">🪪</div>
+        <div class="settings-text">
+          <div class="settings-label">بطاقتي الشخصية</div>
+          <div class="settings-sub">الاسم، اللقب، الجنس، العمر، المهنة، الطول والوزن</div>
+        </div>
+        <div class="settings-arrow">‹</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPEARANCE -->
+  <div class="section-block">
+    <div class="section-head">المظهر</div>
+    <div class="settings-card">
+      <div class="dm-toggle-row">
+        <div class="settings-icon" id="dmIcon">☀️</div>
+        <div class="settings-text">
+          <div class="settings-label">الوضع الليلي</div>
+          <div class="settings-sub" id="dmSub">يحافظ على راحة عينيك ليلاً</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="darkModeToggle" onchange="handleDarkModeToggle()">
+          <span class="switch-slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTIFICATIONS -->
+  <div class="section-block">
+    <div class="section-head">الإشعارات والتذكيرات</div>
+    <div class="settings-card">
+      <div class="settings-row" onclick="window.location.href='#notifications'">
+        <div class="settings-icon">🔔</div>
+        <div class="settings-text">
+          <div class="settings-label">إشعارات التحفيز اليومية</div>
+          <div class="settings-sub">تذكيرات لطيفة لتسجيل يومك</div>
+        </div>
+        <div class="settings-arrow">‹</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- PROFILE EDIT MODAL -->
+<div class="modal-overlay" id="profileModal">
+  <div class="modal-box">
+    <div class="modal-title">🪪 بطاقتي الشخصية</div>
+
+    <div class="form-field">
+      <label class="form-label">الاسم الكامل</label>
+      <input type="text" class="form-input" id="p-name" placeholder="اسمك">
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">كيف تحب أن نناديك؟</label>
+      <input type="text" class="form-input" id="p-nickname" placeholder="مثال: يا بطل، يا كابتن، يا نجم">
+      <div class="note-box">💡 هذا اللقب سيظهر في كل رسائل التحفيز بدل اسمك الكامل (مثال: "أحسنت يا كابتن!")</div>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">الجنس</label>
+      <div class="gender-pick">
+        <button class="gender-btn" id="genderMale" onclick="pickGender('ذكر')">👨 ذكر</button>
+        <button class="gender-btn" id="genderFemale" onclick="pickGender('أنثى')">👩 أنثى</button>
+      </div>
+      <div class="note-box">💡 يساعدنا هذا في تخصيص صيغة الخطاب (أحسنت / أحسنتِ) في كل رسائل التطبيق</div>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">العمر</label>
+      <input type="number" class="form-input" id="p-age" placeholder="مثال: 28">
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">المهنة</label>
+      <input type="text" class="form-input" id="p-profession" placeholder="مثال: مهندس برمجيات">
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">الطول (سم) — اختياري</label>
+      <input type="number" class="form-input" id="p-height" placeholder="مثال: 175">
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">الوزن (كجم) — اختياري</label>
+      <input type="number" class="form-input" id="p-weight" placeholder="مثال: 78">
+      <div class="note-box">📌 الطول والوزن هنا بيانات شخصية بسيطة فقط، ولا ترتبط تلقائياً بأي حسابات صحية في أقسام أخرى من التطبيق.</div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn-save" onclick="saveProfile()">تـم</button>
+      <button class="btn-cancel" onclick="closeModal('profileModal')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="bottom-nav">
+  <div class="nav-item active"><span class="nav-ic">☰</span><span>المزيد</span></div>
+  <div class="nav-item"><span class="nav-ic">📊</span><span>التحليلات</span></div>
+  <div class="nav-item"><span class="nav-ic">🔄</span><span>العادات</span></div>
+  <div class="nav-item"><span class="nav-ic">🎯</span><span>الأهداف</span></div>
+  <div class="nav-item"><span class="nav-ic">🏠</span><span>الرئيسية</span></div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════
+   ⚠️ هذه الصفحة تستخدم window.MufkiratCore (النظام المركزي)
+   المبني في الصفحة السابقة. لو فُتحت هذه الصفحة منفصلة هنا
+   للمراجعة، نُعرّف نسخة مصغّرة محلية منه فقط للعرض التجريبي.
+   عند الدمج الفعلي، تُحذف هذه النسخة المصغّرة ويُستخدم
+   MufkiratCore الحقيقي الموجود مسبقاً في كل صفحات التطبيق.
+   ══════════════════════════════════════════════════ */
+if(!window.MufkiratCore){
+  window.MufkiratCore = (function(){
+    const KEY = 'mufkirat_najah_core_v1';
+    function _load(){ try{ const r=localStorage.getItem(KEY); return r?JSON.parse(r):_default(); }catch(e){return _default();} }
+    function _save(s){ try{ localStorage.setItem(KEY, JSON.stringify(s)); }catch(e){} }
+    function _default(){
+      return { profile:{name:'سعود',nickname:'يا بطل',gender:'ذكر',age:null,height:null,weight:null,profession:'',darkMode:false},
+               xp:0, streak:0, bestStreak:0, activityLog:[] };
+    }
+    return {
+      getUserProfile(){ return _load().profile; },
+      updateUserProfile(u){ const s=_load(); s.profile={...s.profile,...u}; _save(s); this._notify(); },
+      getXP(){ return _load().xp; },
+      getLevel(){
+        const LV=[{name:'مبتدئ',icon:'🌱',min:0},{name:'متعلم',icon:'📚',min:100},{name:'منضبط',icon:'⚡',min:250},{name:'مثابر',icon:'💪',min:500},{name:'محترف',icon:'🎯',min:800},{name:'متميز',icon:'🌟',min:1200},{name:'بطل النجاح',icon:'🏆',min:1800}];
+        const xp=this.getXP(); for(let i=LV.length-1;i>=0;i--) if(xp>=LV[i].min) return LV[i]; return LV[0];
+      },
+      isDarkMode(){ return _load().profile.darkMode; },
+      toggleDarkMode(){ const s=_load(); s.profile.darkMode=!s.profile.darkMode; _save(s); this._notify(); return s.profile.darkMode; },
+      _listeners:[], onUpdate(cb){ this._listeners.push(cb); }, _notify(){ this._listeners.forEach(cb=>cb()); }
+    };
+  })();
+}
+
+let selectedGender = 'ذكر';
+
+function refreshProfileUI(){
+  const p = MufkiratCore.getUserProfile();
+  const lvl = MufkiratCore.getLevel();
+  const xp = MufkiratCore.getXP();
+
+  document.getElementById('profileAvatar').textContent = p.name ? p.name[0] : 'س';
+  document.getElementById('profileGreeting').textContent = p.name + (p.nickname ? ' · '+p.nickname : '');
+  document.getElementById('profileMeta').textContent = p.profession || 'لم تُحدَّد المهنة بعد';
+  document.getElementById('profileLevelBadge').textContent = lvl.icon+' '+lvl.name+' · '+xp+' XP';
+
+  // dark mode
+  const isDark = MufkiratCore.isDarkMode();
+  document.body.classList.toggle('dark', isDark);
+  document.getElementById('darkModeToggle').checked = isDark;
+  document.getElementById('dmIcon').textContent = isDark ? '🌙' : '☀️';
+  document.getElementById('dmSub').textContent = isDark ? 'مفعّل الآن — راحة بصرية ليلية' : 'يحافظ على راحة عينيك ليلاً';
+}
+
+function handleDarkModeToggle(){
+  const isDark = MufkiratCore.toggleDarkMode();
+  document.body.classList.toggle('dark', isDark);
+  document.getElementById('dmIcon').textContent = isDark ? '🌙' : '☀️';
+  document.getElementById('dmSub').textContent = isDark ? 'مفعّل الآن — راحة بصرية ليلية' : 'يحافظ على راحة عينيك ليلاً';
+  showToast(isDark ? '🌙 تم تفعيل الوضع الليلي' : '☀️ تم تفعيل الوضع النهاري');
+}
+
+function openProfileModal(){
+  const p = MufkiratCore.getUserProfile();
+  document.getElementById('p-name').value = p.name || '';
+  document.getElementById('p-nickname').value = p.nickname || '';
+  document.getElementById('p-age').value = p.age || '';
+  document.getElementById('p-profession').value = p.profession || '';
+  document.getElementById('p-height').value = p.height || '';
+  document.getElementById('p-weight').value = p.weight || '';
+  pickGender(p.gender || 'ذكر');
+  openModal('profileModal');
+}
+
+function pickGender(g){
+  selectedGender = g;
+  document.getElementById('genderMale').classList.toggle('sel', g==='ذكر');
+  document.getElementById('genderFemale').classList.toggle('sel', g==='أنثى');
+}
+
+function saveProfile(){
+  const name = document.getElementById('p-name').value.trim();
+  if(!name){ showToast('⚠️ أدخل اسمك أولاً'); return; }
+
+  MufkiratCore.updateUserProfile({
+    name,
+    nickname: document.getElementById('p-nickname').value.trim() || name,
+    gender: selectedGender,
+    age: document.getElementById('p-age').value || null,
+    profession: document.getElementById('p-profession').value.trim(),
+    height: document.getElementById('p-height').value || null,
+    weight: document.getElementById('p-weight').value || null,
+  });
+
+  closeModal('profileModal');
+  refreshProfileUI();
+  showToast('🪪 تم حفظ بطاقتك الشخصية بنجاح!');
+}
+
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(window._tt);
+  window._tt = setTimeout(()=>t.classList.remove('show'), 2400);
+}
+
+MufkiratCore.onUpdate(refreshProfileUI);
+window.addEventListener('DOMContentLoaded', refreshProfileUI);
+</script>
+</body>
+</html>

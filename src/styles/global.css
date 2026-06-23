@@ -516,3 +516,190 @@ select {
   color: var(--text-secondary);
   margin-bottom: 6px;
 }
+
+/* ===== صفحة "صمّم جدول تمارينك" ===== */
+.intro-hero {
+  border-radius: var(--radius);
+  padding: 22px 20px;
+  text-align: center;
+  color: #fff;
+  margin-bottom: 16px;
+  background: linear-gradient(150deg, var(--deep), var(--primary));
+  box-shadow: var(--shadow-soft);
+}
+
+.intro-hero .intro-icon {
+  font-size: 2rem;
+}
+
+.intro-hero .intro-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  margin-top: 8px;
+}
+
+.intro-hero .intro-sub {
+  font-size: 0.82rem;
+  opacity: 0.9;
+  margin-top: 6px;
+  line-height: 1.7;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 36px 20px;
+}
+
+.empty-state .empty-icon {
+  font-size: 2.2rem;
+}
+
+.empty-state .empty-text {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-top: 10px;
+  line-height: 1.7;
+  font-weight: 600;
+}
+
+.day-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.day-arrow {
+  color: var(--primary);
+  font-size: 1rem;
+  transition: transform 0.25s;
+  flex-shrink: 0;
+}
+
+.day-arrow.open {
+  transform: rotate(90deg);
+}
+
+.day-name-input {
+  flex: 1;
+  border: none;
+  background: none;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--deep);
+  outline: none;
+  text-align: right;
+}
+
+.day-count {
+  font-size: 0.68rem;
+  color: var(--primary);
+  background: var(--bg);
+  padding: 3px 9px;
+  border-radius: 10px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.cust-ex {
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  margin-bottom: 10px;
+  border: 1px solid var(--border);
+}
+
+.cust-ex-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.cust-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field label {
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.field input,
+.field select,
+.cust-notes {
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 8px 10px;
+  font-size: 0.82rem;
+  outline: none;
+  background: var(--surface);
+}
+
+.field input:focus,
+.field select:focus,
+.cust-notes:focus {
+  border-color: var(--primary);
+}
+
+.cust-notes {
+  width: 100%;
+  resize: none;
+  margin-top: 4px;
+}
+
+.dashed-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  border: 1.5px dashed var(--primary);
+  background: var(--bg);
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+
+.day-img-slot {
+  aspect-ratio: 1 / 1;
+  max-width: 120px;
+  border-radius: var(--radius-sm);
+  border: 2px dashed var(--primary-light);
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.day-img-slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hint-msg {
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin: 8px 0;
+  text-align: center;
+}
+
+.hint-msg.warn {
+  color: var(--danger);
+}
+
+.hint-msg.ok {
+  color: var(--primary);
+}

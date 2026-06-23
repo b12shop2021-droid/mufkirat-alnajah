@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>التحليلات - مفكرة النجاح</title>
+<style>
+:root{
+  --primary:#05AD98; --primary-light:#2BCFCE; --deep:#245F73;
+  --accent:#EC4D25; --gray:#878787; --gray-light:#BBBFBF;
+  --bg:#FAFAFA; --white:#FFFFFF; --text:#1A2E2C;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Alyamama','Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--text);direction:rtl;-webkit-font-smoothing:antialiased;}
+.amiri{font-family:'Amiri','Segoe UI',serif;}
+.screen{max-width:430px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;padding-bottom:100px;}
+
+.topbar{display:flex;align-items:center;gap:10px;padding:16px 18px 10px;position:sticky;top:0;z-index:60;background:rgba(250,250,250,.94);backdrop-filter:blur(12px);}
+.back-btn{width:36px;height:36px;border-radius:50%;background:rgba(5,173,152,.08);display:flex;align-items:center;justify-content:center;font-size:1.05rem;color:var(--primary);cursor:pointer;flex-shrink:0;}
+.topbar-title{font-size:.98rem;font-weight:800;color:var(--deep);flex:1;}
+.topbar-icon{width:36px;height:36px;border-radius:50%;background:rgba(5,173,152,.08);display:flex;align-items:center;justify-content:center;font-size:.95rem;cursor:pointer;flex-shrink:0;}
+
+.section-block{margin:14px 18px 18px;}
+.section-head{font-size:.9rem;font-weight:800;color:var(--deep);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+
+/* ══ HARMONY METER ══ */
+.harmony-card{
+  border-radius:24px;padding:22px;color:#fff;position:relative;overflow:hidden;text-align:center;margin:10px 18px 18px;
+  background:linear-gradient(150deg,#06b9a3 0%,#0a8f80 55%,#245F73 100%);box-shadow:0 14px 30px rgba(5,173,152,.25);
+}
+.harmony-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 80% -10%, rgba(255,255,255,.22), transparent 55%);}
+.harmony-label{font-size:.78rem;opacity:.85;position:relative;z-index:2;font-weight:700;}
+.harmony-status{font-size:1.3rem;font-weight:800;margin-top:6px;position:relative;z-index:2;}
+.harmony-detail{font-size:.78rem;opacity:.85;margin-top:8px;position:relative;z-index:2;line-height:1.7;}
+.harmony-ring-wrap{margin-top:14px;position:relative;z-index:2;}
+
+/* ══ STATS GRID (الأربع بطاقات الأصلية) ══ */
+.stats-grid-4{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 18px 18px;}
+.stat-tile{background:#fff;border-radius:18px;padding:16px 14px;box-shadow:0 4px 16px rgba(5,173,152,.06);text-align:center;}
+.stat-tile-icon{width:42px;height:42px;border-radius:14px;background:rgba(5,173,152,.08);display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin:0 auto 8px;}
+.stat-tile-num{font-size:1.5rem;font-weight:800;color:var(--deep);}
+.stat-tile-label{font-size:.72rem;color:var(--gray);font-weight:700;margin-top:2px;}
+
+/* ══ COMPARISON ══ */
+.comparison-card{
+  margin:0 18px 18px;border-radius:18px;padding:16px 18px;display:flex;align-items:center;gap:12px;
+  background:linear-gradient(150deg,rgba(5,173,152,.06),rgba(43,207,206,.04));border:1px solid rgba(5,173,152,.16);
+}
+.comp-icon{font-size:1.6rem;flex-shrink:0;}
+.comp-text{font-size:.8rem;color:var(--deep);font-weight:700;line-height:1.6;}
+
+/* ══ FILTERS ══ */
+.filter-row{display:flex;gap:8px;margin:0 18px 18px;}
+.filter-btn{flex:1;padding:9px 0;border-radius:12px;border:1.5px solid rgba(5,173,152,.15);background:#fff;font-family:inherit;font-size:.8rem;font-weight:700;color:var(--gray);cursor:pointer;text-align:center;}
+.filter-btn.active{background:var(--primary);border-color:transparent;color:#fff;box-shadow:0 4px 12px rgba(5,173,152,.3);}
+
+/* ══ LINE CHART ══ */
+.chart-card{background:#fff;border-radius:22px;padding:20px;box-shadow:0 4px 18px rgba(5,173,152,.07);margin:0 18px 18px;}
+.chart-legend-row{display:flex;gap:16px;margin-bottom:14px;}
+.chart-legend-item{display:flex;align-items:center;gap:6px;font-size:.74rem;color:var(--gray);font-weight:700;}
+.chart-legend-dot{width:10px;height:10px;border-radius:50%;}
+
+/* ══ GOALS DISTRIBUTION ══ */
+.dist-card{background:#fff;border-radius:22px;padding:20px;box-shadow:0 4px 18px rgba(5,173,152,.07);margin:0 18px 18px;}
+.dist-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.dist-row:last-child{margin-bottom:0;}
+.dist-icon{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;}
+.dist-name{font-size:.8rem;font-weight:700;width:70px;flex-shrink:0;}
+.dist-bar-bg{flex:1;height:9px;border-radius:6px;background:rgba(5,173,152,.08);overflow:hidden;}
+.dist-bar-fill{height:100%;border-radius:6px;transition:width .5s ease;}
+.dist-val{font-size:.76rem;font-weight:800;color:var(--deep);width:32px;text-align:left;flex-shrink:0;}
+
+/* ══ HABIT ACTIVITY ══ */
+.habit-activity-grid{display:flex;gap:6px;justify-content:space-between;}
+.ha-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;}
+.ha-bar-wrap{height:70px;display:flex;align-items:flex-end;width:100%;justify-content:center;}
+.ha-bar{width:60%;border-radius:6px 6px 3px 3px;background:linear-gradient(to top,var(--primary),var(--primary-light));min-height:4px;transition:height .5s ease;}
+.ha-day{font-size:.62rem;color:var(--gray);font-weight:700;}
+.ha-val{font-size:.62rem;font-weight:800;color:var(--deep);}
+
+/* ══ BADGES SHOWCASE ══ */
+.badges-row{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;}
+.badges-row::-webkit-scrollbar{display:none;}
+.badge-tile{flex-shrink:0;width:88px;text-align:center;padding:14px 8px;border-radius:16px;background:#fff;box-shadow:0 3px 12px rgba(5,173,152,.06);}
+.badge-tile.earned{background:linear-gradient(165deg,#fff,rgba(236,77,37,.04));box-shadow:0 4px 14px rgba(236,77,37,.1);}
+.badge-tile.locked{opacity:.45;}
+.badge-tile-emoji{font-size:1.5rem;}
+.badge-tile-name{font-size:.66rem;font-weight:800;color:var(--deep);margin-top:5px;line-height:1.3;}
+
+/* ══ EMPTY STATE ══ */
+.empty-friendly{
+  text-align:center;padding:30px 16px;border-radius:16px;background:rgba(5,173,152,.03);
+  border:1.5px dashed rgba(5,173,152,.2);
+}
+.empty-friendly-icon{font-size:1.8rem;}
+.empty-friendly-text{font-size:.8rem;color:var(--gray);margin-top:8px;line-height:1.7;font-weight:600;}
+
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-top:1px solid rgba(5,173,152,.10);display:flex;justify-content:space-around;align-items:center;padding:10px 8px calc(10px + env(safe-area-inset-bottom));box-shadow:0 -6px 24px rgba(5,173,152,.08);z-index:50;}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--gray);cursor:pointer;flex:1;}
+.nav-item.active{color:var(--primary);}
+.nav-item .nav-ic{font-size:1.25rem;}
+.nav-item span:last-child{font-size:.66rem;font-weight:700;}
+.nav-item.active .nav-ic{background:rgba(5,173,152,.10);border-radius:12px;padding:2px 10px;}
+::-webkit-scrollbar{width:0;}
+</style>
+</head>
+<body>
+
+<div class="screen">
+
+  <div class="topbar">
+    <div class="back-btn" onclick="history.back()">←</div>
+    <div class="topbar-title">📊 التحليلات</div>
+    <div class="topbar-icon">⋯</div>
+  </div>
+
+  <!-- HARMONY METER -->
+  <div class="harmony-card">
+    <div class="harmony-label">⚖️ مرصد الانسجام الأسبوعي</div>
+    <div class="harmony-status" id="harmonyStatus">🟢 متوازن</div>
+    <div class="harmony-detail" id="harmonyDetail">جوانب حياتك متناسقة هذا الأسبوع، استمر بهذا الإيقاع!</div>
+  </div>
+
+  <!-- ══ ORIGINAL 4 STAT CARDS (محفوظة كما هي) ══ -->
+  <div class="stats-grid-4">
+    <div class="stat-tile">
+      <div class="stat-tile-icon">📈</div>
+      <div class="stat-tile-num" id="statHabits">12</div>
+      <div class="stat-tile-label">العادات المتابعة</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-tile-icon">🎯</div>
+      <div class="stat-tile-num" id="statGoals">4</div>
+      <div class="stat-tile-label">الأهداف المكتملة</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-tile-icon">📊</div>
+      <div class="stat-tile-num" id="statRate">76%</div>
+      <div class="stat-tile-label">معدل الإنجاز</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-tile-icon">🏅</div>
+      <div class="stat-tile-num" id="statXP">340</div>
+      <div class="stat-tile-label">النقاط المكتسبة</div>
+    </div>
+  </div>
+
+  <!-- COMPARISON -->
+  <div class="comparison-card">
+    <div class="comp-icon">📈</div>
+    <div class="comp-text" id="comparisonText">هذا الأسبوع أفضل من الماضي بـ 14% — استمر بهذا الانضباط الرائع!</div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filter-row">
+    <button class="filter-btn" onclick="setFilter('week',this)">أسبوع</button>
+    <button class="filter-btn active" onclick="setFilter('month',this)">شهر</button>
+    <button class="filter-btn" onclick="setFilter('year',this)">سنة</button>
+  </div>
+
+  <!-- LINE CHART: السلسلة + XP عبر الزمن -->
+  <div class="chart-card">
+    <div class="section-head" style="margin-bottom:8px;">📈 السلسلة ونقاط XP عبر الزمن</div>
+    <div class="chart-legend-row">
+      <div class="chart-legend-item"><span class="chart-legend-dot" style="background:#05AD98"></span> معدل الإنجاز %</div>
+      <div class="chart-legend-item"><span class="chart-legend-dot" style="background:#245F73"></span> نقاط XP</div>
+    </div>
+    <div id="lineChartWrap"></div>
+  </div>
+
+  <!-- توزيع الأهداف -->
+  <div class="dist-card">
+    <div class="section-head" style="margin-bottom:14px;">🎯 توزيع الأهداف حسب الفئة</div>
+    <div id="goalsDistWrap"></div>
+  </div>
+
+  <!-- المصاريف حسب الفئة -->
+  <div class="dist-card">
+    <div class="section-head" style="margin-bottom:14px;">💰 المصاريف حسب الفئة (بالريال السعودي)</div>
+    <div id="expensesDistWrap"></div>
+  </div>
+
+  <!-- نشاط العادات الأسبوعي -->
+  <div class="dist-card">
+    <div class="section-head" style="margin-bottom:14px;">🔄 نشاط العادات الأسبوعي</div>
+    <div class="habit-activity-grid" id="habitActivityWrap"></div>
+  </div>
+
+  <!-- الشارات والإنجازات -->
+  <div class="dist-card" style="margin-bottom:30px;">
+    <div class="section-head" style="margin-bottom:14px;">🏆 الشارات والإنجازات</div>
+    <div class="badges-row" id="badgesWrap"></div>
+  </div>
+
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-item"><span class="nav-ic">☰</span><span>المزيد</span></div>
+  <div class="nav-item active"><span class="nav-ic">📊</span><span>التحليلات</span></div>
+  <div class="nav-item"><span class="nav-ic">🔄</span><span>العادات</span></div>
+  <div class="nav-item"><span class="nav-ic">🎯</span><span>الأهداف</span></div>
+  <div class="nav-item"><span class="nav-ic">🏠</span><span>الرئيسية</span></div>
+</div>
+
+<script>
+let curFilter = 'month';
+
+// ══ MOCK DATA يحاكي بيانات حقيقية من باقي أقسام التطبيق ══
+const weeklyTrend = [
+  {label:'الأسبوع 1', rate:58, xp:120},
+  {label:'الأسبوع 2', rate:65, xp:180},
+  {label:'الأسبوع 3', rate:71, xp:245},
+  {label:'الأسبوع 4', rate:76, xp:340},
+];
+
+const goalsDist = [
+  {name:'صحة', icon:'💪', color:'#05AD98', count:5},
+  {name:'مالية', icon:'💰', color:'#245F73', count:3},
+  {name:'تعلّم', icon:'📚', color:'#EC4D25', count:2},
+  {name:'روحانيات', icon:'🕊️', color:'#2BCFCE', count:4},
+];
+
+const expensesDist = [
+  {name:'طعام', icon:'🍽️', color:'#05AD98', amount:480},
+  {name:'فواتير', icon:'📄', color:'#F5B544', amount:340},
+  {name:'نقل', icon:'🚗', color:'#245F73', amount:240},
+  {name:'تسوق', icon:'🛍️', color:'#EC4D25', amount:85},
+];
+
+const habitWeek = [
+  {day:'أحد', val:5},{day:'اثن', val:6},{day:'ثلا', val:4},{day:'أرب', val:6},
+  {day:'خمي', val:3},{day:'جمع', val:5},{day:'سبت', val:6},
+];
+
+const badges = [
+  {icon:'🎯', name:'صانع القرار', earned:true},
+  {icon:'🙏', name:'قلب شاكر', earned:true},
+  {icon:'🌅', name:'حارس الفجر', earned:false},
+  {icon:'📖', name:'خاتم القرآن', earned:false},
+  {icon:'🔥', name:'لا يقهر', earned:false},
+];
+
+function setFilter(f, btn){
+  curFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAll();
+}
+
+function renderHarmony(){
+  // محاكاة حساب الانسجام من بيانات العادات/المزاج/المالية مجتمعة
+  const score = 76; // من statRate
+  const el = document.getElementById('harmonyStatus');
+  const detail = document.getElementById('harmonyDetail');
+  if(score>=70){
+    el.textContent = '🟢 متوازن';
+    detail.textContent = 'جوانب حياتك متناسقة هذا الأسبوع، استمر بهذا الإيقاع!';
+  } else if(score>=45){
+    el.textContent = '🟡 يحتاج انتباه';
+    detail.textContent = 'بعض الجوانب متقدمة على غيرها، راجع الجوانب الأقل نشاطاً.';
+  } else {
+    el.textContent = '🔴 غير متوازن';
+    detail.textContent = 'هناك فجوة واضحة بين جوانب حياتك تحتاج تركيزاً أكبر.';
+  }
+}
+
+function renderLineChart(){
+  const wrap = document.getElementById('lineChartWrap');
+  const w=320, h=140, pad=20;
+  const maxXP = Math.max(...weeklyTrend.map(d=>d.xp));
+  const points1 = weeklyTrend.map((d,i)=>{
+    const x = pad + i*((w-2*pad)/(weeklyTrend.length-1));
+    const y = h-pad - (d.rate/100)*(h-2*pad);
+    return {x,y};
+  });
+  const points2 = weeklyTrend.map((d,i)=>{
+    const x = pad + i*((w-2*pad)/(weeklyTrend.length-1));
+    const y = h-pad - (d.xp/maxXP)*(h-2*pad);
+    return {x,y};
+  });
+  const path1 = points1.map((p,i)=>(i===0?'M':'L')+p.x+','+p.y).join(' ');
+  const path2 = points2.map((p,i)=>(i===0?'M':'L')+p.x+','+p.y).join(' ');
+
+  wrap.innerHTML = `
+  <svg width="100%" height="${h}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">
+    <path d="${path1}" fill="none" stroke="#05AD98" stroke-width="2.5" stroke-linecap="round"/>
+    ${points1.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="4" fill="#05AD98"/>`).join('')}
+    <path d="${path2}" fill="none" stroke="#245F73" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4,3"/>
+    ${points2.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="4" fill="#245F73"/>`).join('')}
+    ${weeklyTrend.map((d,i)=>`<text x="${pad + i*((w-2*pad)/(weeklyTrend.length-1))}" y="${h-4}" font-size="9" fill="#878787" text-anchor="middle">${d.label.replace('الأسبوع ','أ')}</text>`).join('')}
+  </svg>`;
+}
+
+function renderDistribution(wrapId, data, valueKey, unit){
+  const wrap = document.getElementById(wrapId);
+  const total = data.reduce((s,d)=>s+d[valueKey],0) || 1;
+  wrap.innerHTML = data.map(d=>{
+    const pct = Math.round(d[valueKey]/total*100);
+    return `
+    <div class="dist-row">
+      <div class="dist-icon" style="background:${d.color}1A;color:${d.color}">${d.icon}</div>
+      <div class="dist-name">${d.name}</div>
+      <div class="dist-bar-bg"><div class="dist-bar-fill" style="width:${pct}%;background:${d.color}"></div></div>
+      <div class="dist-val">${unit==='%'?pct+'%':d[valueKey]}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderHabitActivity(){
+  const wrap = document.getElementById('habitActivityWrap');
+  const max = Math.max(...habitWeek.map(d=>d.val));
+  wrap.innerHTML = habitWeek.map(d=>{
+    const h = Math.max(6, Math.round(d.val/max*70));
+    return `
+    <div class="ha-col">
+      <div class="ha-val">${d.val}</div>
+      <div class="ha-bar-wrap"><div class="ha-bar" style="height:${h}px"></div></div>
+      <div class="ha-day">${d.day}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderBadges(){
+  const wrap = document.getElementById('badgesWrap');
+  wrap.innerHTML = badges.map(b=>`
+    <div class="badge-tile ${b.earned?'earned':'locked'}">
+      <div class="badge-tile-emoji">${b.icon}</div>
+      <div class="badge-tile-name">${b.name}</div>
+    </div>`).join('');
+}
+
+function renderAll(){
+  renderHarmony();
+  renderLineChart();
+  renderDistribution('goalsDistWrap', goalsDist, 'count', 'val');
+  renderDistribution('expensesDistWrap', expensesDist, 'amount', 'ر.س');
+  renderHabitActivity();
+  renderBadges();
+}
+
+window.addEventListener('DOMContentLoaded', renderAll);
+</script>
+</body>
+</html>

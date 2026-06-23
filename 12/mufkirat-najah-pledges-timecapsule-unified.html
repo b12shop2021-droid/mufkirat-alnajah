@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>العهود ورسائل الزمن - مفكرة النجاح</title>
+<style>
+:root{
+  --primary:#05AD98; --primary-light:#2BCFCE; --deep:#245F73;
+  --accent:#EC4D25; --gray:#878787; --gray-light:#BBBFBF;
+  --bg:#FAFAFA; --white:#FFFFFF; --text:#1A2E2C;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Alyamama','Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--text);direction:rtl;-webkit-font-smoothing:antialiased;}
+.amiri{font-family:'Amiri','Segoe UI',serif;}
+.screen{max-width:430px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;padding-bottom:100px;}
+
+.topbar{display:flex;align-items:center;gap:10px;padding:16px 18px 10px;position:sticky;top:0;z-index:60;background:rgba(250,250,250,.94);backdrop-filter:blur(12px);}
+.back-btn{width:36px;height:36px;border-radius:50%;background:rgba(5,173,152,.08);display:flex;align-items:center;justify-content:center;font-size:1.05rem;color:var(--primary);cursor:pointer;flex-shrink:0;}
+.topbar-title{font-size:.98rem;font-weight:800;color:var(--deep);flex:1;}
+
+.tabs-wrap{display:flex;gap:5px;margin:10px 18px 16px;background:#fff;border-radius:16px;padding:5px;box-shadow:0 2px 10px rgba(5,173,152,.06);}
+.tab-btn{flex:1;text-align:center;padding:9px 0;border-radius:11px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:.72rem;font-weight:700;color:var(--gray);transition:all .25s;}
+.tab-btn.active{background:var(--primary);color:#fff;box-shadow:0 4px 12px rgba(5,173,152,.3);}
+.tab-btn.active.deep{background:var(--deep);box-shadow:0 4px 12px rgba(36,95,115,.35);}
+
+.section{display:none;}
+.section.active{display:block;animation:fadeUp .35s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.section-block{margin:0 18px 20px;}
+.section-head{font-size:.9rem;font-weight:800;color:var(--deep);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+
+/* ══ PLEDGES TAB ══ */
+.intro-card{margin:0 0 16px;padding:16px;border-radius:18px;text-align:center;background:linear-gradient(150deg,rgba(36,95,115,.06),rgba(5,173,152,.04));border:1px solid rgba(36,95,115,.12);}
+.intro-text{font-size:.8rem;color:var(--deep);line-height:1.7;font-weight:600;}
+
+.pledge-card{border-radius:24px;padding:22px;position:relative;overflow:hidden;color:#fff;margin-bottom:16px;background:linear-gradient(150deg,#245F73 0%,#1a4757 60%,#122f3b 100%);box-shadow:0 10px 28px rgba(36,95,115,.28);}
+.pledge-card.danger-zone{background:linear-gradient(150deg,#7a2e1a 0%,#5c2113 60%,#3d150c 100%);box-shadow:0 10px 28px rgba(122,46,26,.28);}
+.pledge-card::before{content:'';position:absolute;top:-30px;left:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.10),transparent 70%);}
+.pledge-oath{font-family:'Amiri','Segoe UI',serif;font-size:1rem;line-height:1.9;position:relative;z-index:2;text-align:center;}
+.pledge-name{color:#2BCFCE;}
+.pledge-habit{color:#F5B544;}
+.pledge-counter-wrap{text-align:center;margin-top:16px;position:relative;z-index:2;}
+.pledge-counter{font-size:2.6rem;font-weight:800;line-height:1;}
+.pledge-counter-label{font-size:.78rem;opacity:.85;margin-top:2px;}
+.pledge-milestones{display:flex;gap:5px;justify-content:center;margin-top:16px;position:relative;z-index:2;}
+.ms-dot{flex:1;max-width:42px;padding:7px 4px;border-radius:10px;text-align:center;background:rgba(255,255,255,.10);font-size:.6rem;font-weight:800;border:1.5px solid rgba(255,255,255,.15);}
+.ms-dot.passed{background:rgba(255,255,255,.92);color:var(--deep);border-color:transparent;}
+.danger-zone .ms-dot.passed{color:#5c2113;}
+.pledge-actions{display:flex;gap:8px;margin-top:16px;position:relative;z-index:2;}
+.pledge-btn{flex:1;padding:10px;border-radius:12px;border:none;font-weight:800;font-size:.78rem;cursor:pointer;font-family:inherit;}
+.pb-reset{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25);}
+.pb-stats{background:rgba(255,255,255,.92);color:var(--deep);}
+.danger-zone .pb-stats{color:#5c2113;}
+
+.add-pledge-btn{width:100%;padding:15px;border-radius:18px;border:2px dashed rgba(5,173,152,.3);background:rgba(5,173,152,.03);color:var(--primary);font-weight:800;font-size:.88rem;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;}
+
+/* ══ TIME CAPSULE TAB ══ */
+.capsule-hero{border-radius:24px;padding:26px 22px;text-align:center;position:relative;overflow:hidden;color:#fff;background:linear-gradient(150deg,#06b9a3 0%,#0a8f80 55%,#245F73 100%);box-shadow:0 14px 32px rgba(5,173,152,.25);margin-bottom:16px;}
+.capsule-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% -10%, rgba(255,255,255,.25), transparent 55%);}
+.capsule-icon{font-size:2.6rem;position:relative;z-index:2;display:inline-block;animation:capFloat 3s infinite ease-in-out;}
+@keyframes capFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.capsule-status{font-size:.92rem;font-weight:800;margin-top:8px;position:relative;z-index:2;}
+.capsule-days-left{font-size:.76rem;opacity:.85;position:relative;z-index:2;}
+.capsule-progress-bg{height:7px;border-radius:6px;background:rgba(255,255,255,.25);overflow:hidden;margin-top:12px;position:relative;z-index:2;}
+.capsule-progress-fill{height:100%;border-radius:6px;background:#fff;transition:width .6s ease;}
+
+.capsule-open-card{background:#fff;border-radius:22px;padding:20px;box-shadow:0 4px 20px rgba(5,173,152,.08);text-align:center;display:none;margin-bottom:16px;}
+.capsule-open-card.show{display:block;animation:fadeUp .4s ease;}
+.capsule-msg-box{margin-top:14px;padding:18px;border-radius:16px;background:rgba(5,173,152,.05);font-family:'Amiri','Segoe UI',serif;font-size:.92rem;color:var(--deep);line-height:1.9;text-align:right;}
+.capsule-open-btn{width:100%;margin-top:14px;padding:13px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;font-weight:800;font-size:.86rem;cursor:pointer;font-family:inherit;}
+
+.capsule-write-card{background:#fff;border-radius:22px;padding:20px;box-shadow:0 4px 20px rgba(5,173,152,.07);margin-bottom:16px;}
+.capsule-write-label{font-size:.82rem;font-weight:700;color:var(--text);margin-bottom:8px;}
+.capsule-textarea{width:100%;border:1.5px solid rgba(5,173,152,.18);border-radius:14px;padding:13px 16px;font-family:'Amiri','Segoe UI',serif;font-size:.88rem;outline:none;resize:none;}
+.capsule-textarea:focus{border-color:var(--primary);}
+.capsule-write-btn{width:100%;margin-top:12px;padding:13px;border-radius:14px;border:none;background:var(--primary);color:#fff;font-weight:800;font-size:.84rem;cursor:pointer;font-family:inherit;}
+
+/* ══ FUTURE LETTERS TAB ══ */
+.future-letter-card{border-radius:24px;padding:22px;position:relative;overflow:hidden;color:#fff;margin-bottom:16px;background:linear-gradient(150deg,#245F73 0%,#1a4757 60%,#122f3b 100%);box-shadow:0 10px 28px rgba(36,95,115,.28);}
+.future-letter-card::before{content:'✉️';position:absolute;left:16px;top:16px;font-size:1.3rem;opacity:.3;}
+.future-letter-title{font-size:.82rem;font-weight:800;opacity:.85;text-align:center;position:relative;z-index:2;}
+.future-letter-body{font-family:'Amiri','Segoe UI',serif;font-size:.92rem;line-height:1.9;margin-top:12px;text-align:right;position:relative;z-index:2;}
+.future-letter-date{font-size:.68rem;opacity:.7;text-align:center;margin-top:12px;position:relative;z-index:2;}
+
+.future-generate-btn{width:100%;padding:14px;border-radius:16px;border:none;background:linear-gradient(135deg,var(--deep),#3a7a92);color:#fff;font-weight:800;font-size:.86rem;cursor:pointer;font-family:inherit;box-shadow:0 8px 20px rgba(36,95,115,.3);margin-bottom:16px;}
+
+.future-archive-item{background:#fff;border-radius:16px;padding:13px 15px;margin-bottom:9px;box-shadow:0 3px 14px rgba(36,95,115,.05);border-right:3px solid var(--deep);}
+.future-archive-date{font-size:.68rem;font-weight:800;color:var(--deep);margin-bottom:5px;}
+.future-archive-text{font-size:.78rem;color:var(--text);line-height:1.6;}
+
+/* ══ MODAL ══ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:18px;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:#fff;border-radius:24px;padding:24px;width:100%;max-width:380px;box-shadow:0 20px 50px rgba(0,0,0,.25);}
+.modal-title{font-size:1rem;font-weight:800;color:var(--deep);margin-bottom:16px;text-align:center;}
+.modal-label{font-size:.8rem;font-weight:700;color:var(--text);margin-bottom:6px;display:block;}
+.modal-input{width:100%;border:1.5px solid rgba(5,173,152,.18);border-radius:12px;padding:11px 14px;font-family:inherit;font-size:.86rem;outline:none;margin-bottom:14px;}
+.modal-input:focus{border-color:var(--primary);}
+.modal-oath-preview{background:rgba(36,95,115,.06);border-radius:14px;padding:14px;margin-bottom:16px;font-family:'Amiri','Segoe UI',serif;font-size:.9rem;color:var(--deep);text-align:center;line-height:1.8;}
+.modal-actions{display:flex;gap:8px;}
+.mbtn-save{flex:1;background:var(--deep);color:#fff;border:none;border-radius:12px;padding:12px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit;}
+.mbtn-cancel{background:rgba(0,0,0,.04);color:var(--gray);border:none;border-radius:12px;padding:12px 18px;font-weight:700;font-size:.85rem;cursor:pointer;font-family:inherit;}
+.reset-icon{font-size:2.2rem;text-align:center;display:block;margin-bottom:10px;}
+.reset-msg{font-size:.88rem;color:var(--text);text-align:center;line-height:1.8;margin-bottom:16px;font-weight:700;}
+.reset-question{font-size:.78rem;color:var(--gray);margin-bottom:8px;}
+.stats-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:.84rem;}
+.stats-row:last-child{border-bottom:none;}
+.stats-row span:last-child{font-weight:800;color:var(--deep);}
+
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--deep);color:#fff;padding:11px 22px;border-radius:14px;font-size:.84rem;font-weight:700;z-index:200;transition:transform .3s;box-shadow:0 8px 24px rgba(0,0,0,.18);max-width:380px;text-align:center;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.cf{position:fixed;width:9px;height:9px;border-radius:2px;pointer-events:none;z-index:600;animation:cfFall linear forwards;}
+@keyframes cfFall{0%{transform:translateY(-20px) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-top:1px solid rgba(5,173,152,.10);display:flex;justify-content:space-around;align-items:center;padding:10px 8px calc(10px + env(safe-area-inset-bottom));box-shadow:0 -6px 24px rgba(5,173,152,.08);z-index:50;}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--gray);cursor:pointer;flex:1;}
+.nav-item.active{color:var(--primary);}
+.nav-item .nav-ic{font-size:1.25rem;}
+.nav-item span:last-child{font-size:.66rem;font-weight:700;}
+.nav-item.active .nav-ic{background:rgba(5,173,152,.10);border-radius:12px;padding:2px 10px;}
+::-webkit-scrollbar{width:0;}
+</style>
+</head>
+<body>
+
+<div class="screen">
+
+  <div class="topbar">
+    <div class="back-btn" onclick="history.back()">←</div>
+    <div class="topbar-title">رحلتي عبر الزمن</div>
+  </div>
+
+  <div class="tabs-wrap">
+    <button class="tab-btn active deep" id="tabPledges" onclick="switchTab('pledges')">🛡️ العهود</button>
+    <button class="tab-btn" id="tabCapsule" onclick="switchTab('capsule')">📦 صندوق الزمن</button>
+    <button class="tab-btn" id="tabFuture" onclick="switchTab('future')">✉️ رسائل المستقبل</button>
+  </div>
+
+  <!-- ══ PLEDGES ══ -->
+  <div class="section active" id="sec-pledges">
+    <div class="section-block" style="margin-top:10px;">
+      <div class="intro-card">
+        <div class="intro-text">🛡️ عهد شخصي لقطع عادة سلبية. لا عقاب عند الانكسار، فقط استمرار بقلب أقوى.</div>
+      </div>
+      <div id="pledgesList"></div>
+      <button class="add-pledge-btn" onclick="openModal('addPledgeModal')">+ عهد جديد</button>
+    </div>
+  </div>
+
+  <!-- ══ TIME CAPSULE ══ -->
+  <div class="section" id="sec-capsule">
+    <div class="section-block" style="margin-top:10px;">
+      <div class="capsule-hero">
+        <div class="capsule-icon">📦</div>
+        <div class="capsule-status" id="capsuleStatus">كبسولتك مغلقة بإحكام</div>
+        <div class="capsule-days-left" id="capsuleDays">تُفتح بعد 18 يوماً</div>
+        <div class="capsule-progress-bg"><div class="capsule-progress-fill" id="capsuleProgress" style="width:40%"></div></div>
+      </div>
+      <div class="capsule-open-card" id="capsuleOpenCard">
+        <div style="font-size:2rem;">🎉</div>
+        <div style="font-size:.92rem;font-weight:800;color:var(--deep);margin-top:6px;">كبسولتك جاهزة للفتح!</div>
+        <div class="capsule-msg-box" id="capsuleOldMsg"></div>
+        <button class="capsule-open-btn" onclick="openCapsule()">📦 افتح الكبسولة الآن</button>
+      </div>
+      <div class="capsule-write-card">
+        <div class="capsule-write-label">✍️ اكتب رسالة جديدة لنفسك (تُفتح بعد 30 يوماً)</div>
+        <textarea class="capsule-textarea" id="capsuleInput" rows="4" placeholder="اكتب ما تريد أن تتذكره بعد شهر..."></textarea>
+        <button class="capsule-write-btn" onclick="lockCapsule()">🔒 إغلاق الكبسولة لـ30 يوماً</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FUTURE LETTERS ══ -->
+  <div class="section" id="sec-future">
+    <div class="section-block" style="margin-top:10px;">
+      <div class="intro-card">
+        <div class="intro-text">✉️ كل 90 يوماً، تكتب رسالة تخيلية من نسختك بعد سنة كاملة — تذكير عاطفي بمن أنت تطمح أن تصبح.</div>
+      </div>
+      <button class="future-generate-btn" onclick="generateFutureLetter()">✨ توليد رسالة من نسختي المستقبلية</button>
+      <div class="future-letter-card" id="futureLetterCard" style="display:none;">
+        <div class="future-letter-title">رسالة من سعود، بعد سنة من الآن</div>
+        <div class="future-letter-body amiri" id="futureLetterBody"></div>
+        <div class="future-letter-date" id="futureLetterDate"></div>
+      </div>
+      <div class="section-head" style="margin-top:18px;">📂 أرشيف الرسائل السابقة</div>
+      <div id="futureArchive"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ADD PLEDGE MODAL -->
+<div class="modal-overlay" id="addPledgeModal">
+  <div class="modal-box">
+    <div class="modal-title">🛡️ عهد جديد</div>
+    <label class="modal-label">العادة التي تريد قطعها</label>
+    <input type="text" class="modal-input" id="habitInput" placeholder="مثال: التدخين، التأجيل، السوشيال ميديا الزائدة">
+    <div class="modal-oath-preview" id="oathPreview">أنا <strong>سعود</strong> أعاهد نفسي بقطع <strong>[العادة]</strong> من اليوم</div>
+    <div class="modal-actions">
+      <button class="mbtn-save" onclick="savePledge()">🛡️ اعتماد العهد</button>
+      <button class="mbtn-cancel" onclick="closeModal('addPledgeModal')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESET MODAL -->
+<div class="modal-overlay" id="resetModal">
+  <div class="modal-box">
+    <span class="reset-icon">💪</span>
+    <div class="reset-msg">لا مشكلة، فقط لا تكرر نفس الخطأ مرة أخرى 💪<br>سنبدأ العداد من جديد بنفس العزم</div>
+    <div class="reset-question">ما الذي حصل؟ (اختياري تماماً)</div>
+    <input type="text" class="modal-input" id="reasonInput" placeholder="اكتب فقط إذا أردت...">
+    <div class="modal-actions">
+      <button class="mbtn-save" onclick="confirmReset()">إعادة البدء بعزيمة</button>
+      <button class="mbtn-cancel" onclick="closeModal('resetModal')">رجوع</button>
+    </div>
+  </div>
+</div>
+
+<!-- STATS MODAL -->
+<div class="modal-overlay" id="statsModal">
+  <div class="modal-box">
+    <div class="modal-title" id="statsTitle">📊 إحصائيات العهد</div>
+    <div class="stats-row"><span>تاريخ بدء العهد الحالي</span><span id="statStart">—</span></div>
+    <div class="stats-row"><span>أطول مدة التزام</span><span id="statBest">—</span></div>
+    <div class="stats-row"><span>عدد مرات إعادة البدء</span><span id="statResets">—</span></div>
+    <div class="modal-actions" style="margin-top:16px;"><button class="mbtn-cancel" style="flex:1;" onclick="closeModal('statsModal')">إغلاق</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="bottom-nav">
+  <div class="nav-item"><span class="nav-ic">☰</span><span>المزيد</span></div>
+  <div class="nav-item"><span class="nav-ic">📊</span><span>التحليلات</span></div>
+  <div class="nav-item"><span class="nav-ic">🔄</span><span>العادات</span></div>
+  <div class="nav-item"><span class="nav-ic">🎯</span><span>الأهداف</span></div>
+  <div class="nav-item active"><span class="nav-ic">🏠</span><span>الرئيسية</span></div>
+</div>
+
+<script>
+const USER_NAME = 'سعود';
+
+function switchTab(tab){
+  document.getElementById('tabPledges').classList.toggle('active', tab==='pledges');
+  document.getElementById('tabPledges').classList.toggle('deep', tab==='pledges');
+  document.getElementById('tabCapsule').classList.toggle('active', tab==='capsule');
+  document.getElementById('tabFuture').classList.toggle('active', tab==='future');
+  document.getElementById('sec-pledges').classList.toggle('active', tab==='pledges');
+  document.getElementById('sec-capsule').classList.toggle('active', tab==='capsule');
+  document.getElementById('sec-future').classList.toggle('active', tab==='future');
+}
+
+/* ══ PLEDGES ══ */
+const MILESTONES = [3,7,14,30,90];
+let pledges = [
+  {id:1, habit:'التأجيل والمماطلة', startDate: new Date(Date.now() - 16*86400000), bestDays:16, resets:2, dangerZone:false},
+  {id:2, habit:'السوشيال ميديا الزائدة قبل النوم', startDate: new Date(Date.now() - 4*86400000), bestDays:9, resets:1, dangerZone:true},
+];
+
+function daysSince(date){ return Math.floor((Date.now() - new Date(date).getTime()) / 86400000); }
+function getNextMilestone(days){ for(const m of MILESTONES) if(days < m) return m; return null; }
+
+function renderPledges(){
+  const wrap = document.getElementById('pledgesList');
+  wrap.innerHTML = pledges.map(p=>{
+    const days = daysSince(p.startDate);
+    const next = getNextMilestone(days);
+    return `
+    <div class="pledge-card ${p.dangerZone?'danger-zone':''}">
+      <div class="pledge-oath">أنا <strong class="pledge-name">${USER_NAME}</strong> أعاهد نفسي بقطع <strong class="pledge-habit">${p.habit}</strong> من اليوم <strong>${new Date(p.startDate).toLocaleDateString('ar-SA')}</strong></div>
+      <div class="pledge-counter-wrap">
+        <div class="pledge-counter">${days}</div>
+        <div class="pledge-counter-label">يوماً بدون هذه العادة ${next?`· المعلم القادم: ${next} يوم`:'· أنجزت كل المعالم! 👑'}</div>
+      </div>
+      <div class="pledge-milestones">${MILESTONES.map(m=>`<div class="ms-dot ${days>=m?'passed':''}">${m}</div>`).join('')}</div>
+      <div class="pledge-actions">
+        <button class="pledge-btn pb-stats" onclick="showStats(${p.id})">📊 الإحصائيات</button>
+        <button class="pledge-btn pb-reset" onclick="openResetModal(${p.id})">🔄 انكسر العهد</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+let activeResetId = null;
+function openResetModal(id){ activeResetId = id; openModal('resetModal'); }
+function confirmReset(){
+  const p = pledges.find(x=>x.id===activeResetId);
+  if(p){ const days = daysSince(p.startDate); if(days > p.bestDays) p.bestDays = days; p.resets += 1; p.startDate = new Date(); }
+  closeModal('resetModal');
+  document.getElementById('reasonInput').value='';
+  renderPledges();
+  showToast('💪 لا بأس، بداية جديدة بعزيمة أقوى');
+}
+function showStats(id){
+  const p = pledges.find(x=>x.id===id);
+  document.getElementById('statsTitle').textContent = '📊 إحصائيات: '+p.habit;
+  document.getElementById('statStart').textContent = new Date(p.startDate).toLocaleDateString('ar-SA');
+  document.getElementById('statBest').textContent = Math.max(p.bestDays, daysSince(p.startDate)) + ' يوم';
+  document.getElementById('statResets').textContent = p.resets + ' مرة';
+  openModal('statsModal');
+}
+document.getElementById('habitInput')?.addEventListener('input', updateOathPreview);
+function updateOathPreview(){
+  const habit = document.getElementById('habitInput').value.trim() || '[العادة]';
+  document.getElementById('oathPreview').innerHTML = `أنا <strong>${USER_NAME}</strong> أعاهد نفسي بقطع <strong>${habit}</strong> من اليوم`;
+}
+function savePledge(){
+  const habit = document.getElementById('habitInput').value.trim();
+  if(!habit){ showToast('⚠️ اكتب اسم العادة أولاً'); return; }
+  pledges.push({id:Date.now(), habit, startDate:new Date(), bestDays:0, resets:0, dangerZone:false});
+  closeModal('addPledgeModal');
+  document.getElementById('habitInput').value='';
+  renderPledges();
+  confetti();
+  showToast('🛡️ عهدك معتمد! بداية رحلة جديدة');
+}
+
+/* ══ TIME CAPSULE ══ */
+let capsuleData = { daysLeft:18, totalDays:30, oldMessage:'إذا تقرأ هذا الآن، فاعلم أنك أنهيت أول 30 يوماً من الانضباط. لا تتوقف، أنت أقوى مما تتخيل. 💪' };
+function renderCapsule(){
+  const pct = Math.round(((capsuleData.totalDays - capsuleData.daysLeft)/capsuleData.totalDays)*100);
+  document.getElementById('capsuleProgress').style.width = pct+'%';
+  if(capsuleData.daysLeft <= 0){
+    document.getElementById('capsuleStatus').textContent = '🎉 كبسولتك جاهزة!';
+    document.getElementById('capsuleDays').textContent = 'حان وقت فتحها الآن';
+    document.getElementById('capsuleOpenCard').classList.add('show');
+    document.getElementById('capsuleOldMsg').textContent = capsuleData.oldMessage;
+  } else {
+    document.getElementById('capsuleStatus').textContent = 'كبسولتك مغلقة بإحكام';
+    document.getElementById('capsuleDays').textContent = `تُفتح بعد ${capsuleData.daysLeft} يوماً`;
+    document.getElementById('capsuleOpenCard').classList.remove('show');
+  }
+}
+function openCapsule(){ confetti(); showToast('📦 لحظة جميلة! اكتب رسالة جديدة لنفسك الآن'); }
+function lockCapsule(){
+  const text = document.getElementById('capsuleInput').value.trim();
+  if(!text){ showToast('⚠️ اكتب رسالتك أولاً'); return; }
+  capsuleData = {daysLeft:30, totalDays:30, oldMessage:text};
+  document.getElementById('capsuleInput').value='';
+  renderCapsule();
+  confetti();
+  showToast('🔒 أُغلقت الكبسولة! ستُفتح بعد 30 يوماً');
+}
+
+/* ══ FUTURE LETTERS ══ */
+let futureArchive = [{date:'منذ 90 يوماً', text:'أكملت أول مرحلة من رحلتك بثبات. السلسلة التي بنيتها لم تكن مجرد أرقام، كانت دليلاً أنك تستطيع الالتزام. استمر، فالنسخة الأقوى منك في الطريق.'}];
+const FUTURE_TEMPLATES = [
+  'أكتب لك اليوم وأنا أنظر للوراء بفخر كبير. تلك العادات الصغيرة التي بدأتها بصعوبة، أصبحت جزءاً من شخصيتك الآن. استمر، فالقادم أجمل.',
+  'بعد سنة من اليوم، أصبحت الشخص الذي كنت تطمح أن تكونه. السلسلة، العهود، اللحظات الصعبة — كل ذلك صنع منك إنساناً أقوى.',
+  'مرّت سنة كاملة، وأنت لا زلت تسير. ربما لم تصل لكل ما خططت له، لكنك أصبحت أفضل نسخة ممكنة من نفسك اليوم. استمر بثقة.',
+];
+function generateFutureLetter(){
+  const text = FUTURE_TEMPLATES[Math.floor(Math.random()*FUTURE_TEMPLATES.length)];
+  document.getElementById('futureLetterBody').textContent = text;
+  document.getElementById('futureLetterDate').textContent = 'تُكتب تلقائياً كل 90 يوماً • ' + new Date().toLocaleDateString('ar-SA');
+  document.getElementById('futureLetterCard').style.display='block';
+  confetti();
+  showToast('✨ رسالتك من المستقبل جاهزة');
+  futureArchive.unshift({date:'اليوم', text});
+  renderFutureArchive();
+}
+function renderFutureArchive(){
+  document.getElementById('futureArchive').innerHTML = futureArchive.map(f=>`
+    <div class="future-archive-item">
+      <div class="future-archive-date">📅 ${f.date}</div>
+      <div class="future-archive-text">${f.text}</div>
+    </div>`).join('');
+}
+
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(window._tt);
+  window._tt = setTimeout(()=>t.classList.remove('show'), 2600);
+}
+function confetti(){
+  const cols = ['#05AD98','#2BCFCE','#245F73','#F5B544'];
+  for(let i=0;i<26;i++){
+    const el = document.createElement('div');
+    el.className='cf';
+    el.style.cssText = `left:${Math.random()*100}vw; top:-10px; background:${cols[Math.floor(Math.random()*cols.length)]};
+      width:${5+Math.random()*7}px; height:${5+Math.random()*7}px;
+      animation-duration:${1.4+Math.random()*1.6}s; animation-delay:${Math.random()*.3}s;
+      border-radius:${Math.random()>.5?'50%':'2px'};`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 2900);
+  }
+}
+
+window.addEventListener('DOMContentLoaded', ()=>{
+  renderPledges();
+  renderCapsule();
+  renderFutureArchive();
+});
+</script>
+</body>
+</html>
