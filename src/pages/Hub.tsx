@@ -33,6 +33,7 @@ const TABS: { id: Tab; label: string; links: Link[] }[] = [
     label: '🔥 رحلتي',
     links: [
       { icon: '🔥', label: 'السلسلة والرفيق الذكي', to: '/streak' },
+      { icon: '🗺️', label: 'محطات الطريق', to: '/gallery' },
       { icon: '😴', label: 'النوم ودائرة العلاقات', to: '/sleep' },
       { icon: '🪞', label: 'مراجعة الأسبوع', to: '/wheel' },
     ],
