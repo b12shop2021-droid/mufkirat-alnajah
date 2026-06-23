@@ -192,12 +192,35 @@ export interface CoreState {
   pledges: Pledge[];
   timeCapsule: TimeCapsule | null;
   futureLetters: FutureLetter[];
+  expenses: ExpenseEntry[];
+  customCategories: CustomCategory[];
+  budgets: Record<string, number>; // اسم الفئة → السقف الشهري
 }
 
 export interface NotifItem {
   id: string;
   enabled: boolean;
   time: string; // 'HH:MM' أو وصف تلقائي
+}
+
+export type ExpenseType = 'income' | 'expense';
+
+export interface ExpenseEntry {
+  id: string;
+  type: ExpenseType;
+  amount: number;
+  date: string; // YYYY-MM-DD
+  category: string;
+  payment: string;
+  desc: string;
+  notes: string;
+}
+
+export interface CustomCategory {
+  id: string;
+  name: string;
+  icon: string;
+  note: string;
 }
 
 export interface Pledge {
@@ -312,6 +335,17 @@ const DEFAULT_STATE: CoreState = {
   pledges: [],
   timeCapsule: null,
   futureLetters: [],
+  expenses: [],
+  customCategories: [],
+  budgets: {
+    طعام: 800,
+    نقل: 400,
+    تسوق: 300,
+    فواتير: 500,
+    صحة: 200,
+    أخرى: 150,
+    'صندوق الخير': 0,
+  },
 };
 
 /* قراءة الحالة المحفوظة من localStorage مع دمج آمن مع الافتراضي */
@@ -352,6 +386,9 @@ const loadState = (): CoreState => {
       pledges: parsed.pledges ?? [],
       timeCapsule: parsed.timeCapsule ?? null,
       futureLetters: parsed.futureLetters ?? [],
+      expenses: parsed.expenses ?? [],
+      customCategories: parsed.customCategories ?? [],
+      budgets: parsed.budgets ?? DEFAULT_STATE.budgets,
     };
   } catch {
     return DEFAULT_STATE;
@@ -437,6 +474,12 @@ interface CoreContextValue {
   removePledge: (id: string) => void;
   lockCapsule: (message: string) => void;
   addFutureLetter: (text: string) => void;
+  // ===== المصاريف =====
+  addExpense: (entry: Omit<ExpenseEntry, 'id'>) => void;
+  removeExpense: (id: string) => void;
+  addCustomCategory: (name: string, icon: string, note: string) => boolean;
+  removeCustomCategory: (id: string, name: string) => void;
+  setBudget: (category: string, amount: number) => void;
 }
 
 const CoreContext = createContext<CoreContextValue | null>(null);
@@ -1363,6 +1406,76 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
+  /* إضافة حركة مالية (دخل/مصروف) مع تنظيف وحصر القيم */
+  const addExpense = useCallback((entry: Omit<ExpenseEntry, 'id'>) => {
+    setState((s) => ({
+      ...s,
+      expenses: [
+        ...s.expenses,
+        {
+          id: crypto.randomUUID(),
+          type: entry.type,
+          amount: clampNum(entry.amount, 0, 1_000_000_000),
+          date: entry.date || todayStr(),
+          category: clean(entry.category),
+          payment: clean(entry.payment),
+          desc: clean(entry.desc),
+          notes: clean(entry.notes),
+        },
+      ],
+    }));
+  }, []);
+
+  /* حذف حركة مالية (يمرّ عبر ConfirmDialog) */
+  const removeExpense = useCallback((id: string) => {
+    setState((s) => ({ ...s, expenses: s.expenses.filter((e) => e.id !== id) }));
+  }, []);
+
+  /* إضافة فئة مخصصة بإيموجي حر + ملاحظة (يعيد false إذا الاسم مكرر/فارغ) */
+  const addCustomCategory = useCallback(
+    (name: string, icon: string, note: string): boolean => {
+      const nm = clean(name);
+      if (!nm) return false;
+      let added = false;
+      setState((s) => {
+        const exists =
+          s.customCategories.some((c) => c.name === nm) || nm in s.budgets;
+        if (exists) return s;
+        added = true;
+        return {
+          ...s,
+          customCategories: [
+            ...s.customCategories,
+            { id: crypto.randomUUID(), name: nm, icon: clean(icon) || '🏷️', note: clean(note) },
+          ],
+          budgets: { ...s.budgets, [nm]: 200 },
+        };
+      });
+      return added;
+    },
+    [],
+  );
+
+  /* حذف فئة مخصصة (الفئات الأساسية محمية في الواجهة) */
+  const removeCustomCategory = useCallback((id: string, name: string) => {
+    setState((s) => {
+      const { [name]: _omit, ...restBudgets } = s.budgets;
+      return {
+        ...s,
+        customCategories: s.customCategories.filter((c) => c.id !== id),
+        budgets: restBudgets,
+      };
+    });
+  }, []);
+
+  /* ضبط سقف ميزانية فئة */
+  const setBudget = useCallback((category: string, amount: number) => {
+    setState((s) => ({
+      ...s,
+      budgets: { ...s.budgets, [category]: clampNum(amount, 0, 1_000_000_000) },
+    }));
+  }, []);
+
   const value = useMemo<CoreContextValue>(
     () => ({
       state,
@@ -1427,6 +1540,11 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       removePledge,
       lockCapsule,
       addFutureLetter,
+      addExpense,
+      removeExpense,
+      addCustomCategory,
+      removeCustomCategory,
+      setBudget,
     }),
     [
       state,
@@ -1491,6 +1609,11 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       removePledge,
       lockCapsule,
       addFutureLetter,
+      addExpense,
+      removeExpense,
+      addCustomCategory,
+      removeCustomCategory,
+      setBudget,
     ],
   );
 
