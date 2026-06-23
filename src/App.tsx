@@ -13,6 +13,8 @@ import Goals from './pages/Goals';
 import CustomWorkout from './pages/CustomWorkout';
 import Mood from './pages/Mood';
 import NotesGratitude from './pages/NotesGratitude';
+import QuranCalendar from './pages/QuranCalendar';
+import Streak from './pages/Streak';
 
 /* صفحة ترحيب مؤقتة للتأكد من ربط النواة — تُستبدل بالصفحات الفعلية */
 function HomePlaceholder() {
@@ -65,6 +67,8 @@ export default function App() {
         <Route path="/custom-workout" component={CustomWorkout} />
         <Route path="/mood" component={Mood} />
         <Route path="/notes" component={NotesGratitude} />
+        <Route path="/quran" component={QuranCalendar} />
+        <Route path="/streak" component={Streak} />
         <Route component={ComingSoon} />
       </Switch>
       <BottomNav />

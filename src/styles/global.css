@@ -1000,3 +1000,483 @@ select {
   flex: 1;
   font-size: 0.86rem;
 }
+
+/* ===== القرآن ===== */
+.ayah-banner {
+  border-radius: var(--radius);
+  padding: 22px 18px;
+  text-align: center;
+  color: #fff;
+  margin-bottom: 18px;
+  background: linear-gradient(150deg, var(--primary-light), var(--primary), var(--deep));
+}
+
+.ayah-text {
+  font-family: var(--font-formal);
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.8;
+}
+
+.qstats-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.qstat {
+  flex: 1;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: 14px 8px;
+  text-align: center;
+  box-shadow: var(--shadow-card);
+}
+
+.qstat-num {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.qstat-label {
+  font-size: 0.66rem;
+  color: var(--text-secondary);
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.juz-legend {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  margin-bottom: 14px;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.juz-legend span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.leg-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.leg-read {
+  background: linear-gradient(150deg, var(--primary-light), var(--primary));
+}
+
+.leg-mem {
+  background: linear-gradient(150deg, var(--warning), var(--celebrate));
+}
+
+.juz-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 7px;
+}
+
+.juz-cell {
+  aspect-ratio: 1;
+  border-radius: 11px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+}
+
+.juz-cell.read {
+  background: linear-gradient(150deg, var(--primary-light), var(--primary));
+  border-color: transparent;
+  color: #fff;
+}
+
+.juz-cell.mem {
+  background: linear-gradient(150deg, var(--warning), var(--celebrate));
+  border-color: transparent;
+  color: #fff;
+}
+
+.juz-num {
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.juz-name {
+  font-size: 0.52rem;
+  opacity: 0.85;
+  margin-top: 1px;
+}
+
+.time-week {
+  margin-top: 12px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.time-week strong {
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+/* ===== التقويم ===== */
+.cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.cal-nav-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--deep);
+  font-size: 1rem;
+}
+
+.cal-month-title {
+  font-size: 0.94rem;
+  font-weight: 800;
+  color: var(--deep);
+}
+
+.cal-head,
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.cal-head {
+  margin-bottom: 6px;
+}
+
+.cal-dn {
+  text-align: center;
+  font-size: 0.62rem;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.cal-day {
+  aspect-ratio: 1;
+  border-radius: 9px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+}
+
+.cal-day.empty {
+  background: transparent;
+  border-color: transparent;
+}
+
+.cal-day.green {
+  background: color-mix(in srgb, var(--success) 18%, transparent);
+  border-color: var(--success);
+}
+
+.cal-day.yellow {
+  background: color-mix(in srgb, var(--warning) 20%, transparent);
+  border-color: var(--warning);
+}
+
+.cal-day.red {
+  background: color-mix(in srgb, var(--danger) 14%, transparent);
+  border-color: var(--danger);
+}
+
+.cal-day.today {
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.cal-pct {
+  font-size: 0.5rem;
+  opacity: 0.85;
+}
+
+.cal-legend {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 14px;
+  font-size: 0.66rem;
+  color: var(--text-secondary);
+  flex-wrap: wrap;
+}
+
+.cal-legend span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ===== صفحة السلسلة ===== */
+.flame-hero {
+  border-radius: var(--radius);
+  padding: 28px 22px;
+  text-align: center;
+  color: #fff;
+  margin-bottom: 16px;
+  background: linear-gradient(150deg, var(--primary-light), var(--primary), var(--deep));
+}
+
+.flame-icon {
+  font-size: 3.2rem;
+}
+
+.flame-num {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-top: 6px;
+}
+
+.flame-label {
+  font-size: 0.85rem;
+  opacity: 0.9;
+  margin-top: 2px;
+  font-weight: 700;
+}
+
+.flame-best {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 20px;
+  padding: 7px 16px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.shield-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.shield-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  border: 1px solid var(--border);
+}
+
+.shield-title {
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: var(--deep);
+}
+
+.shield-sub {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  line-height: 1.5;
+}
+
+.shield-status {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.shield-status.available {
+  background: var(--bg);
+  color: var(--primary);
+}
+
+.shield-status.used {
+  background: var(--bg);
+  color: var(--celebrate);
+}
+
+.days-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.day-cell {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 800;
+  flex-shrink: 0;
+  background: var(--bg);
+  color: var(--text-secondary);
+}
+
+.dc-done {
+  background: linear-gradient(150deg, var(--primary-light), var(--primary));
+  color: #fff;
+}
+
+.dc-today {
+  background: linear-gradient(150deg, var(--warning), var(--celebrate));
+  color: #fff;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--celebrate) 18%, transparent);
+}
+
+.companion-card {
+  text-align: center;
+}
+
+.companion-emoji {
+  font-size: 3.4rem;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.companion-name {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--deep);
+}
+
+.companion-stage {
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+  margin-top: 3px;
+}
+
+.levels-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.level-tile {
+  padding: 14px 8px;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  box-shadow: var(--shadow-card);
+  position: relative;
+}
+
+.level-tile.unlocked {
+  border-color: var(--primary-light);
+}
+
+.level-tile.current {
+  border-color: var(--primary);
+  box-shadow: 0 4px 16px var(--shadow-soft);
+}
+
+.lt-icon {
+  font-size: 1.6rem;
+}
+
+.lt-name {
+  font-size: 0.74rem;
+  font-weight: 800;
+  margin-top: 4px;
+}
+
+.lt-name.locked {
+  color: var(--text-secondary);
+}
+
+.lt-xp {
+  font-size: 0.62rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.lt-current-badge {
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--celebrate);
+  color: #fff;
+  font-size: 0.58rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.badges-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.badge-card {
+  flex-shrink: 0;
+  width: 120px;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: 16px 10px;
+  text-align: center;
+  box-shadow: var(--shadow-card);
+  border: 1.5px solid transparent;
+}
+
+.badge-card.earned {
+  border-color: var(--celebrate);
+}
+
+.badge-card.locked {
+  opacity: 0.55;
+}
+
+.badge-emoji {
+  font-size: 1.8rem;
+}
+
+.badge-title {
+  font-size: 0.74rem;
+  font-weight: 800;
+  margin-top: 6px;
+  color: var(--deep);
+}
+
+.badge-desc {
+  font-size: 0.62rem;
+  color: var(--text-secondary);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+.badge-progress {
+  font-size: 0.6rem;
+  color: var(--primary);
+  font-weight: 800;
+  margin-top: 4px;
+}

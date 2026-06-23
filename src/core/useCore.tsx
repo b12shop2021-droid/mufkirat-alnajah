@@ -136,6 +136,13 @@ export interface GratitudeEntry {
   date: string; // YYYY-MM-DD (حد 3 يومياً)
 }
 
+export type QuranStatus = 'read' | 'mem';
+
+export interface QuranMinutesEntry {
+  date: string; // YYYY-MM-DD
+  minutes: number;
+}
+
 export interface CoreState {
   profile: Profile;
   xp: number;
@@ -143,6 +150,9 @@ export interface CoreState {
   accent: AccentName; // اسم الثيم (لا اللون المباشر)
   dark: boolean;
   countedMemorizedJuz: number[]; // أجزاء حُسبت +50 لمنع التكرار
+  countedReadJuz: number[]; // أجزاء حُسبت +20 لمنع التكرار
+  quranJuz: Record<number, QuranStatus>; // حالة كل جزء
+  quranMinutes: QuranMinutesEntry[]; // دقائق التلاوة اليومية
   routine: { morning: RoutineTask[]; evening: RoutineTask[] };
   goals: Goal[];
   customWorkout: CustomDay[];
@@ -215,6 +225,9 @@ const DEFAULT_STATE: CoreState = {
   accent: 'emerald',
   dark: false,
   countedMemorizedJuz: [],
+  countedReadJuz: [],
+  quranJuz: {},
+  quranMinutes: [],
   routine: { morning: [], evening: [] },
   goals: [],
   customWorkout: [],
@@ -236,6 +249,9 @@ const loadState = (): CoreState => {
       profile: { ...DEFAULT_STATE.profile, ...parsed.profile },
       streak: { ...DEFAULT_STATE.streak, ...parsed.streak },
       countedMemorizedJuz: parsed.countedMemorizedJuz ?? [],
+      countedReadJuz: parsed.countedReadJuz ?? [],
+      quranJuz: parsed.quranJuz ?? {},
+      quranMinutes: parsed.quranMinutes ?? [],
       routine: {
         morning: parsed.routine?.morning ?? [],
         evening: parsed.routine?.evening ?? [],
@@ -303,6 +319,9 @@ interface CoreContextValue {
   removeNote: (id: string) => void;
   addGratitude: (text: string) => boolean; // false إذا اكتمل حد اليوم (3)
   removeGratitude: (id: string) => void;
+  // ===== القرآن =====
+  cycleJuz: (juz: number) => void; // فارغ→مقروء(+20)→محفوظ(+50)→فارغ
+  addQuranMinutes: (minutes: number) => void; // +10 وتجميع دقائق اليوم
 }
 
 const CoreContext = createContext<CoreContextValue | null>(null);
@@ -937,6 +956,68 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
+  /* تدوير حالة جزء قرآن: فارغ→مقروء(+20)→محفوظ(+50 واحتفال)→فارغ
+     مع منع تكرار النقاط عبر مصفوفات الاحتساب */
+  const cycleJuz = useCallback(
+    (juz: number) => {
+      const j = clampNum(juz, 1, 30);
+      let awardRead = false;
+      let awardMem = false;
+      setState((s) => {
+        const cur = s.quranJuz[j];
+        const nextJuz = { ...s.quranJuz };
+        let countedRead = s.countedReadJuz;
+        let countedMem = s.countedMemorizedJuz;
+        if (!cur) {
+          nextJuz[j] = 'read';
+          if (!countedRead.includes(j)) {
+            countedRead = [...countedRead, j];
+            awardRead = true;
+          }
+        } else if (cur === 'read') {
+          nextJuz[j] = 'mem';
+          if (!countedMem.includes(j)) {
+            countedMem = [...countedMem, j];
+            awardMem = true;
+          }
+        } else {
+          delete nextJuz[j];
+        }
+        return {
+          ...s,
+          quranJuz: nextJuz,
+          countedReadJuz: countedRead,
+          countedMemorizedJuz: countedMem,
+        };
+      });
+      if (awardRead) addXP(20);
+      if (awardMem) {
+        addXP(50);
+        fireConfetti();
+      }
+    },
+    [addXP],
+  );
+
+  /* تسجيل دقائق تلاوة اليوم (تجميع) + احتساب +10 */
+  const addQuranMinutes = useCallback(
+    (minutes: number) => {
+      const min = clampNum(Math.round(minutes), 1, 1440);
+      const today = todayStr();
+      setState((s) => {
+        const existing = s.quranMinutes.find((q) => q.date === today);
+        const others = s.quranMinutes.filter((q) => q.date !== today);
+        const total = (existing?.minutes ?? 0) + min;
+        return {
+          ...s,
+          quranMinutes: [...others, { date: today, minutes: total }],
+        };
+      });
+      addXP(10);
+    },
+    [addXP],
+  );
+
   const value = useMemo<CoreContextValue>(
     () => ({
       state,
@@ -979,6 +1060,8 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       removeNote,
       addGratitude,
       removeGratitude,
+      cycleJuz,
+      addQuranMinutes,
     }),
     [
       state,
@@ -1021,6 +1104,8 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       removeNote,
       addGratitude,
       removeGratitude,
+      cycleJuz,
+      addQuranMinutes,
     ],
   );
 
