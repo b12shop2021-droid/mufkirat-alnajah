@@ -21,7 +21,7 @@ interface SetEntry {
   done: boolean;
 }
 
-export default function CaptainWorkout() {
+export default function CaptainWorkout({ embedded = false }: { embedded?: boolean }) {
   const core = useCore();
   const [, navigate] = useLocation();
   const [dayIdx, setDayIdx] = useState(0);
@@ -116,7 +116,7 @@ export default function CaptainWorkout() {
 
   return (
     <div className="page">
-      <BackButton />
+      {!embedded && <BackButton />}
 
       <div className="day-header">
         <div className="day-title-row">

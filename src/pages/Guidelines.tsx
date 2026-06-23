@@ -9,7 +9,7 @@ import BackButton from '../components/BackButton';
 
 const MAX_IMAGE_BYTES = 1_500_000;
 
-export default function Guidelines() {
+export default function Guidelines({ embedded = false }: { embedded?: boolean }) {
   const core = useCore();
   const [hint, setHint] = useState<string | null>(null);
 
@@ -35,7 +35,7 @@ export default function Guidelines() {
 
   return (
     <div className="page">
-      <BackButton />
+      {!embedded && <BackButton />}
 
       <div className="hero">
         <div className="hero-icon">💪</div>

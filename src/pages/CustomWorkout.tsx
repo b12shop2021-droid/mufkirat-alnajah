@@ -19,7 +19,7 @@ interface PendingDelete {
   label: string;
 }
 
-export default function CustomWorkout() {
+export default function CustomWorkout({ embedded = false }: { embedded?: boolean }) {
   const core = useCore();
   const days = core.state.customWorkout;
 
@@ -86,7 +86,7 @@ export default function CustomWorkout() {
 
   return (
     <div className="page">
-      <BackButton />
+      {!embedded && <BackButton />}
 
       <div className="intro-hero">
         <div className="intro-icon">🛠️</div>

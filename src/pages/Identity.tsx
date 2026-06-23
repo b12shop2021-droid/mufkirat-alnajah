@@ -10,7 +10,7 @@ import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { fireConfetti } from '../components/Confetti';
 
-export default function Identity() {
+export default function Identity({ embedded = false }: { embedded?: boolean }) {
   const core = useCore();
   const { identityStatement, constitution } = core.state;
 
@@ -54,8 +54,8 @@ export default function Identity() {
 
   return (
     <div className="page">
-      <BackButton />
-      <XPBar />
+      {!embedded && <BackButton />}
+      {!embedded && <XPBar />}
 
       <h2 className="section-title">🪪 بطاقة هويتي الشخصية</h2>
       <div className="id-card">

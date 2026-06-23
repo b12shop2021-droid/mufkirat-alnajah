@@ -17,7 +17,7 @@ const META: Record<string, { icon: string; label: string; sub: string; auto?: bo
   streak: { icon: '🔥', label: 'تنبيه السلسلة المعرّضة للخطر', sub: 'قبل منتصف الليل لو يومك ناقص' },
 };
 
-export default function Notifications() {
+export default function Notifications({ embedded = false }: { embedded?: boolean }) {
   const core = useCore();
   const { notifMaster, notifItems, profile } = core.state;
 
@@ -25,8 +25,8 @@ export default function Notifications() {
   const verb = profile.gender === 'female' ? 'تسجّلي' : 'تسجّل';
 
   return (
-    <div className="page">
-      <BackButton />
+    <div className={embedded ? '' : 'page'}>
+      {!embedded && <BackButton />}
 
       <h1 className="section-title">🔔 الإشعارات والتذكيرات</h1>
 

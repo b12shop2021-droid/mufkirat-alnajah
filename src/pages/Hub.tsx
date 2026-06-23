@@ -19,52 +19,47 @@ interface Link {
 const TABS: { id: Tab; label: string; links: Link[] }[] = [
   {
     id: 'daily',
-    label: '🏠 يومي',
+    label: '☀️ حياتي',
     links: [
       { icon: '🏠', label: 'الملخص الذكي', to: '/' },
       { icon: '🔄', label: 'الروتين الصباحي/المسائي', to: '/routine' },
       { icon: '😊', label: 'المزاج ولحظة الفخر', to: '/mood' },
       { icon: '📝', label: 'الملاحظات وشكر اليوم', to: '/notes' },
       { icon: '📖', label: 'القرآن والتقويم', to: '/quran' },
+      { icon: '🍽️', label: 'الوجبات', to: '/meals' },
     ],
   },
   {
     id: 'journey',
-    label: '🔥 رحلتي',
+    label: '🔥 التزامي',
     links: [
-      { icon: '🔥', label: 'السلسلة والرفيق الذكي', to: '/streak' },
-      { icon: '🗺️', label: 'محطات الطريق', to: '/gallery' },
+      { icon: '🔥', label: 'السلسلة والرفيق الذكي', to: '/achievements' },
       { icon: '😴', label: 'النوم ودائرة العلاقات', to: '/sleep' },
-      { icon: '🪞', label: 'مراجعة الأسبوع', to: '/wheel' },
+      { icon: '🛡️', label: 'العهود وصندوق الزمن', to: '/pledges' },
+      { icon: '🏋️', label: 'التمارين', to: '/workouts' },
     ],
   },
   {
     id: 'deep',
-    label: '🌱 رحلتي العميقة',
+    label: '🌱 تطوّري',
     links: [
-      { icon: '🪪', label: 'بطاقة الهوية ودستور الذات', to: '/identity' },
-      { icon: '📦', label: 'العهود وصندوق الزمن', to: '/pledges' },
+      { icon: '🪪', label: 'تطوير الذات (الهوية والمراجعة)', to: '/self-dev' },
+      { icon: '🎯', label: 'الأهداف', to: '/goals' },
+      { icon: '💳', label: 'المصاريف', to: '/expenses' },
     ],
   },
   {
     id: 'achievements',
-    label: '🏆 إنجازاتي',
+    label: '🏆 فخري',
     links: [
-      { icon: '🖼️', label: 'معرض الإنجازات والمحطات وقصة الشهر', to: '/gallery' },
-      { icon: '🏆', label: 'الألقاب والمستويات', to: '/streak' },
+      { icon: '🖼️', label: 'إنجازاتي (السلسلة والمعرض والمحطات)', to: '/achievements' },
       { icon: '📊', label: 'التحليلات', to: '/analytics' },
     ],
   },
 ];
 
 const EXTRA: Link[] = [
-  { icon: '💳', label: 'المصاريف', to: '/expenses' },
-  { icon: '🍽️', label: 'الوجبات', to: '/meals' },
-  { icon: '🏋️', label: 'جدول الكابتن سعود', to: '/captain-workout' },
-  { icon: '🛠️', label: 'صمّم جدول تمارينك', to: '/custom-workout' },
-  { icon: '📋', label: 'الإرشادات الأساسية', to: '/guidelines' },
-  { icon: '⚙️', label: 'الإعدادات', to: '/settings' },
-  { icon: '🔔', label: 'الإشعارات', to: '/notifications' },
+  { icon: '⚙️', label: 'الإعدادات والإشعارات', to: '/settings' },
 ];
 
 export default function Hub() {

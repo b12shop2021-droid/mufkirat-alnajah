@@ -25,7 +25,7 @@ const dateBefore = (offset: number): string => {
   ).padStart(2, '0')}`;
 };
 
-export default function Streak() {
+export default function Streak({ embedded = false }: { embedded?: boolean }) {
   const core = useCore();
   const level = core.level;
   const { streak, moodLog, gratitudeLog, quranMinutes, notes, goals } = core.state;
@@ -105,8 +105,8 @@ export default function Streak() {
 
   return (
     <div className="page">
-      <BackButton />
-      <XPBar />
+      {!embedded && <BackButton />}
+      {!embedded && <XPBar />}
 
       <div className="flame-hero">
         <span className="flame-icon">🔥</span>

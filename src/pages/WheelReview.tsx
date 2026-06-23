@@ -10,7 +10,7 @@ import XPBar from '../components/XPBar';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
 
-export default function WheelReview() {
+export default function WheelReview({ embedded = false }: { embedded?: boolean }) {
   const core = useCore();
   const { weeklyReviews } = core.state;
 
@@ -34,8 +34,8 @@ export default function WheelReview() {
 
   return (
     <div className="page">
-      <BackButton />
-      <XPBar />
+      {!embedded && <BackButton />}
+      {!embedded && <XPBar />}
 
       <h1 className="section-title">🪞 مراجعة الأسبوع</h1>
 

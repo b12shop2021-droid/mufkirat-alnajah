@@ -4,9 +4,9 @@
    =================================================================== */
 
 import { useState } from 'react';
-import { useLocation } from 'wouter';
 import { useCore, type AccentName, type Gender } from '../core/useCore';
 import BackButton from '../components/BackButton';
+import Notifications from './Notifications';
 
 const ACCENTS: { id: AccentName; cls: string }[] = [
   { id: 'emerald', cls: 'sw-emerald' },
@@ -19,7 +19,6 @@ const ACCENTS: { id: AccentName; cls: string }[] = [
 export default function Settings() {
   const core = useCore();
   const { profile, dark, accent } = core.state;
-  const [, navigate] = useLocation();
 
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
@@ -32,6 +31,7 @@ export default function Settings() {
     weight: profile.weight ? String(profile.weight) : '',
   });
   const [hint, setHint] = useState<string | null>(null);
+  const [showNotif, setShowNotif] = useState(false);
 
   const handleSave = () => {
     if (form.name.trim() === '') {
@@ -219,38 +219,23 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* الإشعارات */}
+      {/* الإشعارات (مدمجة داخل الإعدادات) */}
       <div className="section-title">الإشعارات والتذكيرات</div>
       <div className="settings-card">
         <button
           className="settings-row"
           style={{ width: '100%', textAlign: 'right' }}
-          onClick={() => navigate('/notifications')}
+          onClick={() => setShowNotif((v) => !v)}
         >
           <div className="settings-icon">🔔</div>
           <div className="settings-text">
             <div className="settings-label">إشعارات التحفيز اليومية</div>
             <div className="settings-sub">تذكيرات لطيفة لتسجيل يومك</div>
           </div>
-          <div style={{ color: 'var(--text-secondary)' }}>‹</div>
+          <div style={{ color: 'var(--text-secondary)' }}>{showNotif ? '▲' : '▾'}</div>
         </button>
       </div>
-
-      {/* الإرشادات */}
-      <div className="settings-card">
-        <button
-          className="settings-row"
-          style={{ width: '100%', textAlign: 'right' }}
-          onClick={() => navigate('/guidelines')}
-        >
-          <div className="settings-icon">📋</div>
-          <div className="settings-text">
-            <div className="settings-label">إرشادات أساسية</div>
-            <div className="settings-sub">قبل البدء بالتمارين</div>
-          </div>
-          <div style={{ color: 'var(--text-secondary)' }}>‹</div>
-        </button>
-      </div>
+      {showNotif && <Notifications embedded />}
 
       {hint && <div className="hint-msg ok">{hint}</div>}
 

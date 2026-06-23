@@ -66,11 +66,11 @@ export default function Home() {
     { icon: '🔄', label: 'العادات', to: '/routine' },
     { icon: '🎯', label: 'الأهداف', to: '/goals' },
     { icon: '💳', label: 'المصاريف', to: '/expenses' },
-    { icon: '🏋️', label: 'التمارين', to: '/captain-workout' },
+    { icon: '🏋️', label: 'التمارين', to: '/workouts' },
     { icon: '🍽️', label: 'الوجبات', to: '/meals' },
     { icon: '📊', label: 'التحليلات', to: '/analytics' },
     { icon: '🛡️', label: 'العهود', to: '/pledges' },
-    { icon: '🗺️', label: 'رحلتي', to: '/gallery' },
+    { icon: '🏆', label: 'إنجازاتي', to: '/achievements' },
   ];
 
   return (

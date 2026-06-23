@@ -16,7 +16,7 @@ const MONTHS = [
   'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
 ];
 
-export default function JourneyGallery() {
+export default function JourneyGallery({ embedded = false }: { embedded?: boolean }) {
   const core = useCore();
   const s = core.state;
   const [tab, setTab] = useState<Tab>('wrap');
@@ -62,8 +62,8 @@ export default function JourneyGallery() {
 
   return (
     <div className="page">
-      <BackButton />
-      <XPBar />
+      {!embedded && <BackButton />}
+      {!embedded && <XPBar />}
 
       <div className="subtabs">
         <button className={tab === 'wrap' ? 'subtab active' : 'subtab'} onClick={() => setTab('wrap')}>

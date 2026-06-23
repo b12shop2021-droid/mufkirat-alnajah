@@ -29,6 +29,9 @@ import Expenses from './pages/Expenses';
 import Analytics from './pages/Analytics';
 import CaptainWorkout from './pages/CaptainWorkout';
 import Meals from './pages/Meals';
+import Workouts from './pages/Workouts';
+import Achievements from './pages/Achievements';
+import SelfDev from './pages/SelfDev';
 
 /* صفحة عامة لأي مسار غير معروف */
 function NotFound() {
@@ -61,23 +64,26 @@ export default function App() {
         <Route path="/more" component={Hub} />
         <Route path="/routine" component={Routine} />
         <Route path="/goals" component={Goals} />
-        <Route path="/custom-workout" component={CustomWorkout} />
+        <Route path="/custom-workout">{() => <CustomWorkout />}</Route>
         <Route path="/mood" component={Mood} />
         <Route path="/notes" component={NotesGratitude} />
         <Route path="/quran" component={QuranCalendar} />
-        <Route path="/streak" component={Streak} />
+        <Route path="/streak">{() => <Streak />}</Route>
         <Route path="/sleep" component={SleepRelations} />
-        <Route path="/wheel" component={WheelReview} />
-        <Route path="/identity" component={Identity} />
-        <Route path="/gallery" component={JourneyGallery} />
+        <Route path="/wheel">{() => <WheelReview />}</Route>
+        <Route path="/identity">{() => <Identity />}</Route>
+        <Route path="/gallery">{() => <JourneyGallery />}</Route>
         <Route path="/settings" component={Settings} />
-        <Route path="/notifications" component={Notifications} />
-        <Route path="/guidelines" component={Guidelines} />
+        <Route path="/notifications">{() => <Notifications />}</Route>
+        <Route path="/guidelines">{() => <Guidelines />}</Route>
         <Route path="/pledges" component={Pledges} />
         <Route path="/expenses" component={Expenses} />
         <Route path="/analytics" component={Analytics} />
-        <Route path="/captain-workout" component={CaptainWorkout} />
+        <Route path="/captain-workout">{() => <CaptainWorkout />}</Route>
         <Route path="/meals" component={Meals} />
+        <Route path="/workouts" component={Workouts} />
+        <Route path="/achievements" component={Achievements} />
+        <Route path="/self-dev" component={SelfDev} />
         <Route component={NotFound} />
       </Switch>
       <BottomNav />
