@@ -170,8 +170,12 @@ export interface Session {
   email: string;
 }
 
+export type OnboardState = boolean;
+
 export interface CoreState {
   session: Session;
+  onboarded: boolean; // أكمل المستخدم شاشة الترحيب؟
+  challenge21Started: boolean; // فعّل تحدّي 21 يوم؟
   profile: Profile;
   xp: number;
   streak: Streak;
@@ -327,6 +331,8 @@ const monthStr = (): string => {
 /* الحالة الافتراضية — صفر ألوان ثابتة، فقط اسم الثيم */
 const DEFAULT_STATE: CoreState = {
   session: { loggedIn: false, email: '' },
+  onboarded: false,
+  challenge21Started: false,
   profile: {
     name: '',
     nickname: '',
@@ -401,6 +407,8 @@ const loadState = (): CoreState => {
       ...DEFAULT_STATE,
       ...parsed,
       session: { ...DEFAULT_STATE.session, ...parsed.session },
+      onboarded: parsed.onboarded ?? false,
+      challenge21Started: parsed.challenge21Started ?? false,
       profile: { ...DEFAULT_STATE.profile, ...parsed.profile },
       streak: { ...DEFAULT_STATE.streak, ...parsed.streak },
       autoDark: parsed.autoDark ?? false,
@@ -544,6 +552,8 @@ interface CoreContextValue {
   // ===== الجلسة (تُربط بمصادقة Manus لاحقاً) =====
   login: (email: string) => void;
   logout: () => void;
+  setOnboarded: (v: boolean) => void;
+  startChallenge21: () => void; // يضيف روتيناً وهدفاً جاهزاً
 }
 
 const CoreContext = createContext<CoreContextValue | null>(null);
@@ -1001,10 +1011,10 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     ]);
   }, [updateCustom]);
 
-  /* إعادة تسمية يوم */
+  /* إعادة تسمية يوم (إدخال حي: نقص الطول فقط مع إبقاء المسافات) */
   const renameCustomDay = useCallback(
     (dayId: string, name: string) => {
-      const t = clean(name);
+      const t = name.slice(0, 200);
       updateCustom((list) =>
         list.map((d) => (d.id === dayId ? { ...d, name: t } : d)),
       );
@@ -1068,9 +1078,10 @@ export function CoreProvider({ children }: { children: ReactNode }) {
             exercises: d.exercises.map((ex) => {
               if (ex.id !== exId) return ex;
               const next: CustomExercise = { ...ex };
-              if (patch.name !== undefined) next.name = clean(patch.name);
-              if (patch.reps !== undefined) next.reps = clean(patch.reps);
-              if (patch.notes !== undefined) next.notes = clean(patch.notes);
+              // إدخال حي: نقص الطول فقط مع إبقاء المسافات أثناء الكتابة
+              if (patch.name !== undefined) next.name = patch.name.slice(0, 200);
+              if (patch.reps !== undefined) next.reps = patch.reps.slice(0, 200);
+              if (patch.notes !== undefined) next.notes = patch.notes.slice(0, 200);
               if (patch.difficulty !== undefined) next.difficulty = patch.difficulty;
               if (patch.sets !== undefined) next.sets = clampNum(patch.sets, 0, 100);
               return next;
@@ -1648,6 +1659,53 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     setState((s) => ({ ...s, session: { loggedIn: false, email: '' } }));
   }, []);
 
+  /* إنهاء/تخطّي شاشة الترحيب */
+  const setOnboarded = useCallback((v: boolean) => {
+    setState((s) => ({ ...s, onboarded: v }));
+  }, []);
+
+  /* تحدّي 21 يوم: روتين جاهز + هدف بموعد بعد 21 يوماً (مرة واحدة) */
+  const startChallenge21 = useCallback(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 21);
+    const deadline = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const mk = (text: string): RoutineTask => ({
+      id: crypto.randomUUID(), text, priority: 'med', doneDate: '', subtasks: [],
+    });
+    setState((s) => {
+      if (s.challenge21Started) return s;
+      return {
+        ...s,
+        challenge21Started: true,
+        routine: {
+          morning: [
+            ...s.routine.morning,
+            mk('صلاة الفجر في وقتها'),
+            mk('شرب كوب ماء'),
+            mk('قراءة 10 دقائق'),
+          ],
+          evening: [
+            ...s.routine.evening,
+            mk('مراجعة إنجاز اليوم'),
+            mk('النوم مبكراً'),
+          ],
+        },
+        goals: [
+          ...s.goals,
+          {
+            id: crypto.randomUUID(),
+            title: 'تحدّي 21 يوم 🔥',
+            steps: [],
+            completed: false,
+            createdDate: todayStr(),
+            category: 'شخصي',
+            deadline,
+          },
+        ],
+      };
+    });
+  }, []);
+
   const value = useMemo<CoreContextValue>(
     () => ({
       state,
@@ -1727,6 +1785,8 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       setCalorieGoal,
       login,
       logout,
+      setOnboarded,
+      startChallenge21,
     }),
     [
       state,
@@ -1806,6 +1866,8 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       setCalorieGoal,
       login,
       logout,
+      setOnboarded,
+      startChallenge21,
     ],
   );
 

@@ -8,6 +8,7 @@ import BottomNav from './components/BottomNav';
 import Confetti from './components/Confetti';
 import { useCore } from './core/useCore';
 import Login from './pages/Login';
+import Onboarding from './pages/Onboarding';
 import Home from './pages/Home';
 import Hub from './pages/Hub';
 import Routine from './pages/Routine';
@@ -44,6 +45,16 @@ export default function App() {
     return (
       <>
         <Login />
+        <Confetti />
+      </>
+    );
+  }
+
+  /* شاشة الترحيب الأولى بعد أول تسجيل دخول */
+  if (!state.onboarded) {
+    return (
+      <>
+        <Onboarding />
         <Confetti />
       </>
     );
