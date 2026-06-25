@@ -227,7 +227,7 @@ export default function Routine() {
                   onKeyDown={(e) => e.key === 'Enter' && handleAddSub(task.id)}
                 />
                 <button className="btn-primary" onClick={() => handleAddSub(task.id)}>
-                  إضافة
+                  زِد
                 </button>
               </div>
             ) : (
@@ -270,9 +270,9 @@ export default function Routine() {
       <div className={allDone ? 'card pulse' : 'card'}>
         <div className="section-progress">
           {tasks.length === 0
-            ? 'لا مهام بعد — أضف أول مهمة 👇'
-            : `أُنجز اليوم ${doneCount} من ${tasks.length}`}
-          {allDone ? ' — أكملت القسم! ✨' : ''}
+            ? 'ما فيه مهام — زِد أول وحدة 👇'
+            : `خلّصت ${doneCount} من ${tasks.length}`}
+          {allDone ? ' — كمّلت القسم، كفو! ✨' : ''}
         </div>
 
         {tasks.map(renderTask)}
@@ -280,7 +280,7 @@ export default function Routine() {
         <div className="add-row">
           <input
             className="input-field"
-            placeholder="مهمة جديدة (دائمة)"
+            placeholder="مهمة جديدة (ثابتة كل يوم)"
             value={newTask}
             maxLength={200}
             onChange={(e) => setNewTask(e.target.value)}
