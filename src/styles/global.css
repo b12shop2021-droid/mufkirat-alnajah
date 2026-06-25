@@ -86,6 +86,38 @@ body {
   background: var(--bg);
 }
 
+/* حجم الخط الكبير (راحة القراءة) */
+:root[data-font='large'] #root {
+  zoom: 1.12;
+}
+
+/* الزر العائم السريع */
+.fab {
+  position: fixed;
+  bottom: calc(var(--nav-height) + 16px);
+  left: 50%;
+  transform: translateX(calc(-50% + 190px));
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: #fff;
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-soft);
+  z-index: 49;
+}
+
+@media (max-width: 460px) {
+  .fab {
+    transform: translateX(0);
+    left: auto;
+    right: 18px;
+  }
+}
+
 button {
   font-family: inherit;
   cursor: pointer;

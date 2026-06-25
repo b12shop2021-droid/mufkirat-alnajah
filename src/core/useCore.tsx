@@ -177,6 +177,8 @@ export interface CoreState {
   streak: Streak;
   accent: AccentName; // اسم الثيم (لا اللون المباشر)
   dark: boolean;
+  autoDark: boolean; // وضع ليلي تلقائي حسب الوقت
+  fontScale: 'normal' | 'large'; // حجم الخط
   countedMemorizedJuz: number[]; // أجزاء حُسبت +50 لمنع التكرار
   countedReadJuz: number[]; // أجزاء حُسبت +20 لمنع التكرار
   quranJuz: Record<number, QuranStatus>; // حالة كل جزء
@@ -338,6 +340,8 @@ const DEFAULT_STATE: CoreState = {
   streak: { current: 0, longest: 0, lastDoneDate: '', freezeMonth: '' },
   accent: 'emerald',
   dark: false,
+  autoDark: false,
+  fontScale: 'normal',
   countedMemorizedJuz: [],
   countedReadJuz: [],
   quranJuz: {},
@@ -399,6 +403,8 @@ const loadState = (): CoreState => {
       session: { ...DEFAULT_STATE.session, ...parsed.session },
       profile: { ...DEFAULT_STATE.profile, ...parsed.profile },
       streak: { ...DEFAULT_STATE.streak, ...parsed.streak },
+      autoDark: parsed.autoDark ?? false,
+      fontScale: parsed.fontScale ?? 'normal',
       countedMemorizedJuz: parsed.countedMemorizedJuz ?? [],
       countedReadJuz: parsed.countedReadJuz ?? [],
       quranJuz: parsed.quranJuz ?? {},
@@ -451,6 +457,8 @@ interface CoreContextValue {
   markStreakToday: () => void;
   setAccent: (accent: AccentName) => void;
   toggleDark: () => void;
+  toggleAutoDark: () => void;
+  setFontScale: (scale: 'normal' | 'large') => void;
   markMemorizedJuz: (juz: number) => boolean; // true إذا احتُسبت لأول مرة
   // ===== الروتين =====
   addRoutineTask: (section: RoutineSection, text: string) => void;
@@ -552,12 +560,16 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     }
   }, [state]);
 
-  /* تطبيق الثيم والوضع الليلي على عنصر <html> فوراً */
+  /* تطبيق الثيم/الوضع الليلي/حجم الخط على <html> فوراً
+     الوضع الليلي التلقائي: مفعّل بين 19:00 و 6:00 */
   useEffect(() => {
     const root = document.documentElement;
     root.setAttribute('data-accent', state.accent);
-    root.setAttribute('data-dark', String(state.dark));
-  }, [state.accent, state.dark]);
+    const hour = new Date().getHours();
+    const effectiveDark = state.autoDark ? hour >= 19 || hour < 6 : state.dark;
+    root.setAttribute('data-dark', String(effectiveDark));
+    root.setAttribute('data-font', state.fontScale);
+  }, [state.accent, state.dark, state.autoDark, state.fontScale]);
 
   /* المستوى: كل 100 نقطة = مستوى، بحد أقصى 7 مستويات */
   const level = useMemo(
@@ -644,6 +656,16 @@ export function CoreProvider({ children }: { children: ReactNode }) {
   /* تبديل الوضع الليلي */
   const toggleDark = useCallback(() => {
     setState((s) => ({ ...s, dark: !s.dark }));
+  }, []);
+
+  /* تبديل الوضع الليلي التلقائي */
+  const toggleAutoDark = useCallback(() => {
+    setState((s) => ({ ...s, autoDark: !s.autoDark }));
+  }, []);
+
+  /* ضبط حجم الخط */
+  const setFontScale = useCallback((scale: 'normal' | 'large') => {
+    setState((s) => ({ ...s, fontScale: scale }));
   }, []);
 
   /* احتساب حفظ جزء قرآن مرة واحدة فقط (+50 لا تتكرر) */
@@ -1637,6 +1659,8 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       markStreakToday,
       setAccent,
       toggleDark,
+      toggleAutoDark,
+      setFontScale,
       markMemorizedJuz,
       addRoutineTask,
       editRoutineText,
@@ -1714,6 +1738,8 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       markStreakToday,
       setAccent,
       toggleDark,
+      toggleAutoDark,
+      setFontScale,
       markMemorizedJuz,
       addRoutineTask,
       editRoutineText,

@@ -19,7 +19,7 @@ const ACCENTS: { id: AccentName; cls: string }[] = [
 
 export default function Settings() {
   const core = useCore();
-  const { profile, dark, accent } = core.state;
+  const { profile, dark, accent, autoDark, fontScale } = core.state;
 
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
@@ -234,13 +234,43 @@ export default function Settings() {
           <div className="settings-text">
             <div className="settings-label">الوضع الليلي</div>
             <div className="settings-sub">
-              {dark ? 'مفعّل — راحة بصرية ليلية' : 'يحافظ على راحة عينيك ليلاً'}
+              {autoDark ? 'يتحكم به الوضع التلقائي' : 'يريّح عينك بالليل'}
             </div>
           </div>
           <label className="switch">
-            <input type="checkbox" checked={dark} onChange={core.toggleDark} />
+            <input type="checkbox" checked={dark} disabled={autoDark} onChange={core.toggleDark} />
             <span className="switch-slider" />
           </label>
+        </div>
+        <div className="settings-row">
+          <div className="settings-icon">🌗</div>
+          <div className="settings-text">
+            <div className="settings-label">وضع ليلي تلقائي</div>
+            <div className="settings-sub">يشتغل تلقائياً من المغرب للفجر</div>
+          </div>
+          <label className="switch">
+            <input type="checkbox" checked={autoDark} onChange={core.toggleAutoDark} />
+            <span className="switch-slider" />
+          </label>
+        </div>
+        <div className="settings-row" style={{ display: 'block' }}>
+          <div className="settings-label" style={{ marginBottom: 8 }}>🔠 حجم الخط</div>
+          <div className="add-row" style={{ marginTop: 0 }}>
+            <button
+              className={fontScale === 'normal' ? 'btn-primary' : 'btn-ghost'}
+              style={{ flex: 1 }}
+              onClick={() => core.setFontScale('normal')}
+            >
+              عادي
+            </button>
+            <button
+              className={fontScale === 'large' ? 'btn-primary' : 'btn-ghost'}
+              style={{ flex: 1 }}
+              onClick={() => core.setFontScale('large')}
+            >
+              كبير
+            </button>
+          </div>
         </div>
         <div className="settings-row" style={{ display: 'block' }}>
           <div className="settings-label" style={{ marginBottom: 8 }}>🎨 لون الثيم</div>

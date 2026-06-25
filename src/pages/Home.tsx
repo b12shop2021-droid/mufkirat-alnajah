@@ -155,6 +155,10 @@ export default function Home() {
           ))}
         </div>
       </div>
+
+      <button className="fab" aria-label="خطوة سريعة" onClick={() => navigate(next.to)}>
+        +
+      </button>
     </div>
   );
 }
