@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useCore, type AccentName, type Gender } from '../core/useCore';
 import BackButton from '../components/BackButton';
 import Notifications from './Notifications';
+import { promptInstall } from '../pwa';
 
 const ACCENTS: { id: AccentName; cls: string }[] = [
   { id: 'emerald', cls: 'sw-emerald' },
@@ -62,6 +63,14 @@ export default function Settings() {
       }
     };
     reader.readAsText(file);
+  };
+
+  /* تثبيت التطبيق على الشاشة الرئيسية */
+  const handleInstall = async () => {
+    const res = await promptInstall();
+    if (res === 'installed') setHint('🎉 تم تثبيت التطبيق!');
+    else if (res === 'dismissed') setHint('ألغيت التثبيت');
+    else setHint('💡 لتثبيته: افتح قائمة المتصفح ← "إضافة إلى الشاشة الرئيسية"');
   };
 
   const handleSave = () => {
@@ -308,9 +317,17 @@ export default function Settings() {
         </button>
       </div>
 
-      {/* حول التطبيق */}
-      <div className="section-title">حول التطبيق</div>
+      {/* التطبيق */}
+      <div className="section-title">التطبيق</div>
       <div className="settings-card">
+        <button className="settings-row" style={{ width: '100%', textAlign: 'right' }} onClick={handleInstall}>
+          <div className="settings-icon">📲</div>
+          <div className="settings-text">
+            <div className="settings-label">تثبيت التطبيق على جوالك</div>
+            <div className="settings-sub">يفتح كأيقونة مستقلة ويعمل بدون إنترنت</div>
+          </div>
+          <div style={{ color: 'var(--text-secondary)' }}>‹</div>
+        </button>
         <div className="settings-row">
           <div className="settings-icon">📖</div>
           <div className="settings-text">
