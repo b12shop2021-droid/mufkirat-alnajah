@@ -112,6 +112,10 @@ export default function Home() {
         </div>
       </div>
 
+      {routine.length > 0 && doneToday === routine.length && (
+        <div className="day-done-badge">🏅 أنجزت يومك كامل — كفووو!</div>
+      )}
+
       <div className="greet-strip">{whisper}</div>
 
       <button className="next-step" onClick={() => navigate(next.to)}>

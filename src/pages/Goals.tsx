@@ -36,7 +36,13 @@ const countdownText = (n: number): string => {
 
 export default function Goals() {
   const core = useCore();
-  const goals = core.state.goals;
+  /* ترتيب: غير المكتمل أولاً، ثم الأقرب موعداً (بلا موعد في الآخر) */
+  const goals = [...core.state.goals].sort((a, b) => {
+    if (a.completed !== b.completed) return a.completed ? 1 : -1;
+    const da = a.deadline || '9999-12-31';
+    const db = b.deadline || '9999-12-31';
+    return da < db ? -1 : da > db ? 1 : 0;
+  });
 
   const [editKey, setEditKey] = useState<string | null>(null);
   const [draft, setDraft] = useState('');

@@ -3596,6 +3596,18 @@ select {
   margin-bottom: 12px;
 }
 
+.day-done-badge {
+  text-align: center;
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: #fff;
+  background: linear-gradient(135deg, var(--warning), var(--celebrate));
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-soft);
+}
+
 .next-step {
   width: 100%;
   display: flex;

@@ -33,6 +33,37 @@ export default function Settings() {
   const [hint, setHint] = useState<string | null>(null);
   const [showNotif, setShowNotif] = useState(false);
 
+  /* تصدير نسخة احتياطية كملف JSON */
+  const handleExport = () => {
+    const data = localStorage.getItem('mufkirat_core_v1') ?? '{}';
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `mufkirat-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setHint('⬇️ تم تصدير نسختك الاحتياطية');
+  };
+
+  /* استيراد نسخة احتياطية (مع تحقق) ثم إعادة التحميل */
+  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        JSON.parse(reader.result as string);
+        localStorage.setItem('mufkirat_core_v1', reader.result as string);
+        window.location.reload();
+      } catch {
+        setHint('⚠️ الملف غير صالح');
+      }
+    };
+    reader.readAsText(file);
+  };
+
   const handleSave = () => {
     if (form.name.trim() === '') {
       setHint('⚠️ أدخل اسمك أولاً');
@@ -239,6 +270,26 @@ export default function Settings() {
 
       {hint && <div className="hint-msg ok">{hint}</div>}
 
+      {/* بياناتي — نسخ احتياطي */}
+      <div className="section-title">بياناتي</div>
+      <div className="settings-card">
+        <button className="settings-row" style={{ width: '100%', textAlign: 'right' }} onClick={handleExport}>
+          <div className="settings-icon">⬇️</div>
+          <div className="settings-text">
+            <div className="settings-label">نسخة احتياطية (تصدير)</div>
+            <div className="settings-sub">احفظ بياناتك كملف على جهازك</div>
+          </div>
+        </button>
+        <label className="settings-row" style={{ width: '100%', textAlign: 'right', cursor: 'pointer' }}>
+          <div className="settings-icon">⬆️</div>
+          <div className="settings-text">
+            <div className="settings-label">استعادة (استيراد)</div>
+            <div className="settings-sub">ارجع بياناتك من ملف نسخة احتياطية</div>
+          </div>
+          <input type="file" accept="application/json" style={{ display: 'none' }} onChange={handleImport} />
+        </label>
+      </div>
+
       {/* الحساب */}
       <div className="section-title">الحساب</div>
       <div className="settings-card">
@@ -255,6 +306,18 @@ export default function Settings() {
             <div className="settings-label" style={{ color: 'var(--danger)' }}>تسجيل الخروج</div>
           </div>
         </button>
+      </div>
+
+      {/* حول التطبيق */}
+      <div className="section-title">حول التطبيق</div>
+      <div className="settings-card">
+        <div className="settings-row">
+          <div className="settings-icon">📖</div>
+          <div className="settings-text">
+            <div className="settings-label">مفكرة النجاح</div>
+            <div className="settings-sub">الإصدار 0.1.0 — رفيقك في رحلة التطوير</div>
+          </div>
+        </div>
       </div>
     </div>
   );
