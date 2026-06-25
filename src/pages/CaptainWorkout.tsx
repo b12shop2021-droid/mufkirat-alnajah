@@ -82,11 +82,11 @@ export default function CaptainWorkout({ embedded = false }: { embedded?: boolea
     const wasDone = core.state.completedExercises.includes(k);
     core.toggleExerciseDone(k);
     if (!wasDone) {
-      fireConfetti();
-      // فحص اكتمال اليوم بعد هذا التمرين
+      // فحص اكتمال اليوم — الاحتفال للإنجاز الكبير فقط (إكمال اليوم)
       const doneKeys = new Set([...core.state.completedExercises, k]);
       const allDone = day.exercises.every((e) => doneKeys.has(exKey(e.id)));
       if (allDone) {
+        fireConfetti();
         const duration = Math.floor((Date.now() - sessionStart.current) / 1000);
         core.logWorkoutDay(day.id, duration, day.exercises.map((e) => exKey(e.id)));
       }

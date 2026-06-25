@@ -49,13 +49,15 @@ export default function NotesGratitude() {
       setHint('⚠️ اكتب ما تشكر عليه');
       return;
     }
+    const beforeCount = todayGrat.length;
     const ok = core.addGratitude(value);
     if (!ok) {
-      setHint('✨ اكتملت ٣ لحظات شكر لهذا اليوم');
+      setHint('✨ كمّلت ٣ شكر اليوم، الله يسعدك');
       return;
     }
     if (!preset) setGratText('');
-    fireConfetti();
+    // احتفال فقط عند اكتمال الـ3 (إنجاز اليوم)
+    if (beforeCount + 1 >= 3) fireConfetti();
     setHint(null);
   };
 

@@ -8,7 +8,6 @@ import { useState } from 'react';
 import { useCore, todayStr, type ExpenseType } from '../core/useCore';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
-import { fireConfetti } from '../components/Confetti';
 
 type Tab = 'overview' | 'budget' | 'list';
 
@@ -124,8 +123,7 @@ export default function Expenses() {
     });
     setForm({ ...form, amount: '', desc: '', notes: '' });
     setAdding(false);
-    fireConfetti();
-    setHint('💾 تم حفظ الحركة!');
+    setHint('💾 سجّلنا الحركة');
   };
 
   const handleAddSadaqah = () => {
@@ -144,8 +142,7 @@ export default function Expenses() {
       notes: '',
     });
     setSadaqah('');
-    fireConfetti();
-    setHint('🤲 جزاك الله خيراً! سُجّلت صدقتك');
+    setHint('🤲 جزاك الله خير، سُجّلت صدقتك');
   };
 
   const handleAddCat = () => {

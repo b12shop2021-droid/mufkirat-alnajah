@@ -10,7 +10,6 @@ import { useCore, todayStr, type MealType, type FavoriteMeal } from '../core/use
 import XPBar from '../components/XPBar';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
-import { fireConfetti } from '../components/Confetti';
 
 const TYPES: MealType[] = ['إفطار', 'غداء', 'عشاء', 'وجبة خفيفة'];
 
@@ -71,8 +70,7 @@ export default function Meals() {
     );
     setForm({ ...form, name: '', ingredients: '', calories: '', notes: '' });
     setSaveFav(false);
-    fireConfetti();
-    setHint('🍽️ أُضيفت الوجبة!');
+    setHint('🍽️ سجّلنا وجبتك، صحتين');
   };
 
   /* اختيار وجبة مفضلة → تعبئة النموذج لتعديلها قبل الإضافة */

@@ -8,7 +8,6 @@ import { useCore } from '../core/useCore';
 import XPBar from '../components/XPBar';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
-import { fireConfetti } from '../components/Confetti';
 
 export default function Identity({ embedded = false }: { embedded?: boolean }) {
   const core = useCore();
@@ -32,8 +31,7 @@ export default function Identity({ embedded = false }: { embedded?: boolean }) {
     }
     core.setIdentity(draft);
     setEditing(false);
-    fireConfetti();
-    setHint(null);
+    setHint('🪪 حدّثنا بطاقتك');
   };
 
   /* إضافة قاعدة للدستور */
@@ -48,7 +46,6 @@ export default function Identity({ embedded = false }: { embedded?: boolean }) {
       return;
     }
     setRule('');
-    fireConfetti();
     setHint(null);
   };
 

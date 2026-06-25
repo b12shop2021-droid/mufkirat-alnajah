@@ -8,7 +8,6 @@ import { useCore } from '../core/useCore';
 import XPBar from '../components/XPBar';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
-import { fireConfetti } from '../components/Confetti';
 
 type Tab = 'sleep' | 'rel';
 
@@ -58,8 +57,7 @@ export default function SleepRelations() {
       return;
     }
     const h = core.saveSleep(sleepTime, wakeTime);
-    fireConfetti();
-    setHint(`😴 تم تسجيل ${h} ساعة نوم!`);
+    setHint(`😴 سجّلنا ${h} ساعة نوم — ريّح نفسك`);
   };
 
   const handleAddRel = () => {
@@ -72,9 +70,8 @@ export default function SleepRelations() {
     setHint(null);
   };
 
-  const handleToggleRel = (id: string, wasContacted: boolean) => {
+  const handleToggleRel = (id: string) => {
     core.toggleRelation(id);
-    if (!wasContacted) fireConfetti();
   };
 
   return (
@@ -201,7 +198,7 @@ export default function SleepRelations() {
                 <button
                   className={r.contacted ? 'rel-check-btn done' : 'rel-check-btn'}
                   aria-label="تأكيد التواصل"
-                  onClick={() => handleToggleRel(r.id, r.contacted)}
+                  onClick={() => handleToggleRel(r.id)}
                 >
                   {r.contacted ? '✓' : ''}
                 </button>

@@ -8,7 +8,6 @@ import { useCore, todayStr } from '../core/useCore';
 import XPBar from '../components/XPBar';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
-import { fireConfetti } from '../components/Confetti';
 
 /* 8 حالات مزاج (إيموجي + وصف) */
 const MOODS = [
@@ -62,19 +61,17 @@ export default function Mood() {
       return;
     }
     core.saveMood(selected, energy);
-    fireConfetti();
-    setHint('😊 تم حفظ مزاج اليوم!');
+    setHint('😊 سجّلنا مزاجك، عساك دوم بخير');
   };
 
   /* إضافة لحظة فخر */
   const handleAddPride = () => {
     if (pride.trim() === '') {
-      setHint('⚠️ اكتب لحظة فخرك أولاً');
+      setHint('⚠️ اكتب لحظة تفتخر فيها');
       return;
     }
     core.addPride(pride);
     setPride('');
-    fireConfetti();
     setShowArchive(true);
   };
 

@@ -1467,6 +1467,13 @@ select {
   margin-top: 3px;
 }
 
+.companion-msg {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-top: 8px;
+}
+
 .levels-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

@@ -52,6 +52,16 @@ export default function Streak({ embedded = false }: { embedded?: boolean }) {
     return idx;
   })();
   const stage = COMPANION_STAGES[stageIdx];
+
+  /* رسالة الرفيق التفاعلية حسب حالة السلسلة */
+  const companionMsg =
+    streak.current === 0
+      ? 'يلا نبدأ من جديد، أنا معك! 🌱'
+      : streak.current < 7
+        ? `${streak.current} أيام وما وقفت — كفو، كمّل! 💪`
+        : streak.current < 30
+          ? 'ماشي عدّال يا بطل، خلّك ثابت 🔥'
+          : 'إنجاز خرافي! أنت قدوة لغيرك 👑';
   const nextStage = COMPANION_STAGES[stageIdx + 1];
   const companionPct = nextStage
     ? Math.round(((streak.current - stage.min) / (nextStage.min - stage.min)) * 100)
@@ -150,6 +160,7 @@ export default function Streak({ embedded = false }: { embedded?: boolean }) {
         <span className="companion-emoji">{stage.emoji}</span>
         <div className="companion-name">رفيقك في الرحلة</div>
         <div className="companion-stage">{stage.stage}</div>
+        <div className="companion-msg">{companionMsg}</div>
         <div className="progress-track">
           <div className="progress-fill" style={{ width: `${companionPct}%` }} />
         </div>
