@@ -11,10 +11,10 @@ import XPBar from '../components/XPBar';
 const DAY_NAMES = ['أحد', 'اثن', 'ثلا', 'أرب', 'خمي', 'جمع', 'سبت'];
 
 const MOTIVATIONS = [
-  'كل خطوة تقدّم نحو أحلامك تستحق الاحتفال',
-  'النجاح مجموع جهود صغيرة تتكرر كل يوم',
-  'لا تقارن بدايتك بنهايات الآخرين، قارن نفسك بأمسك',
-  'الانضباط جسر بين الأهداف والإنجاز',
+  'كل خطوة صغيرة تقرّبك لحلمك — لا تستهين فيها',
+  'النجاح عادة يومية، مو ضربة حظ',
+  'لا تقارن بدايتك بنهايات غيرك — قارن نفسك بأمسك',
+  'انضباطك اليوم هو فخرك بكرة',
 ];
 
 const dateBefore = (offset: number): string => {
@@ -44,14 +44,32 @@ export default function Home() {
     (s.notes.some((n) => n.date === date) ? 1 : 0) +
     (s.sleepLog.some((e) => e.date === date) ? 1 : 0);
 
-  /* همسة الفجر حسب أداء الأمس */
+  /* صيغة الخطاب حسب الجنس */
+  const fem = s.profile.gender === 'female';
+  const v = (m: string, f: string) => (fem ? f : m);
+
+  /* همسة الفجر حسب أداء الأمس (لهجة سعودية شبابية) */
   const yChips = activityOn(dateBefore(1));
   const whisper =
     yChips >= 3
-      ? `✨ صباح النجاح يا ${greeting}! أمسك كان رائعاً — واصل التألق 🥇`
+      ? `🔥 صباح النجاح يا ${greeting}! أمس كان ولا أروع — ${v('كمّل', 'كمّلي')} عالخطى`
       : yChips >= 1
-        ? `🌅 يوم جديد يا ${greeting}، فرصة لتكون أفضل من الأمس 💪`
-        : `🌱 ابدأ يومك بخطوة صغيرة يا ${greeting} — الرحلة لا تُقاس بالكمال`;
+        ? `💪 يومٍ جديد يا ${greeting} — فرصتك ${v('تكون', 'تكونين')} أحسن من أمس`
+        : `🌱 ${v('ابدأ', 'ابدئي')} بخطوة صغيرة يا ${greeting} — المهم ما ${v('توقف', 'توقفين')}`;
+
+  /* خطوتك اليوم — اقتراح ذكي لأهم إجراء ناقص */
+  const gratToday = s.gratitudeLog.filter((g) => g.date === today).length;
+  const moodToday = s.moodLog.some((m) => m.date === today);
+  const next =
+    routine.length === 0
+      ? { t: '✍️ جهّز روتينك اليومي', to: '/routine' }
+      : doneToday < routine.length
+        ? { t: '☀️ كمّل روتين اليوم', to: '/routine' }
+        : !moodToday
+          ? { t: '😊 سجّل مزاجك اليوم', to: '/mood' }
+          : gratToday < 3
+            ? { t: '🙏 اكتب شكر اليوم', to: '/notes' }
+            : { t: '🎉 يومك كامل، كفو!', to: '/achievements' };
 
   /* نظرة الأسبوع */
   const week = Array.from({ length: 7 }, (_, i) => {
@@ -90,11 +108,16 @@ export default function Home() {
           <div className="home-progress-bg">
             <div className="home-progress-fill" style={{ width: `${dayPct}%` }} />
           </div>
-          <span className="home-progress-label">إنجاز اليوم</span>
+          <span className="home-progress-label">إنجاز يومك</span>
         </div>
       </div>
 
       <div className="greet-strip">{whisper}</div>
+
+      <button className="next-step" onClick={() => navigate(next.to)}>
+        <span>{next.t}</span>
+        <span>←</span>
+      </button>
 
       <h2 className="section-title">🧭 رحلتك اليوم</h2>
       <div className="home-grid">

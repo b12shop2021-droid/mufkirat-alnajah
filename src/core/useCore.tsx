@@ -93,6 +93,8 @@ export interface Goal {
   steps: GoalStep[];
   completed: boolean;
   createdDate: string; // YYYY-MM-DD
+  category: string; // فئة الهدف (شخصي/عملي/علاقات/أخرى أو اسم حر)
+  deadline: string; // YYYY-MM-DD موعد التسليم (فارغ = بلا موعد)
 }
 
 export type Difficulty = 'سهل' | 'متوسط' | 'متقدم';
@@ -200,7 +202,7 @@ export interface CoreState {
   customCategories: CustomCategory[];
   budgets: Record<string, number>; // اسم الفئة → السقف الشهري
   workoutPRs: Record<string, number>; // مفتاح التمرين → أعلى وزن
-  workoutImages: Record<string, string>; // مفتاح التمرين → صورة
+  workoutDayImages: Record<string, string>; // معرّف اليوم → صورة (1080×1920)
   completedExercises: string[]; // مفاتيح التمارين المكتملة
   workoutLogs: WorkoutLog[];
   meals: MealEntry[];
@@ -376,7 +378,7 @@ const DEFAULT_STATE: CoreState = {
     'صندوق الخير': 0,
   },
   workoutPRs: {},
-  workoutImages: {},
+  workoutDayImages: {},
   completedExercises: [],
   workoutLogs: [],
   meals: [],
@@ -425,7 +427,7 @@ const loadState = (): CoreState => {
       customCategories: parsed.customCategories ?? [],
       budgets: parsed.budgets ?? DEFAULT_STATE.budgets,
       workoutPRs: parsed.workoutPRs ?? {},
-      workoutImages: parsed.workoutImages ?? {},
+      workoutDayImages: parsed.workoutDayImages ?? {},
       completedExercises: parsed.completedExercises ?? [],
       workoutLogs: parsed.workoutLogs ?? [],
       meals: parsed.meals ?? [],
@@ -461,7 +463,7 @@ interface CoreContextValue {
   toggleSubDone: (section: RoutineSection, taskId: string, subId: string) => void;
   removeSubTask: (section: RoutineSection, taskId: string, subId: string) => void;
   // ===== الأهداف =====
-  addGoal: (title: string) => void;
+  addGoal: (title: string, category?: string, deadline?: string) => void;
   editGoalTitle: (goalId: string, title: string) => void;
   removeGoal: (goalId: string) => void;
   addGoalStep: (goalId: string, text: string) => void;
@@ -522,7 +524,7 @@ interface CoreContextValue {
   setBudget: (category: string, amount: number) => void;
   // ===== جدول الكابتن سعود =====
   toggleExerciseDone: (key: string) => void; // +15 عند الإكمال
-  setWorkoutImage: (key: string, image: string) => void;
+  setWorkoutDayImage: (dayId: string, image: string) => void;
   recordPR: (key: string, weight: number) => boolean; // true إذا رقم شخصي جديد
   logWorkoutDay: (dayId: string, durationSec: number, doneIds: string[]) => void; // +10 إضافية
   // ===== الوجبات =====
@@ -827,9 +829,9 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     [],
   );
 
-  /* إضافة هدف جديد */
+  /* إضافة هدف جديد (مع فئة وموعد تسليم اختياريين) */
   const addGoal = useCallback(
-    (title: string) => {
+    (title: string, category = '', deadline = '') => {
       const t = clean(title);
       if (!t) return;
       updateGoals((list) => [
@@ -840,6 +842,8 @@ export function CoreProvider({ children }: { children: ReactNode }) {
           steps: [],
           completed: false,
           createdDate: todayStr(),
+          category: clean(category),
+          deadline: deadline,
         },
       ]);
     },
@@ -1509,9 +1513,9 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     [addXP],
   );
 
-  /* حفظ صورة تمرين */
-  const setWorkoutImage = useCallback((key: string, image: string) => {
-    setState((s) => ({ ...s, workoutImages: { ...s.workoutImages, [key]: image } }));
+  /* حفظ صورة اليوم (1080×1920) */
+  const setWorkoutDayImage = useCallback((dayId: string, image: string) => {
+    setState((s) => ({ ...s, workoutDayImages: { ...s.workoutDayImages, [dayId]: image } }));
   }, []);
 
   /* تسجيل رقم شخصي إذا تجاوز الأعلى السابق */
@@ -1689,7 +1693,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       removeCustomCategory,
       setBudget,
       toggleExerciseDone,
-      setWorkoutImage,
+      setWorkoutDayImage,
       recordPR,
       logWorkoutDay,
       addMeal,
@@ -1766,7 +1770,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       removeCustomCategory,
       setBudget,
       toggleExerciseDone,
-      setWorkoutImage,
+      setWorkoutDayImage,
       recordPR,
       logWorkoutDay,
       addMeal,

@@ -1,11 +1,11 @@
 /* ===================================================================
    Goals.tsx — صفحة الأهداف
-   كل هدف بخطوات (مهام فرعية): +3 لكل خطوة، +25 واحتفال عند اكتمال الهدف.
+   كل هدف بخطوات (+3 لكل خطوة، +25 واحتفال عند الإكمال) + فئة + موعد تسليم بعدّ تنازلي.
    كل الحالة عبر useCore المركزي.
    =================================================================== */
 
 import { useState } from 'react';
-import { useCore, type Goal } from '../core/useCore';
+import { useCore, todayStr, type Goal } from '../core/useCore';
 import XPBar from '../components/XPBar';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
@@ -16,6 +16,24 @@ interface PendingDelete {
   label: string;
 }
 
+/* فئات سريعة جاهزة (والمستخدم يقدر يكتب فئته الخاصة) */
+const QUICK_CATS = ['شخصي', 'عملي', 'علاقات', 'أخرى'];
+
+/* الأيام المتبقية لموعد التسليم */
+const daysLeft = (deadline: string): number | null => {
+  if (!deadline) return null;
+  const d = new Date(deadline + 'T00:00:00').getTime();
+  const now = new Date(todayStr() + 'T00:00:00').getTime();
+  return Math.round((d - now) / 86400000);
+};
+
+const countdownText = (n: number): string => {
+  if (n > 1) return `⏳ باقي ${n} يوم`;
+  if (n === 1) return '⏳ باقي يوم واحد';
+  if (n === 0) return '🔥 اليوم موعدك!';
+  return `⌛ فات الموعد بـ ${Math.abs(n)} يوم`;
+};
+
 export default function Goals() {
   const core = useCore();
   const goals = core.state.goals;
@@ -23,17 +41,17 @@ export default function Goals() {
   const [editKey, setEditKey] = useState<string | null>(null);
   const [draft, setDraft] = useState('');
   const [newGoal, setNewGoal] = useState('');
+  const [newCat, setNewCat] = useState('');
+  const [newDeadline, setNewDeadline] = useState('');
   const [newStepFor, setNewStepFor] = useState<string | null>(null);
   const [newStep, setNewStep] = useState('');
   const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(null);
 
-  /* بدء تعديل نص (عنوان هدف أو خطوة) */
   const startEdit = (key: string, current: string) => {
     setEditKey(key);
     setDraft(current);
   };
 
-  /* حفظ التعديل الجاري حسب نوع المفتاح */
   const commitEdit = () => {
     if (!editKey) return;
     const parts = editKey.split('|');
@@ -43,20 +61,19 @@ export default function Goals() {
     setDraft('');
   };
 
-  /* إضافة هدف جديد */
   const handleAddGoal = () => {
-    core.addGoal(newGoal);
+    core.addGoal(newGoal, newCat, newDeadline);
     setNewGoal('');
+    setNewCat('');
+    setNewDeadline('');
   };
 
-  /* إضافة خطوة لهدف */
   const handleAddStep = (goalId: string) => {
     core.addGoalStep(goalId, newStep);
     setNewStep('');
     setNewStepFor(null);
   };
 
-  /* تنفيذ الحذف بعد التأكيد */
   const confirmDelete = () => {
     if (!pendingDelete) return;
     const { goalId, stepId } = pendingDelete;
@@ -70,16 +87,14 @@ export default function Goals() {
     const done = goal.steps.filter((s) => s.done).length;
     const pct = total === 0 ? 0 : Math.round((done / total) * 100);
     const titleEditing = editKey === `goal|${goal.id}`;
+    const dleft = daysLeft(goal.deadline);
 
     return (
       <div className={goal.completed ? 'card pulse' : 'card'} key={goal.id}>
         <div className="goal-head">
           {titleEditing ? (
             <input
-              className="input-field"
-              value={draft}
-              autoFocus
-              maxLength={200}
+              className="input-field" value={draft} autoFocus maxLength={200}
               onChange={(e) => setDraft(e.target.value)}
               onBlur={commitEdit}
               onKeyDown={(e) => e.key === 'Enter' && commitEdit()}
@@ -92,20 +107,29 @@ export default function Goals() {
               {goal.title}
             </span>
           )}
-          {goal.completed && <span className="goal-badge">✅ مكتمل</span>}
+          {goal.completed && <span className="goal-badge">✅ تم</span>}
           <button
-            className="icon-btn"
-            aria-label="حذف الهدف"
-            onClick={() =>
-              setPendingDelete({ goalId: goal.id, label: goal.title })
-            }
+            className="icon-btn" aria-label="حذف الهدف"
+            onClick={() => setPendingDelete({ goalId: goal.id, label: goal.title })}
           >
             🗑️
           </button>
         </div>
 
+        {/* الفئة والعدّ التنازلي */}
+        {(goal.category || dleft !== null) && (
+          <div className="goal-chips">
+            {goal.category && <span className="goal-chip cat">🏷️ {goal.category}</span>}
+            {dleft !== null && !goal.completed && (
+              <span className={dleft < 0 ? 'goal-chip late' : 'goal-chip due'}>
+                {countdownText(dleft)}
+              </span>
+            )}
+          </div>
+        )}
+
         <div className="goal-meta">
-          {total === 0 ? 'أضف خطوات لإكمال الهدف' : `أُنجز ${done} من ${total} (${pct}%)`}
+          {total === 0 ? 'زِد خطوات عشان تخلّص الهدف' : `خلّصت ${done} من ${total} (${pct}%)`}
         </div>
         <div className="progress-track">
           <div className="progress-fill" style={{ width: `${pct}%` }} />
@@ -125,10 +149,7 @@ export default function Goals() {
                 </button>
                 {stepEditing ? (
                   <input
-                    className="input-field"
-                    value={draft}
-                    autoFocus
-                    maxLength={200}
+                    className="input-field" value={draft} autoFocus maxLength={200}
                     onChange={(e) => setDraft(e.target.value)}
                     onBlur={commitEdit}
                     onKeyDown={(e) => e.key === 'Enter' && commitEdit()}
@@ -142,15 +163,8 @@ export default function Goals() {
                   </span>
                 )}
                 <button
-                  className="icon-btn"
-                  aria-label="حذف الخطوة"
-                  onClick={() =>
-                    setPendingDelete({
-                      goalId: goal.id,
-                      stepId: step.id,
-                      label: step.text,
-                    })
-                  }
+                  className="icon-btn" aria-label="حذف الخطوة"
+                  onClick={() => setPendingDelete({ goalId: goal.id, stepId: step.id, label: step.text })}
                 >
                   🗑️
                 </button>
@@ -161,26 +175,14 @@ export default function Goals() {
           {newStepFor === goal.id ? (
             <div className="add-row">
               <input
-                className="input-field"
-                placeholder="خطوة جديدة"
-                value={newStep}
-                autoFocus
-                maxLength={200}
+                className="input-field" placeholder="وش الخطوة؟" value={newStep} autoFocus maxLength={200}
                 onChange={(e) => setNewStep(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleAddStep(goal.id)}
               />
-              <button className="btn-primary" onClick={() => handleAddStep(goal.id)}>
-                إضافة
-              </button>
+              <button className="btn-primary" onClick={() => handleAddStep(goal.id)}>زِد</button>
             </div>
           ) : (
-            <button
-              className="add-sub-btn"
-              onClick={() => {
-                setNewStepFor(goal.id);
-                setNewStep('');
-              }}
-            >
+            <button className="add-sub-btn" onClick={() => { setNewStepFor(goal.id); setNewStep(''); }}>
               ➕ خطوة
             </button>
           )}
@@ -194,37 +196,60 @@ export default function Goals() {
       <BackButton />
       <XPBar />
 
-      <h1 className="section-title">🎯 الأهداف</h1>
+      <h1 className="section-title">🎯 أهدافي</h1>
 
       {goals.length === 0 && (
         <div className="card">
           <p style={{ color: 'var(--text-secondary)' }}>
-            لا أهداف بعد — أضف أول هدف لتبدأ رحلتك 👇
+            ما عندك أهداف لين الحين — زِد أول هدف وخلنا نبدأ 👇
           </p>
         </div>
       )}
 
       {goals.map(renderGoal)}
 
-      <div className="add-row">
+      {/* نموذج إضافة هدف */}
+      <div className="card">
         <input
-          className="input-field"
-          placeholder="هدف جديد"
-          value={newGoal}
-          maxLength={200}
+          className="input-field" placeholder="وش هدفك الجديد؟" value={newGoal} maxLength={200}
+          style={{ marginBottom: 10 }}
           onChange={(e) => setNewGoal(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleAddGoal()}
         />
-        <button className="btn-primary" onClick={handleAddGoal}>
-          إضافة
+        <div className="cat-chips">
+          {QUICK_CATS.map((c) => (
+            <button
+              key={c}
+              className={newCat === c ? 'cat-pick active' : 'cat-pick'}
+              onClick={() => setNewCat(c)}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+        <input
+          className="input-field" placeholder="الفئة (أو اكتب فئتك)" value={newCat} maxLength={200}
+          style={{ margin: '10px 0' }}
+          onChange={(e) => setNewCat(e.target.value)}
+        />
+        <label style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 700 }}>
+          ⏳ موعد التسليم (اختياري)
+        </label>
+        <input
+          className="input-field" type="date" value={newDeadline}
+          style={{ margin: '6px 0 12px' }}
+          onChange={(e) => setNewDeadline(e.target.value)}
+        />
+        <button className="btn-primary" style={{ width: '100%' }} onClick={handleAddGoal}>
+          زِد الهدف 🚀
         </button>
       </div>
 
       <ConfirmDialog
         open={pendingDelete !== null}
-        title="تأكيد الحذف"
-        message={`هل تريد حذف «${pendingDelete?.label ?? ''}» نهائياً؟`}
-        confirmLabel="حذف"
+        title="متأكد؟"
+        message={`بتحذف «${pendingDelete?.label ?? ''}» نهائياً؟`}
+        confirmLabel="احذف"
+        cancelLabel="رجوع"
         danger
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}

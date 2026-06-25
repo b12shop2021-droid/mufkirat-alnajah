@@ -93,18 +93,20 @@ export default function CaptainWorkout({ embedded = false }: { embedded?: boolea
     }
   };
 
-  const handleImage = (e: React.ChangeEvent<HTMLInputElement>, ex: CaptainExercise) => {
+  /* رفع صورة اليوم (يُفضّل 1080×1920) */
+  const handleDayImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
-    if (!file.type.startsWith('image/')) { setHint('⚠️ الملف ليس صورة'); return; }
-    if (file.size > MAX_IMG) { setHint('⚠️ حجم الصورة كبير (الحد 1.5MB)'); return; }
+    if (!file.type.startsWith('image/')) { setHint('⚠️ لازم تكون صورة'); return; }
+    if (file.size > MAX_IMG) { setHint('⚠️ الصورة كبيرة (الحد 1.5 ميجا)'); return; }
     const reader = new FileReader();
     reader.onload = () => {
-      if (typeof reader.result === 'string') core.setWorkoutImage(exKey(ex.id), reader.result);
+      if (typeof reader.result === 'string') core.setWorkoutDayImage(day.id, reader.result);
     };
     reader.readAsDataURL(file);
   };
+  const dayImage = core.state.workoutDayImages[day.id];
 
   const doneCount = day.exercises.filter((e) =>
     core.state.completedExercises.includes(exKey(e.id)),
@@ -115,6 +117,18 @@ export default function CaptainWorkout({ embedded = false }: { embedded?: boolea
   return (
     <div className="page">
       {!embedded && <BackButton />}
+
+      <label className="day-photo">
+        {dayImage ? (
+          <img src={dayImage} alt="صورة اليوم" />
+        ) : (
+          <div className="day-photo-empty">
+            <div style={{ fontSize: '1.8rem' }}>📸</div>
+            <div>أضف صورة لهذا اليوم (1080×1920)</div>
+          </div>
+        )}
+        <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleDayImage} />
+      </label>
 
       <div className="day-header">
         <div className="day-title-row">
@@ -157,7 +171,6 @@ export default function CaptainWorkout({ embedded = false }: { embedded?: boolea
         const k = exKey(ex.id);
         const exSets = getSets(ex);
         const completed = core.state.completedExercises.includes(k);
-        const img = core.state.workoutImages[k];
         return (
           <div className="ex-card" key={k}>
             <div className="ex-banner">
@@ -169,11 +182,6 @@ export default function CaptainWorkout({ embedded = false }: { embedded?: boolea
               <div className="ex-name-en">{ex.nameEn}</div>
               {ex.sameDay && <div className="same-day-tag">🔁 {ex.sameDay}</div>}
             </div>
-
-            <label className="ex-img-slot">
-              {img ? <img src={img} alt="صورة التمرين" /> : <span style={{ fontSize: '1.6rem', opacity: 0.4 }}>🏋️</span>}
-              <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleImage(e, ex)} />
-            </label>
 
             <div className="ex-body">
               <div className="ex-muscles">💪 <strong>العضلات المستهدفة:</strong> {ex.muscles}</div>

@@ -74,7 +74,7 @@ export default function Hub() {
       {/* تبويب العهود المستقل البارز */}
       <button
         className="hub-link"
-        style={{ background: 'linear-gradient(150deg, var(--deep), #122f3b)', color: '#fff' }}
+        style={{ background: 'linear-gradient(150deg, var(--deep), var(--deep-2))', color: '#fff' }}
         onClick={() => navigate('/pledges')}
       >
         <div className="hub-link-icon" style={{ background: 'rgba(255,255,255,0.18)' }}>🛡️</div>

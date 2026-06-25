@@ -8,6 +8,7 @@
   --primary: #05ad98;          /* تركوازي أساسي (النشط) */
   --primary-light: #2bcfce;    /* تركوازي فاتح (خلفيات دائرية) */
   --deep: #245f73;             /* أزرق عميق (العناوين الكبيرة، العهود، النوم) */
+  --deep-2: var(--deep-2);           /* درجة أعمق للتدرجات */
   --celebrate: #ec4d25;        /* برتقالي احتفالي (الشارات والاحتفالات فقط) */
   --text: #1a1a1a;             /* النص الأساسي */
   --text-secondary: #878787;   /* النص الثانوي */
@@ -525,6 +526,58 @@ select {
   font-size: 0.78rem;
   color: var(--text-secondary);
   margin-bottom: 6px;
+}
+
+.goal-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.goal-chip {
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.goal-chip.cat {
+  background: var(--bg);
+  color: var(--deep);
+  border: 1px solid var(--border);
+}
+
+.goal-chip.due {
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  color: var(--primary);
+}
+
+.goal-chip.late {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  color: var(--danger);
+}
+
+.cat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cat-pick {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.cat-pick.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: transparent;
 }
 
 /* ===== صفحة "صمّم جدول تمارينك" ===== */
@@ -2381,7 +2434,7 @@ select {
   padding: 22px;
   color: #fff;
   margin-bottom: 16px;
-  background: linear-gradient(150deg, var(--deep), #122f3b);
+  background: linear-gradient(150deg, var(--deep), var(--deep-2));
   box-shadow: var(--shadow-soft);
 }
 
@@ -3037,6 +3090,37 @@ select {
 }
 
 /* ===== جدول الكابتن سعود ===== */
+.day-photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  max-height: 360px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 14px;
+  background: var(--bg);
+  border: 2px dashed var(--primary-light);
+}
+
+.day-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.day-photo-empty {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
 .day-header {
   border-radius: var(--radius);
   padding: 18px 20px;
@@ -3219,26 +3303,6 @@ select {
   padding: 3px 10px;
   font-size: 0.66rem;
   font-weight: 700;
-}
-
-.ex-img-slot {
-  margin: -4px 18px 0;
-  aspect-ratio: 1 / 1;
-  border-radius: var(--radius-sm);
-  border: 2px dashed var(--primary-light);
-  background: var(--bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  z-index: 3;
-  overflow: hidden;
-}
-
-.ex-img-slot img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 
 .ex-body {
@@ -3529,7 +3593,23 @@ select {
   font-weight: 700;
   text-align: center;
   line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.next-step {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 18px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.92rem;
   margin-bottom: 18px;
+  box-shadow: var(--shadow-soft);
 }
 
 .home-grid {
