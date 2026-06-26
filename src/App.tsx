@@ -3,6 +3,7 @@
    الصفحات الفعلية تُضاف لاحقاً صفحة-صفحة وفق منهجية العمل.
    =================================================================== */
 
+import { lazy, Suspense } from 'react';
 import { Route, Switch } from 'wouter';
 import BottomNav from './components/BottomNav';
 import Confetti from './components/Confetti';
@@ -10,21 +11,32 @@ import { useCore } from './core/useCore';
 import Login from './pages/Login';
 import Onboarding from './pages/Onboarding';
 import Home from './pages/Home';
-import Hub from './pages/Hub';
-import Routine from './pages/Routine';
-import Goals from './pages/Goals';
-import Mood from './pages/Mood';
-import NotesGratitude from './pages/NotesGratitude';
-import QuranCalendar from './pages/QuranCalendar';
-import SleepRelations from './pages/SleepRelations';
-import Settings from './pages/Settings';
-import Pledges from './pages/Pledges';
-import Expenses from './pages/Expenses';
-import Analytics from './pages/Analytics';
-import Meals from './pages/Meals';
-import Workouts from './pages/Workouts';
-import Achievements from './pages/Achievements';
-import SelfDev from './pages/SelfDev';
+
+/* تحميل كسول للصفحات: كل صفحة تُحمّل عند فتحها فقط (أخف وأسرع) */
+const Hub = lazy(() => import('./pages/Hub'));
+const Routine = lazy(() => import('./pages/Routine'));
+const Goals = lazy(() => import('./pages/Goals'));
+const Mood = lazy(() => import('./pages/Mood'));
+const NotesGratitude = lazy(() => import('./pages/NotesGratitude'));
+const QuranCalendar = lazy(() => import('./pages/QuranCalendar'));
+const SleepRelations = lazy(() => import('./pages/SleepRelations'));
+const Settings = lazy(() => import('./pages/Settings'));
+const Pledges = lazy(() => import('./pages/Pledges'));
+const Expenses = lazy(() => import('./pages/Expenses'));
+const Analytics = lazy(() => import('./pages/Analytics'));
+const Meals = lazy(() => import('./pages/Meals'));
+const Workouts = lazy(() => import('./pages/Workouts'));
+const Achievements = lazy(() => import('./pages/Achievements'));
+const SelfDev = lazy(() => import('./pages/SelfDev'));
+
+/* مؤشر تحميل بسيط بين الصفحات */
+function Loader() {
+  return (
+    <div className="page" style={{ textAlign: 'center', color: 'var(--text-secondary)', paddingTop: 60 }}>
+      ⏳ لحظة...
+    </div>
+  );
+}
 
 /* صفحة عامة لأي مسار غير معروف */
 function NotFound() {
@@ -62,6 +74,7 @@ export default function App() {
 
   return (
     <>
+      <Suspense fallback={<Loader />}>
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/more" component={Hub} />
@@ -81,6 +94,7 @@ export default function App() {
         <Route path="/self-dev" component={SelfDev} />
         <Route component={NotFound} />
       </Switch>
+      </Suspense>
       <BottomNav />
       <Confetti />
     </>

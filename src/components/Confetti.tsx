@@ -7,8 +7,11 @@ import { useEffect, useState } from 'react';
 
 const EVENT_NAME = 'mufkirat:confetti';
 
-/* إطلاق الاحتفال من أي صفحة */
+/* إطلاق الاحتفال من أي صفحة (مع اهتزاز خفيف إن دعمه الجهاز) */
 export function fireConfetti(): void {
+  if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+    navigator.vibrate?.(30);
+  }
   window.dispatchEvent(new CustomEvent(EVENT_NAME));
 }
 
