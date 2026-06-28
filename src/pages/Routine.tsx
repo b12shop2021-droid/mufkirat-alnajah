@@ -15,6 +15,7 @@ import {
 import XPBar from '../components/XPBar';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
+import SleepRelations from './SleepRelations';
 
 /* صنف نقطة الأولوية حسب القيمة (لا لون ثابت — الأصناف من global.css) */
 const PRIO_CLASS: Record<Priority, string> = {
@@ -317,6 +318,14 @@ export default function Routine() {
           </button>
         </div>
       </div>
+
+      {/* متتبع النوم — مدمج مع الروتين المسائي */}
+      {active === 'evening' && (
+        <>
+          <h2 className="section-title" style={{ marginTop: 18 }}>😴 نومك الليلة</h2>
+          <SleepRelations embedded />
+        </>
+      )}
 
       <ConfirmDialog
         open={pendingDelete !== null}

@@ -23,7 +23,6 @@ const Goals = lazy(() => import('./pages/Goals'));
 const Mood = lazy(() => import('./pages/Mood'));
 const NotesGratitude = lazy(() => import('./pages/NotesGratitude'));
 const QuranCalendar = lazy(() => import('./pages/QuranCalendar'));
-const SleepRelations = lazy(() => import('./pages/SleepRelations'));
 const Settings = lazy(() => import('./pages/Settings'));
 const Pledges = lazy(() => import('./pages/Pledges'));
 const Expenses = lazy(() => import('./pages/Expenses'));
@@ -105,7 +104,6 @@ export default function App() {
         <Route path="/mood" component={Mood} />
         <Route path="/notes" component={NotesGratitude} />
         <Route path="/quran" component={QuranCalendar} />
-        <Route path="/sleep" component={SleepRelations} />
         <Route path="/settings" component={Settings} />
         <Route path="/pledges" component={Pledges} />
         <Route path="/expenses" component={Expenses} />

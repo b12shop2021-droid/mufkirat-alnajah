@@ -31,7 +31,6 @@ const TABS: { id: Tab; label: string; links: Link[] }[] = [
     label: '🔥 التزامي',
     links: [
       { iconClass: 'ic-workouts',    label: 'التمارين',                   to: '/workouts' },
-      { iconClass: 'ic-sleep',       label: 'النوم',                       to: '/sleep'      },
       { iconClass: 'ic-mood',        label: 'العلاقات والمناسبات',        to: '/occasions'  },
       { iconClass: 'ic-timecapsule', label: 'العهود وصندوق الزمن',        to: '/pledges'  },
       { iconClass: 'ic-habits',      label: 'مؤقت البومودورو',            to: '/pomodoro' },

@@ -21,7 +21,7 @@ const dateBefore = (offset: number): string => {
   ).padStart(2, '0')}`;
 };
 
-export default function SleepRelations() {
+export default function SleepRelations({ embedded = false }: { embedded?: boolean }) {
   const core = useCore();
   const { sleepLog } = core.state;
 
@@ -55,9 +55,9 @@ export default function SleepRelations() {
   };
 
   return (
-    <div className="page">
-      <BackButton />
-      <XPBar />
+    <div className={embedded ? '' : 'page'}>
+      {!embedded && <BackButton />}
+      {!embedded && <XPBar />}
 
       <PageHero variant="calm" centered stars>
         <div className="sleep-moon">🌙</div>
