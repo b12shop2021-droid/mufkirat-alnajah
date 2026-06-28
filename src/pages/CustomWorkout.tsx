@@ -71,18 +71,18 @@ export default function CustomWorkout({ embedded = false }: { embedded?: boolean
   /* حفظ البرنامج: تحقق ثم احتفال (البيانات محفوظة تلقائياً أصلاً) */
   const handleSave = () => {
     if (days.length === 0) {
-      setHint({ kind: 'warn', text: '⚠️ أضف يوم تمرين واحداً على الأقل أولاً' });
+      setHint({ kind: 'warn', text: '⚠️ ضِف يوم تمرين واحد أول' });
       return;
     }
     const hasEmpty = days.some((d) =>
       d.exercises.some((ex) => ex.name.trim() === ''),
     );
     if (hasEmpty) {
-      setHint({ kind: 'warn', text: '⚠️ تأكد من كتابة اسم كل تمرين قبل الحفظ' });
+      setHint({ kind: 'warn', text: '⚠️ تأكد إنك كتبت اسم كل تمرين قبل الحفظ' });
       return;
     }
     fireConfetti();
-    setHint({ kind: 'ok', text: '🛠️ تـم حفظ برنامجك المخصّص بنجاح!' });
+    setHint({ kind: 'ok', text: '🛠️ حفظنا برنامجك الخاص!' });
   };
 
   return (

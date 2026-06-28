@@ -108,11 +108,11 @@ export default function Expenses() {
   const handleSaveExpense = () => {
     const amt = Number(form.amount);
     if (!amt || amt <= 0) {
-      setHint('⚠️ أدخل مبلغاً صحيحاً');
+      setHint('⚠️ اكتب مبلغ صحيح');
       return;
     }
     if (form.desc.trim() === '') {
-      setHint('⚠️ أضف وصفاً');
+      setHint('⚠️ اكتب وش هي الحركة');
       return;
     }
     core.addExpense({
@@ -132,7 +132,7 @@ export default function Expenses() {
   const handleAddSadaqah = () => {
     const amt = Number(sadaqah);
     if (!amt || amt <= 0) {
-      setHint('⚠️ أدخل مبلغاً صحيحاً');
+      setHint('⚠️ اكتب مبلغ صحيح');
       return;
     }
     core.addExpense({
@@ -151,11 +151,11 @@ export default function Expenses() {
   const handleAddCat = () => {
     const ok = core.addCustomCategory(newCat.name, newCat.icon, newCat.note);
     if (!ok) {
-      setHint('⚠️ اسم الفئة فارغ أو مكرر');
+      setHint('⚠️ اسم الفئة فاضي أو مكرر');
       return;
     }
     setNewCat({ icon: '', name: '', note: '' });
-    setHint('🏷️ أُضيفت الفئة');
+    setHint('🏷️ ضِفنا الفئة');
   };
 
   const sadaqahTotal = catTotals['صندوق الخير'] || 0;
@@ -241,22 +241,22 @@ export default function Expenses() {
           {noExpenseToday && (
             <div className="zero-day-card">
               <div style={{ fontSize: '1.8rem' }}>🌿</div>
-              <div style={{ fontWeight: 800, marginTop: 6 }}>يوم بدون مصاريف! ادخار حقيقي يستحق الاحتفال</div>
+              <div style={{ fontWeight: 800, marginTop: 6 }}>يوم بدون مصاريف! توفير حقيقي يستاهل الاحتفال</div>
             </div>
           )}
 
           {diffPct !== null && (
             <div className="intro-card">
               {diffPct < 0
-                ? `📉 هذا الشهر أنفقت أقل من الماضي بـ ${Math.abs(diffPct)}% — استمر بهذا الانضباط!`
-                : `📈 هذا الشهر أنفقت أكثر من الماضي بـ ${diffPct}% — انتبه لميزانيتك.`}
+                ? `📉 هالشهر صرفت أقل من اللي قبله بـ ${Math.abs(diffPct)}% — كفو واصل كذا!`
+                : `📈 هالشهر صرفت أكثر من اللي قبله بـ ${diffPct}% — خفّها شوي وراقب ميزانيتك.`}
             </div>
           )}
 
           <div className="card">
             <div className="section-title">🥧 توزيع المصاريف حسب الفئة</div>
             {pieEntries.length === 0 ? (
-              <div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>لا مصاريف بعد</div>
+              <div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>ما فيه مصاريف بعد</div>
             ) : (
               <div className="pie-wrap">
                 <svg width={120} height={120} viewBox="0 0 120 120" style={{ flexShrink: 0 }}>
@@ -319,8 +319,8 @@ export default function Expenses() {
                   <div className="budget-bar-bg">
                     <div className={`budget-bar-fill ${cls}`} style={{ width: `${pct}%` }} />
                   </div>
-                  {pct >= 80 && pct < 100 && <div className="budget-alert">⚠️ اقتربت من حد هذه الفئة</div>}
-                  {pct >= 100 && <div className="budget-alert">🚨 تجاوزت السقف المحدد</div>}
+                  {pct >= 80 && pct < 100 && <div className="budget-alert">⚠️ قربت تخلّص حد هالفئة</div>}
+                  {pct >= 100 && <div className="budget-alert">🚨 طلّعت فوق السقف اللي حاطّه</div>}
                 </div>
               );
             })}
@@ -343,10 +343,10 @@ export default function Expenses() {
                 className="btn-primary"
                 onClick={() => {
                   const a = Number(budgetForm.amount);
-                  if (!a || a <= 0) { setHint('⚠️ أدخل سقفاً صحيحاً'); return; }
+                  if (!a || a <= 0) { setHint('⚠️ اكتب سقف صحيح'); return; }
                   core.setBudget(budgetForm.category, a);
                   setBudgetForm({ ...budgetForm, amount: '' });
-                  setHint('💼 تم تحديث السقف');
+                  setHint('💼 حدّثنا السقف');
                 }}
               >
                 حفظ
@@ -362,7 +362,7 @@ export default function Expenses() {
             <div className="card" style={{ marginTop: 14 }}>
               {customCategories.length === 0 && (
                 <div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginBottom: 10 }}>
-                  لا فئات مخصصة بعد. الفئات الأساسية الست + صندوق الخير محمية.
+                  ما فيه فئات خاصة بعد. الفئات الأساسية الست + صندوق الخير محميّة.
                 </div>
               )}
               {customCategories.map((c) => (
@@ -404,7 +404,7 @@ export default function Expenses() {
         <>
           {expenses.length === 0 ? (
             <div className="card" style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
-              💰 لا حركات مسجّلة بعد
+              💰 ما فيه حركات بعد
             </div>
           ) : (
             [...expenses].sort((a, b) => (a.date < b.date ? 1 : -1)).map((e) => {
@@ -436,7 +436,7 @@ export default function Expenses() {
         <>
           {/* إضافة سريعة */}
           <div className="card" style={{ marginBottom: 12 }}>
-            <div style={{ fontWeight: 700, fontSize: '0.82rem', marginBottom: 8 }}>أضف مشتريات</div>
+            <div style={{ fontWeight: 700, fontSize: '0.82rem', marginBottom: 8 }}>ضِف مشترياتك</div>
             <div style={{ display: 'flex', gap: 8 }}>
               <input className="input-field" placeholder="اكتب اسم المنتج..." value={shopInput}
                 onChange={(e) => setShopInput(e.target.value)}

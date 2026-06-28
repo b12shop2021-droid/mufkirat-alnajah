@@ -134,7 +134,7 @@ export default function CaptainWorkout({ embedded = false }: { embedded?: boolea
         ) : (
           <div className="day-photo-empty">
             <div style={{ fontSize: '1.8rem' }}>📸</div>
-            <div>أضف صورة لهذا اليوم (1080×1920)</div>
+            <div>ضِف صورة لهذا اليوم (1080×1920)</div>
           </div>
         )}
         <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleDayImage} />
@@ -173,7 +173,7 @@ export default function CaptainWorkout({ embedded = false }: { embedded?: boolea
 
       {day.warmup && (
         <div className="warmup-note">
-          🔥 تسخين خاص بيوم الأرجل: 10 دقائق تسخين للرجل + 5 دقائق إطالات للجسم كاملاً. لا تتخطَّ هذه الخطوة!
+          🔥 تسخين خاص بيوم الأرجل: ١٠ دقائق تسخين للرجل + ٥ دقائق إطالات للجسم كامل. لا تتخطّى هالخطوة!
         </div>
       )}
 

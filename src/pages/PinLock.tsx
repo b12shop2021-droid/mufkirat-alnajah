@@ -50,7 +50,7 @@ export default function PinLock({ onUnlock }: Props) {
   return (
     <div className="pin-screen">
       <div className="pin-logo">🔒</div>
-      <div className="pin-title">أدخل رمز الدخول</div>
+      <div className="pin-title">اكتب رمز الدخول</div>
 
       <div className="pin-dots">
         {[0, 1, 2, 3].map((i) => (

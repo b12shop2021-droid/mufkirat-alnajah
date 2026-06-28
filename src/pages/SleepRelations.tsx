@@ -54,7 +54,7 @@ export default function SleepRelations() {
 
   const handleSaveSleep = () => {
     if (!sleepTime || !wakeTime) {
-      setHint('⚠️ أدخل وقت النوم والاستيقاظ');
+      setHint('⚠️ اكتب وقت النوم والصحيان');
       return;
     }
     const h = core.saveSleep(sleepTime, wakeTime);

@@ -99,7 +99,7 @@ export default function Occasions() {
         notes: form.notes.trim(),
         giftIdeas: form.giftIdeas.trim(),
       });
-      setHint('تم التعديل ✓');
+      setHint('عدّلناها ✓');
     } else {
       core.addOccasion({
         personName: name,
@@ -110,7 +110,7 @@ export default function Occasions() {
         notes: form.notes.trim(),
         giftIdeas: form.giftIdeas.trim(),
       });
-      setHint('تمت الإضافة ✓');
+      setHint('ضِفناها ✓');
     }
     setForm(EMPTY_FORM);
     setEditing(null);
@@ -170,7 +170,7 @@ export default function Occasions() {
             <div className="empty-state">
               <div className="empty-icon">🎁</div>
               <div>ما في مناسبات في الـ 60 يوم القادمة</div>
-              <button className="btn-primary" style={{ marginTop: 12 }} onClick={() => setTab('add')}>أضف مناسبة</button>
+              <button className="btn-primary" style={{ marginTop: 12 }} onClick={() => setTab('add')}>ضِف مناسبة</button>
             </div>
           ) : (
             upcoming.map((o) => <OccasionCard key={o.id} o={o} expanded={expandedId === o.id}
@@ -194,7 +194,7 @@ export default function Occasions() {
             <div className="empty-state">
               <div className="empty-icon">👥</div>
               <div>ما أضفت أي مناسبة بعد</div>
-              <button className="btn-primary" style={{ marginTop: 12 }} onClick={() => setTab('add')}>أضف الأولى</button>
+              <button className="btn-primary" style={{ marginTop: 12 }} onClick={() => setTab('add')}>ضِف أول وحدة</button>
             </div>
           ) : (
             sorted.map((o) => <OccasionCard key={o.id} o={o} expanded={expandedId === o.id}

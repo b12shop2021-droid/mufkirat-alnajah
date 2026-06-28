@@ -58,7 +58,7 @@ export default function Settings() {
       await setPin(entered);
       setPinEnabled(true);
       setPinMode(null); setPinDigits([]); setPinNew('');
-      setHint('🔒 تم تفعيل قفل PIN بنجاح');
+      setHint('🔒 فعّلنا قفل PIN');
     } else if (pinMode === 'disable') {
       /* تعطيل: تحقق من PIN الحالي */
       const hash = await hashPin(entered);
@@ -67,7 +67,7 @@ export default function Settings() {
       }
       clearPin(); setPinEnabled(false);
       setPinMode(null); setPinDigits([]);
-      setHint('🔓 تم إلغاء قفل PIN');
+      setHint('🔓 ألغينا قفل PIN');
     } else if (pinMode === 'change_old') {
       /* تغيير: تحقق من القديم */
       const hash = await hashPin(entered);
@@ -81,21 +81,21 @@ export default function Settings() {
     } else if (pinMode === 'change_confirm') {
       /* تغيير: تأكيد الجديد */
       if (entered !== pinNew) {
-        setPinError('الرمزان غير متطابقين'); setPinDigits([]); return;
+        setPinError('الرمزين ما يطابقون'); setPinDigits([]); return;
       }
       await setPin(entered);
       setPinMode(null); setPinDigits([]); setPinNew('');
-      setHint('🔑 تم تغيير رمز PIN بنجاح');
+      setHint('🔑 غيّرنا رمز PIN');
     }
   }, [pinDigits, pinMode, pinNew]);
 
   const PIN_KEYS = ['1','2','3','4','5','6','7','8','9','','0','del'];
   const pinLabel: Record<NonNullable<PinMode>, string> = {
-    enable: 'أدخل رمزاً مكوّناً من 4 أرقام',
-    disable: 'أدخل رمزك الحالي للتأكيد',
-    change_old: 'أدخل رمزك الحالي',
-    change_new: 'أدخل الرمز الجديد',
-    change_confirm: 'أعد إدخال الرمز الجديد',
+    enable: 'اكتب رمز من ٤ أرقام',
+    disable: 'اكتب رمزك الحالي للتأكيد',
+    change_old: 'اكتب رمزك الحالي',
+    change_new: 'اكتب الرمز الجديد',
+    change_confirm: 'اكتب الرمز الجديد مرة ثانية',
   };
 
   /* تصدير نسخة احتياطية كملف JSON */
@@ -108,7 +108,7 @@ export default function Settings() {
     a.download = `mufkirat-backup-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    setHint('⬇️ تم تصدير نسختك الاحتياطية');
+    setHint('⬇️ صدّرنا نسختك الاحتياطية');
   };
 
   /* استيراد نسخة احتياطية (مع تحقق) ثم إعادة التحميل */
@@ -123,7 +123,7 @@ export default function Settings() {
         localStorage.setItem('mufkirat_core_v1', reader.result as string);
         window.location.reload();
       } catch {
-        setHint('⚠️ الملف غير صالح');
+        setHint('⚠️ الملف مو صالح');
       }
     };
     reader.readAsText(file);
@@ -155,7 +155,7 @@ export default function Settings() {
         });
         setHint(`🍏 تم استيراد ${imported} سجل نوم من Apple Health`);
       } catch {
-        setHint('⚠️ الملف غير صالح — تأكد أنه export.xml من Apple Health');
+        setHint('⚠️ الملف مو صالح — تأكد إنه export.xml من Apple Health');
       }
     };
     reader.readAsText(file);
@@ -201,7 +201,7 @@ export default function Settings() {
         });
         setHint(imported > 0 ? `🏃 تم استيراد ${imported} سجل نوم من Google Fit` : '⚠️ ما فيه بيانات نوم في هذا الملف');
       } catch {
-        setHint('⚠️ الملف غير صالح — تأكد أنه ملف JSON من Google Takeout');
+        setHint('⚠️ الملف مو صالح — تأكد إنه ملف JSON من Google Takeout');
       }
     };
     reader.readAsText(file);
@@ -212,23 +212,23 @@ export default function Settings() {
     const perm = await requestNotifPermission();
     if (perm === 'granted') {
       await scheduleNotifications({ masterEnabled: true, items: core.state.notifItems });
-      setHint('🔔 تم تفعيل الإشعارات! ستصلك اليوم في أوقاتها');
+      setHint('🔔 فعّلنا الإشعارات! بتوصلك اليوم بأوقاتها');
     } else {
-      setHint('⚠️ لم تُمنح الإذن — افتح إعدادات المتصفح وفعّل الإشعارات لهذا الموقع');
+      setHint('⚠️ ما تم الإذن — افتح إعدادات المتصفح وفعّل الإشعارات للموقع');
     }
   };
 
   /* تثبيت التطبيق على الشاشة الرئيسية */
   const handleInstall = async () => {
     const res = await promptInstall();
-    if (res === 'installed') setHint('🎉 تم تثبيت التطبيق!');
+    if (res === 'installed') setHint('🎉 ثبّتنا التطبيق!');
     else if (res === 'dismissed') setHint('ألغيت التثبيت');
     else setHint('💡 عشان تثبّته: افتح قائمة المتصفح ← "إضافة إلى الشاشة الرئيسية"');
   };
 
   const handleSave = () => {
     if (form.name.trim() === '') {
-      setHint('⚠️ أدخل اسمك أولاً');
+      setHint('⚠️ اكتب اسمك أول');
       return;
     }
     core.updateProfile({
@@ -241,7 +241,7 @@ export default function Settings() {
       weight: Number(form.weight) || 0,
     });
     setEditing(false);
-    setHint('🪪 تم حفظ بطاقتك الشخصية!');
+    setHint('🪪 حفظنا بطاقتك الشخصية!');
   };
 
   return (

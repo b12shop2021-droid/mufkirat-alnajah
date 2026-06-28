@@ -188,7 +188,7 @@ export default function Analytics() {
       <div className="card">
         <div className="section-title">💰 المصاريف حسب الفئة</div>
         {expEntries.length === 0 ? (
-          <div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>لا مصاريف في هذه الفترة</div>
+          <div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>ما فيه مصاريف بهالفترة</div>
         ) : (
           expEntries.map(([cat, val], i) => (
             <div className="dist-row" key={cat}>

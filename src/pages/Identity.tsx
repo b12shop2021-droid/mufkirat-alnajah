@@ -131,7 +131,7 @@ export default function Identity({ embedded = false }: { embedded?: boolean }) {
         <div className="add-row">
           <input
             className="input-field"
-            placeholder="أضف قاعدة (مثال: لا أؤخر صلاة)"
+            placeholder="ضِف قاعدة (مثال: ما أأخّر صلاة)"
             value={rule}
             maxLength={200}
             onChange={(e) => setRule(e.target.value)}

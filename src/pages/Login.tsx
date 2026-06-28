@@ -25,11 +25,11 @@ export default function Login() {
       return;
     }
     if (!validEmail(email.trim())) {
-      setError('أدخل بريداً إلكترونياً صحيحاً');
+      setError('اكتب إيميل صحيح');
       return;
     }
     if (password.length < 6) {
-      setError('كلمة المرور 6 أحرف على الأقل');
+      setError('كلمة السر ٦ أحرف على الأقل');
       return;
     }
     // ⚠️ Manus: استبدل ما يلي بنداء مصادقة فعلي (signIn / signUp)

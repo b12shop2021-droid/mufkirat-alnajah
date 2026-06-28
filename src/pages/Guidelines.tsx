@@ -20,11 +20,11 @@ export default function Guidelines({ embedded = false }: { embedded?: boolean })
     e.target.value = '';
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-      setHint('⚠️ الملف المختار ليس صورة');
+      setHint('⚠️ لازم تختار صورة');
       return;
     }
     if (file.size > MAX_IMAGE_BYTES) {
-      setHint('⚠️ حجم الصورة كبير (الحد 1.5 ميجابايت)');
+      setHint('⚠️ الصورة كبيرة (الحد ١.٥ ميجا)');
       return;
     }
     const reader = new FileReader();
@@ -159,7 +159,7 @@ export default function Guidelines({ embedded = false }: { embedded?: boolean })
             <li><strong>رفع الأرجل المعلقة:</strong> 3 جولات × 10-15 عدة.</li>
             <li><strong>الدراجة الهوائية (Bicycle Crunches):</strong> 3 جولات × 15-20 عدة لكل جانب.</li>
           </ul>
-          <div className="example-box">💡 التوصية: أضف هذه التمارين في نهاية أيام Legs A و Legs B.</div>
+          <div className="example-box">💡 نصيحة: ضِف هالتمارين بنهاية أيام Legs A و Legs B.</div>
         </div>
       </div>
 
