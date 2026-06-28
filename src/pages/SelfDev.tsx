@@ -1,15 +1,24 @@
 /* ===================================================================
    SelfDev.tsx — تطوير الذات (مجمّعة): الهوية والدستور + مراجعة الأسبوع
-   تدمج صفحتي التأمل الذاتي في تبويبات.
+   تبويبات. كل تبويب يُحمّل كسولاً (lazy) عند فتحه فقط.
    =================================================================== */
 
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import BackButton from '../components/BackButton';
 import XPBar from '../components/XPBar';
-import Identity from './Identity';
-import WheelReview from './WheelReview';
+
+const Identity = lazy(() => import('./Identity'));
+const WheelReview = lazy(() => import('./WheelReview'));
 
 type Tab = 'identity' | 'review';
+
+function TabLoader() {
+  return (
+    <div className="card" style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '28px 0' }}>
+      ⏳ لحظة...
+    </div>
+  );
+}
 
 export default function SelfDev() {
   const [tab, setTab] = useState<Tab>('identity');
@@ -25,8 +34,10 @@ export default function SelfDev() {
           🪞 مراجعة الأسبوع
         </button>
       </div>
-      {tab === 'identity' && <Identity embedded />}
-      {tab === 'review' && <WheelReview embedded />}
+      <Suspense fallback={<TabLoader />}>
+        {tab === 'identity' && <Identity embedded />}
+        {tab === 'review' && <WheelReview embedded />}
+      </Suspense>
     </div>
   );
 }

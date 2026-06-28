@@ -1,16 +1,25 @@
 /* ===================================================================
    Achievements.tsx — إنجازاتي (مجمّعة): السلسلة + رحلتي ومعرض الإنجازات
-   تدمج صفحتي السلسلة والمعرض/المحطات/قصة الشهر في تبويبات.
+   تبويبات. كل تبويب يُحمّل كسولاً (lazy) عند فتحه فقط — حزمة أولية أخف.
    =================================================================== */
 
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import BackButton from '../components/BackButton';
 import XPBar from '../components/XPBar';
-import Streak from './Streak';
-import JourneyGallery from './JourneyGallery';
-import WeeklyWrapped from './WeeklyWrapped';
+
+const Streak = lazy(() => import('./Streak'));
+const JourneyGallery = lazy(() => import('./JourneyGallery'));
+const WeeklyWrapped = lazy(() => import('./WeeklyWrapped'));
 
 type Tab = 'streak' | 'journey' | 'wrapped';
+
+function TabLoader() {
+  return (
+    <div className="card" style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '28px 0' }}>
+      ⏳ لحظة...
+    </div>
+  );
+}
 
 export default function Achievements() {
   const [tab, setTab] = useState<Tab>('streak');
@@ -29,9 +38,11 @@ export default function Achievements() {
           ✨ قصة الأسبوع
         </button>
       </div>
-      {tab === 'streak' && <Streak embedded />}
-      {tab === 'journey' && <JourneyGallery embedded />}
-      {tab === 'wrapped' && <WeeklyWrapped embedded />}
+      <Suspense fallback={<TabLoader />}>
+        {tab === 'streak' && <Streak embedded />}
+        {tab === 'journey' && <JourneyGallery embedded />}
+        {tab === 'wrapped' && <WeeklyWrapped embedded />}
+      </Suspense>
     </div>
   );
 }
