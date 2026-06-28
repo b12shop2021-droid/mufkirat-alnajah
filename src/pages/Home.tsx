@@ -254,7 +254,7 @@ export default function Home() {
           <button key={t.label + t.to} className="tile" onClick={() => navigate(t.to)}>
             <div className={t.label === 'الهمّة' ? 'tile-circle glow' : 'tile-circle'}>
               {t.icon.startsWith('/') ? (
-                <img className="tile-img" src={t.icon} alt="" width={42} height={42} />
+                <img className="tile-img" src={t.icon} alt="" width={42} height={42} loading="lazy" decoding="async" />
               ) : (
                 <span>{t.icon}</span>
               )}
