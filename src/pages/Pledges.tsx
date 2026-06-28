@@ -248,7 +248,7 @@ export default function Pledges() {
       <ConfirmDialog
         open={deleteFor !== null}
         title="تأكيد الحذف"
-        message={`هل تريد حذف عهد «${deleteFor?.habit ?? ''}» نهائياً؟`}
+        message={`متأكد تبي تحذف عهد «${deleteFor?.habit ?? ''}»؟`}
         confirmLabel="حذف"
         danger
         onConfirm={() => {

@@ -6,6 +6,7 @@
 import { useCore, LEVELS } from '../core/useCore';
 import XPBar from '../components/XPBar';
 import BackButton from '../components/BackButton';
+import PageHero from '../components/PageHero';
 
 /* مراحل الرفيق الذكي حسب طول السلسلة (0/7/14/30/90) */
 const COMPANION_STAGES = [
@@ -25,6 +26,12 @@ const dateBefore = (offset: number): string => {
   ).padStart(2, '0')}`;
 };
 
+/* YYYY-MM-DD من كائن Date */
+const toDateStr = (d: Date): string =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+const ARABIC_MONTHS = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+
 export default function Streak({ embedded = false }: { embedded?: boolean }) {
   const core = useCore();
   const level = core.level;
@@ -42,6 +49,52 @@ export default function Streak({ embedded = false }: { embedded?: boolean }) {
     gratitudeLog.some((g) => g.date === dateStr) ||
     quranMinutes.some((q) => q.date === dateStr) ||
     notes.some((n) => n.date === dateStr);
+
+  /* عدد أنواع النشاط في يوم معيّن (0..4) لتحديد مستوى الخريطة الحرارية */
+  const activityLevel = (dateStr: string): number => {
+    let count = 0;
+    if (moodLog.some((m) => m.date === dateStr)) count++;
+    if (gratitudeLog.some((g) => g.date === dateStr)) count++;
+    if (quranMinutes.some((q) => q.date === dateStr)) count++;
+    if (notes.some((n) => n.date === dateStr)) count++;
+    return count;
+  };
+
+  /* بناء خلايا الخريطة الحرارية (365 يوم) مرتّبة في أعمدة أسبوعية */
+  const heatmapData = (() => {
+    const today = new Date();
+    /* ابدأ من أول الأسبوع (الأحد) قبل 364 يوماً */
+    const start = new Date(today);
+    start.setDate(today.getDate() - 364);
+    /* اضبط على بداية الأسبوع (الأحد) */
+    start.setDate(start.getDate() - start.getDay());
+
+    const weeks: { date: string; level: number; isFuture: boolean }[][] = [];
+    const todayStr = toDateStr(today);
+    let cur = new Date(start);
+
+    while (cur <= today || weeks[weeks.length - 1]?.length < 7) {
+      if (weeks.length === 0 || weeks[weeks.length - 1].length === 7) {
+        weeks.push([]);
+      }
+      const dateStr = toDateStr(cur);
+      const isFuture = dateStr > todayStr;
+      weeks[weeks.length - 1].push({
+        date: dateStr,
+        level: isFuture ? -1 : activityLevel(dateStr),
+        isFuture,
+      });
+      cur.setDate(cur.getDate() + 1);
+    }
+    return weeks;
+  })();
+
+  /* تسميات الأشهر: لكل عمود نحسب الشهر الأول فيه */
+  const monthLabels = heatmapData.map((week) => {
+    const firstDay = week[0].date;
+    const d = new Date(firstDay + 'T00:00:00');
+    return { col: 0, month: d.getDate() <= 7 ? ARABIC_MONTHS[d.getMonth()] : '' };
+  });
 
   /* مرحلة الرفيق الحالية + نسبة التقدّم للمرحلة التالية */
   const stageIdx = (() => {
@@ -118,12 +171,12 @@ export default function Streak({ embedded = false }: { embedded?: boolean }) {
       {!embedded && <BackButton />}
       {!embedded && <XPBar />}
 
-      <div className="flame-hero">
+      <PageHero variant="primary" centered stars>
         <span className="flame-icon">🔥</span>
         <div className="flame-num">{streak.current}</div>
         <div className="flame-label">أيام متتالية من الانضباط</div>
         <div className="flame-best">🏅 أطول سلسلة: <strong>{streak.longest}</strong> يوم</div>
-      </div>
+      </PageHero>
 
       <div className="card shield-card">
         <div className="shield-icon">🛡️</div>
@@ -153,6 +206,41 @@ export default function Streak({ embedded = false }: { embedded?: boolean }) {
               </div>
             );
           })}
+        </div>
+      </div>
+
+      <h2 className="section-title">🗓️ خريطة العام</h2>
+      <div className="card heatmap-card">
+        <div className="heatmap-wrap">
+          <div className="heatmap-months">
+            {heatmapData.map((_, wi) =>
+              monthLabels[wi].month ? (
+                <span key={wi} className="hm-month-label" style={{ gridColumn: wi + 1 }}>
+                  {monthLabels[wi].month}
+                </span>
+              ) : null,
+            )}
+          </div>
+          <div className="heatmap-grid">
+            {heatmapData.map((week, wi) => (
+              <div className="hm-col" key={wi}>
+                {week.map((cell, di) => (
+                  <div
+                    key={di}
+                    className={`hm-cell lv-${cell.isFuture ? 'future' : cell.level}`}
+                    title={cell.isFuture ? '' : cell.date}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="heatmap-legend">
+          <span className="hm-legend-label">أقل</span>
+          {[0, 1, 2, 3, 4].map((lv) => (
+            <div key={lv} className={`hm-cell lv-${lv}`} />
+          ))}
+          <span className="hm-legend-label">أكثر</span>
         </div>
       </div>
 

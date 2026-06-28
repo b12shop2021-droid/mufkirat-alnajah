@@ -3,14 +3,18 @@
    الصفحات الفعلية تُضاف لاحقاً صفحة-صفحة وفق منهجية العمل.
    =================================================================== */
 
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Route, Switch } from 'wouter';
 import BottomNav from './components/BottomNav';
 import Confetti from './components/Confetti';
+import XPToast from './components/XPToast';
 import { useCore } from './core/useCore';
+import { isPinEnabled, isSessionUnlocked } from './core/pinUtils';
+import { scheduleNotifications } from './core/notificationScheduler';
 import Login from './pages/Login';
 import Onboarding from './pages/Onboarding';
 import Home from './pages/Home';
+import PinLock from './pages/PinLock';
 
 /* تحميل كسول للصفحات: كل صفحة تُحمّل عند فتحها فقط (أخف وأسرع) */
 const Hub = lazy(() => import('./pages/Hub'));
@@ -28,6 +32,8 @@ const Meals = lazy(() => import('./pages/Meals'));
 const Workouts = lazy(() => import('./pages/Workouts'));
 const Achievements = lazy(() => import('./pages/Achievements'));
 const SelfDev = lazy(() => import('./pages/SelfDev'));
+const Pomodoro = lazy(() => import('./pages/Pomodoro'));
+const Occasions = lazy(() => import('./pages/Occasions'));
 
 /* مؤشر تحميل بسيط بين الصفحات */
 function Loader() {
@@ -51,6 +57,15 @@ function NotFound() {
 
 export default function App() {
   const { state } = useCore();
+  const [pinUnlocked, setPinUnlocked] = useState(isSessionUnlocked);
+
+  /* إعادة جدولة تذكيرات اليوم عند كل فتح للتطبيق (إذا كان الإذن ممنوحاً) —
+     لأن جدولة الـSW عبر setTimeout تنتهي بإغلاق التطبيق، فنعيد تسليحها كل جلسة */
+  useEffect(() => {
+    if (!state.session.loggedIn || !state.onboarded) return;
+    if (!state.notifMaster) return;
+    void scheduleNotifications({ masterEnabled: true, items: state.notifItems });
+  }, [state.session.loggedIn, state.onboarded, state.notifMaster, state.notifItems]);
 
   /* بوابة المصادقة: بدون تسجيل دخول تُعرض صفحة الدخول فقط */
   if (!state.session.loggedIn) {
@@ -58,6 +73,7 @@ export default function App() {
       <>
         <Login />
         <Confetti />
+        <XPToast />
       </>
     );
   }
@@ -68,8 +84,14 @@ export default function App() {
       <>
         <Onboarding />
         <Confetti />
+        <XPToast />
       </>
     );
+  }
+
+  /* بوابة PIN: تظهر مرة واحدة لكل جلسة إذا كان القفل مفعّلاً */
+  if (isPinEnabled() && !pinUnlocked) {
+    return <PinLock onUnlock={() => setPinUnlocked(true)} />;
   }
 
   return (
@@ -92,11 +114,14 @@ export default function App() {
         <Route path="/workouts" component={Workouts} />
         <Route path="/achievements" component={Achievements} />
         <Route path="/self-dev" component={SelfDev} />
+        <Route path="/pomodoro">{() => <Pomodoro />}</Route>
+        <Route path="/occasions">{() => <Occasions />}</Route>
         <Route component={NotFound} />
       </Switch>
       </Suspense>
       <BottomNav />
       <Confetti />
+      <XPToast />
     </>
   );
 }

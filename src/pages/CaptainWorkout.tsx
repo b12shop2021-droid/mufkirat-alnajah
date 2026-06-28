@@ -118,6 +118,16 @@ export default function CaptainWorkout({ embedded = false }: { embedded?: boolea
     <div className="page">
       {!embedded && <BackButton />}
 
+      {day.image && (
+        <img
+          className="day-infographic"
+          src={day.image}
+          alt={`صورة تمارين ${day.label}`}
+          width={760}
+          height={1602}
+        />
+      )}
+
       <label className="day-photo">
         {dayImage ? (
           <img src={dayImage} alt="صورة اليوم" />

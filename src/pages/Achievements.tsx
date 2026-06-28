@@ -8,8 +8,9 @@ import BackButton from '../components/BackButton';
 import XPBar from '../components/XPBar';
 import Streak from './Streak';
 import JourneyGallery from './JourneyGallery';
+import WeeklyWrapped from './WeeklyWrapped';
 
-type Tab = 'streak' | 'journey';
+type Tab = 'streak' | 'journey' | 'wrapped';
 
 export default function Achievements() {
   const [tab, setTab] = useState<Tab>('streak');
@@ -24,9 +25,13 @@ export default function Achievements() {
         <button className={tab === 'journey' ? 'subtab active' : 'subtab'} onClick={() => setTab('journey')}>
           🖼️ المعرض والمحطات
         </button>
+        <button className={tab === 'wrapped' ? 'subtab active' : 'subtab'} onClick={() => setTab('wrapped')}>
+          ✨ قصة الأسبوع
+        </button>
       </div>
       {tab === 'streak' && <Streak embedded />}
       {tab === 'journey' && <JourneyGallery embedded />}
+      {tab === 'wrapped' && <WeeklyWrapped embedded />}
     </div>
   );
 }

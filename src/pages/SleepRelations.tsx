@@ -8,6 +8,7 @@ import { useCore } from '../core/useCore';
 import XPBar from '../components/XPBar';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
+import PageHero from '../components/PageHero';
 
 type Tab = 'sleep' | 'rel';
 
@@ -53,7 +54,7 @@ export default function SleepRelations() {
 
   const handleSaveSleep = () => {
     if (!sleepTime || !wakeTime) {
-      setHint('⚠️ أدخل وقتي النوم والاستيقاظ');
+      setHint('⚠️ أدخل وقت النوم والاستيقاظ');
       return;
     }
     const h = core.saveSleep(sleepTime, wakeTime);
@@ -96,11 +97,11 @@ export default function SleepRelations() {
 
       {tab === 'sleep' && (
         <>
-          <div className="sleep-hero">
+          <PageHero variant="calm" centered stars>
             <div className="sleep-moon">🌙</div>
             <div className="sleep-hours">{lastHours || '—'}</div>
             <div className="sleep-hours-label">ساعة نوم الليلة الماضية</div>
-          </div>
+          </PageHero>
 
           {lowAlert && (
             <div className="sleep-alert">
@@ -183,7 +184,7 @@ export default function SleepRelations() {
 
           {relations.length === 0 ? (
             <div className="card" style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
-              👥 لا أحد في القائمة بعد — أضف اسم شخص تريد التواصل معه
+              👥 ما فيه أحد بالقائمة بعد — ضيف اسم شخص ودّك تتواصل معه
             </div>
           ) : (
             relations.map((r) => (
@@ -192,7 +193,7 @@ export default function SleepRelations() {
                 <div className="rel-info">
                   <div className="rel-name">{r.name}</div>
                   <div className={r.contacted ? 'rel-status done' : 'rel-status'}>
-                    {r.contacted ? '✓ تم التواصل هذا الأسبوع' : 'لم يتم التواصل بعد'}
+                    {r.contacted ? '✓ تواصلت معه هالأسبوع' : 'لسا ما تواصلت'}
                   </div>
                 </div>
                 <button
@@ -220,7 +221,7 @@ export default function SleepRelations() {
       <ConfirmDialog
         open={pendingDelete !== null}
         title="تأكيد الحذف"
-        message={`هل تريد حذف «${pendingDelete?.label ?? ''}» من القائمة؟`}
+        message={`تبي تشيل «${pendingDelete?.label ?? ''}» من القائمة؟`}
         confirmLabel="حذف"
         danger
         onConfirm={() => {

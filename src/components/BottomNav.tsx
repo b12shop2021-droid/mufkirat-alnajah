@@ -1,22 +1,20 @@
-/* ===================================================================
-   BottomNav — التنقل السفلي الثابت (المزيد/التحليلات/العادات/الأهداف/الرئيسية).
-   =================================================================== */
+/* BottomNav — التنقل السفلي الثابت */
 
 import { useLocation } from 'wouter';
 
 interface NavEntry {
   path: string;
   label: string;
-  icon: string;
+  iconClass: string;
+  img?: string; // صورة مخصّصة بدل أيقونة الـsprite
 }
 
-/* الترتيب البصري RTL: الرئيسية أولاً من اليمين */
 const NAV_ITEMS: NavEntry[] = [
-  { path: '/', label: 'الرئيسية', icon: '🏠' },
-  { path: '/goals', label: 'الأهداف', icon: '🎯' },
-  { path: '/routine', label: 'العادات', icon: '🔁' },
-  { path: '/analytics', label: 'التحليلات', icon: '📊' },
-  { path: '/more', label: 'المزيد', icon: '☰' },
+  { path: '/',          label: 'الرئيسية',  iconClass: 'ic-home'      },
+  { path: '/goals',     label: 'الأهداف',   iconClass: 'ic-goals', img: '/icons/goals.webp' },
+  { path: '/quran',  label: 'القرآن',     iconClass: 'ic-quran' },
+  { path: '/notes',  label: 'الملاحظات', iconClass: 'ic-notes'  },
+  { path: '/more',      label: 'المزيد',    iconClass: 'ic-hub'       },
 ];
 
 export default function BottomNav() {
@@ -32,9 +30,11 @@ export default function BottomNav() {
             className={active ? 'nav-item active' : 'nav-item'}
             onClick={() => navigate(item.path)}
           >
-            <span className="nav-icon" aria-hidden="true">
-              {item.icon}
-            </span>
+            {item.img ? (
+              <img className="nav-img" src={item.img} alt="" aria-hidden="true" width={28} height={28} />
+            ) : (
+              <span className={`app-icon sm ${item.iconClass}`} aria-hidden="true" />
+            )}
             <span>{item.label}</span>
           </button>
         );

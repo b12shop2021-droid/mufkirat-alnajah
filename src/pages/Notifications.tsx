@@ -4,8 +4,10 @@
    كل الحالة عبر useCore المركزي.
    =================================================================== */
 
+import { useState } from 'react';
 import { useCore } from '../core/useCore';
 import BackButton from '../components/BackButton';
+import { requestNotifPermission, scheduleNotifications } from '../core/notificationScheduler';
 
 /* بيانات عرض كل نوع تذكير (ثابتة) */
 const META: Record<string, { icon: string; label: string; sub: string; auto?: boolean }> = {
@@ -13,7 +15,7 @@ const META: Record<string, { icon: string; label: string; sub: string; auto?: bo
   evening: { icon: '🌙', label: 'تذكير الروتين المسائي', sub: 'قبل النوم بساعة تقريباً' },
   meal: { icon: '🍽️', label: 'تذكير الوجبة المنسية', sub: 'لو تجاوز وقت وجبة معتاد', auto: true },
   water: { icon: '💧', label: 'تذكير الترطيب', sub: 'كل 3 ساعات خلال النهار', auto: true },
-  gratitude: { icon: '🙏', label: 'تذكير شكر اليوم', sub: 'لو لم تسجّل لحظة شكر بعد' },
+  gratitude: { icon: '🙏', label: 'تذكير شكر اليوم', sub: 'لو ما سجّلت لحظة شكر بعد' },
   streak: { icon: '🔥', label: 'تنبيه السلسلة المعرّضة للخطر', sub: 'قبل منتصف الليل لو يومك ناقص' },
 };
 
@@ -21,8 +23,21 @@ export default function Notifications({ embedded = false }: { embedded?: boolean
   const core = useCore();
   const { notifMaster, notifItems, profile } = core.state;
 
-  const greeting = profile.nickname || profile.name || 'يا بطل';
+  const greeting = profile.nickname || profile.name || 'بطل';
   const verb = profile.gender === 'female' ? 'تسجّلي' : 'تسجّل';
+
+  /* حالة إذن المتصفح للإشعارات (نظهر زر التفعيل فقط لو ما أُعطي بعد) */
+  const supported = typeof Notification !== 'undefined';
+  const [perm, setPerm] = useState<NotificationPermission>(supported ? Notification.permission : 'denied');
+
+  const handleEnable = async () => {
+    const p = await requestNotifPermission();
+    setPerm(p);
+    if (p === 'granted') {
+      core.setNotifMaster(true);
+      await scheduleNotifications({ masterEnabled: true, items: core.state.notifItems });
+    }
+  };
 
   return (
     <div className={embedded ? '' : 'page'}>
@@ -47,6 +62,24 @@ export default function Notifications({ embedded = false }: { embedded?: boolean
           </label>
         </div>
       </div>
+
+      {supported && perm !== 'granted' && (
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ fontSize: '0.82rem', fontWeight: 800 }}>
+            {perm === 'denied' ? '🔕 الإشعارات محظورة' : '🔔 فعّل الإشعارات الفعلية'}
+          </div>
+          <div style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+            {perm === 'denied'
+              ? 'حظرت الإشعارات لهذا الموقع — افتح إعدادات المتصفح واسمح بها عشان توصلك التذكيرات.'
+              : 'عشان توصلك التذكيرات فعلاً، لازم تأذن للمتصفح أول مرة.'}
+          </div>
+          {perm !== 'denied' && (
+            <button className="weekly-btn" onClick={handleEnable} style={{ marginTop: 4 }}>
+              تفعيل التذكيرات 🔔
+            </button>
+          )}
+        </div>
+      )}
 
       <div className="section-title">أنواع التذكيرات</div>
       <div className="settings-card">
@@ -94,7 +127,7 @@ export default function Notifications({ embedded = false }: { embedded?: boolean
             🚀
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: '0.8rem', fontWeight: 800 }}>مفكرة النجاح</div>
+            <div style={{ fontSize: '0.8rem', fontWeight: 800 }}>الهمّة</div>
             <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: 2, lineHeight: 1.5 }}>
               لم {verb} يومك بعد يا {greeting}! خطوة صغيرة الآن تصنع فرقاً كبيراً 💪
             </div>

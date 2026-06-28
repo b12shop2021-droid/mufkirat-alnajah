@@ -138,7 +138,7 @@ export default function Meals() {
 
       {/* تنبيهات */}
       {lunchMissing && (
-        <div className="hint-msg warn">🍽️ لم تسجّل وجبة الغداء بعد — لا تنسَ غذاءك!</div>
+        <div className="hint-msg warn">🍽️ ما سجّلت وجبة الغداء بعد — لا تنسى غذاءك!</div>
       )}
       {weekComplete && (
         <div className="zero-day-card">
@@ -241,7 +241,7 @@ export default function Meals() {
       <ConfirmDialog
         open={deleteMeal !== null}
         title="تأكيد الحذف"
-        message={`هل تريد حذف «${deleteMeal?.label ?? ''}»؟`}
+        message={`متأكد تبي تحذف «${deleteMeal?.label ?? ''}»؟`}
         confirmLabel="حذف"
         danger
         onConfirm={() => { if (deleteMeal) core.removeMeal(deleteMeal.id); setDeleteMeal(null); }}

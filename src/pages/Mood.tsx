@@ -221,7 +221,7 @@ export default function Mood() {
       <ConfirmDialog
         open={pendingDelete !== null}
         title="تأكيد الحذف"
-        message={`هل تريد حذف «${pendingDelete?.label ?? ''}» من الأرشيف؟`}
+        message={`تبي تحذف «${pendingDelete?.label ?? ''}» من الأرشيف؟`}
         confirmLabel="حذف"
         danger
         onConfirm={() => {

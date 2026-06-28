@@ -9,6 +9,7 @@ import { useCore, type Difficulty } from '../core/useCore';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { fireConfetti } from '../components/Confetti';
+import PageHero from '../components/PageHero';
 
 const DIFFICULTIES: Difficulty[] = ['سهل', 'متوسط', 'متقدم'];
 const MAX_IMAGE_BYTES = 1_500_000; // حد حجم صورة اليوم لمنع تضخّم التخزين
@@ -88,14 +89,13 @@ export default function CustomWorkout({ embedded = false }: { embedded?: boolean
     <div className="page">
       {!embedded && <BackButton />}
 
-      <div className="intro-hero">
-        <div className="intro-icon">🛠️</div>
-        <div className="intro-title">برنامجك، بطريقتك الخاصة</div>
-        <div className="intro-sub">
-          صمّم عدد الأيام والتمارين التي تناسبك تماماً — بجانب برنامج «الكابتن
-          سعود» الجاهز، لا بديلاً عنه.
-        </div>
-      </div>
+      <PageHero
+        variant="primary"
+        centered
+        icon="🛠️"
+        title="برنامجك، بطريقتك الخاصة"
+        subtitle="صمّم عدد الأيام والتمارين التي تناسبك تماماً — بجانب برنامج «الكابتن سعود» الجاهز، لا بديلاً عنه."
+      />
 
       {days.length === 0 && (
         <div className="card empty-state">
@@ -290,7 +290,7 @@ export default function CustomWorkout({ embedded = false }: { embedded?: boolean
       <ConfirmDialog
         open={pendingDelete !== null}
         title="تأكيد الحذف"
-        message={`هل تريد حذف «${pendingDelete?.label ?? ''}» نهائياً؟`}
+        message={`متأكد تبي تحذف «${pendingDelete?.label ?? ''}»؟`}
         confirmLabel="حذف"
         danger
         onConfirm={confirmDelete}

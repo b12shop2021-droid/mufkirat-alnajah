@@ -103,7 +103,7 @@ export default function WheelReview({ embedded = false }: { embedded?: boolean }
       <ConfirmDialog
         open={pendingDelete !== null}
         title="تأكيد الحذف"
-        message="هل تريد حذف هذه المراجعة نهائياً؟"
+        message="متأكد تبي تحذف هالمراجعة؟"
         confirmLabel="حذف"
         danger
         onConfirm={() => {

@@ -148,7 +148,7 @@ export default function Identity({ embedded = false }: { embedded?: boolean }) {
       <ConfirmDialog
         open={pendingDelete !== null}
         title="تأكيد الحذف"
-        message={`هل تريد حذف «${pendingDelete?.label ?? ''}» من دستورك؟`}
+        message={`تبي تشيل «${pendingDelete?.label ?? ''}» من دستورك؟`}
         confirmLabel="حذف"
         danger
         onConfirm={() => {

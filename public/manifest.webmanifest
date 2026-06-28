@@ -1,6 +1,6 @@
 {
-  "name": "مفكرة النجاح",
-  "short_name": "مفكرة النجاح",
+  "name": "الهمّة",
+  "short_name": "الهمّة",
   "lang": "ar",
   "dir": "rtl",
   "start_url": "/",
@@ -11,5 +11,35 @@
   "theme_color": "#05AD98",
   "icons": [
     { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "روتين الصباح",
+      "short_name": "الروتين",
+      "description": "افتح روتين الصباح مباشرة",
+      "url": "/routine",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "سجّل مزاجك",
+      "short_name": "المزاج",
+      "description": "سجّل مزاجك اليومي",
+      "url": "/mood",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "أهدافي",
+      "short_name": "الأهداف",
+      "description": "تابع أهدافك",
+      "url": "/goals",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "البومودورو",
+      "short_name": "تركيز",
+      "description": "ابدأ جلسة تركيز",
+      "url": "/pomodoro",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    }
   ]
 }

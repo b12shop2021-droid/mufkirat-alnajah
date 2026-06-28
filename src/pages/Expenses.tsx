@@ -9,7 +9,7 @@ import { useCore, todayStr, type ExpenseType } from '../core/useCore';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
 
-type Tab = 'overview' | 'budget' | 'list';
+type Tab = 'overview' | 'budget' | 'list' | 'shopping';
 
 /* الفئات الأساسية المحمية (أيقونة + لون من لوحة الرسوم) */
 const BASE_CATS: { name: string; icon: string; color: string }[] = [
@@ -23,12 +23,14 @@ const BASE_CATS: { name: string; icon: string; color: string }[] = [
 ];
 
 const CUSTOM_COLORS = ['var(--chart-7)', 'var(--chart-6)', 'var(--chart-5)', 'var(--chart-4)'];
-const PAYMENTS = ['نقدي', 'بطاقة', 'تحويل بنكي'];
 const monthOf = (d: string) => d.slice(0, 7);
+
+/* مشتريات متكررة شائعة */
+const QUICK_ITEMS = ['حليب', 'خبز', 'ماء', 'بنزين', 'بيض', 'أرز', 'دجاج', 'خضار', 'فاكهة', 'تمر'];
 
 export default function Expenses() {
   const core = useCore();
-  const { expenses, customCategories, budgets } = core.state;
+  const { expenses, customCategories, budgets, shoppingList } = core.state;
 
   const [tab, setTab] = useState<Tab>('overview');
   const [adding, setAdding] = useState(false);
@@ -37,12 +39,13 @@ export default function Expenses() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   /* نموذج الإضافة */
+  const [shopInput, setShopInput] = useState('');
+
   const [form, setForm] = useState({
     type: 'expense' as ExpenseType,
     amount: '',
     date: todayStr(),
     category: 'طعام',
-    payment: 'نقدي',
     desc: '',
     notes: '',
   });
@@ -117,7 +120,7 @@ export default function Expenses() {
       amount: amt,
       date: form.date,
       category: form.type === 'income' ? '' : form.category,
-      payment: form.payment,
+      payment: '',
       desc: form.desc,
       notes: form.notes,
     });
@@ -171,6 +174,9 @@ export default function Expenses() {
         <button className={tab === 'list' ? 'subtab active' : 'subtab'} onClick={() => setTab('list')}>
           📋 السجل
         </button>
+        <button className={tab === 'shopping' ? 'subtab active' : 'subtab'} onClick={() => setTab('shopping')}>
+          🛒 مشتريات
+        </button>
       </div>
 
       <button className="btn-primary" style={{ width: '100%', marginBottom: 14 }} onClick={() => setAdding((v) => !v)}>
@@ -210,12 +216,6 @@ export default function Expenses() {
               ))}
             </select>
           )}
-          <select
-            className="input-field" style={{ marginBottom: 10 }}
-            value={form.payment} onChange={(e) => setForm({ ...form, payment: e.target.value })}
-          >
-            {PAYMENTS.map((p) => <option key={p} value={p}>{p}</option>)}
-          </select>
           <input
             className="input-field" placeholder="الوصف" maxLength={200} style={{ marginBottom: 10 }}
             value={form.desc} onChange={(e) => setForm({ ...form, desc: e.target.value })}
@@ -431,12 +431,106 @@ export default function Expenses() {
         </>
       )}
 
+      {/* ===== تبويب المشتريات ===== */}
+      {tab === 'shopping' && (
+        <>
+          {/* إضافة سريعة */}
+          <div className="card" style={{ marginBottom: 12 }}>
+            <div style={{ fontWeight: 700, fontSize: '0.82rem', marginBottom: 8 }}>أضف مشتريات</div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <input className="input-field" placeholder="اكتب اسم المنتج..." value={shopInput}
+                onChange={(e) => setShopInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter' && shopInput.trim()) { core.addShoppingItem(shopInput); setShopInput(''); } }}
+                style={{ flex: 1, marginBottom: 0 }} maxLength={60} />
+              <button className="btn-primary" style={{ padding: '0 16px' }}
+                onClick={() => { if (shopInput.trim()) { core.addShoppingItem(shopInput); setShopInput(''); } }}>+</button>
+            </div>
+            {/* مشتريات متكررة */}
+            <div style={{ marginTop: 10 }}>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', marginBottom: 6 }}>إضافة سريعة:</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {QUICK_ITEMS.map((item) => (
+                  <button key={item} className="chip"
+                    onClick={() => core.addShoppingItem(item)}
+                    style={{ fontSize: '0.75rem' }}>{item}</button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* القائمة */}
+          {shoppingList.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-icon">🛒</div>
+              <div>ما فيه مشتريات بعد — ضيف اللي ناقصك</div>
+            </div>
+          ) : (
+            <div className="card">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                  {shoppingList.filter((i) => i.bought).length}/{shoppingList.length} تم شراؤه
+                </span>
+                {shoppingList.some((i) => i.bought) && (
+                  <button style={{ fontSize: '0.72rem', color: 'var(--danger)', background: 'none', border: 'none', cursor: 'pointer' }}
+                    onClick={core.clearBoughtItems}>حذف المشترى</button>
+                )}
+              </div>
+              {shoppingList.map((item) => (
+                <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
+                  <input type="checkbox" checked={item.bought} onChange={() => core.toggleShoppingItem(item.id)}
+                    style={{ width: 18, height: 18, cursor: 'pointer', accentColor: 'var(--primary)' }} />
+                  <span style={{ flex: 1, fontSize: '0.88rem', textDecoration: item.bought ? 'line-through' : 'none', color: item.bought ? 'var(--text-secondary)' : 'var(--text)' }}>
+                    {item.text}
+                  </span>
+                  <button style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', color: 'var(--text-secondary)' }}
+                    onClick={() => core.removeShoppingItem(item.id)}>×</button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* ملخص شهري للمصاريف */}
+          {expenses.length > 0 && (() => {
+            const thisM = monthOf(todayStr());
+            const monthly = expenses.filter((e) => e.type === 'expense' && monthOf(e.date) === thisM);
+            const total = monthly.reduce((s, e) => s + e.amount, 0);
+            const byCat: Record<string, number> = {};
+            monthly.forEach((e) => { byCat[e.category] = (byCat[e.category] ?? 0) + e.amount; });
+            const topCats = Object.entries(byCat).sort((a, b) => b[1] - a[1]).slice(0, 4);
+            return (
+              <div className="card" style={{ marginTop: 12 }}>
+                <div style={{ fontWeight: 700, fontSize: '0.85rem', marginBottom: 10 }}>📊 ملخص هذا الشهر</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.82rem' }}>إجمالي المصروف</span>
+                  <span style={{ fontWeight: 800, color: 'var(--danger)' }}>{total.toLocaleString()} ر.س</span>
+                </div>
+                {topCats.map(([cat, amt]) => {
+                  const pct = total > 0 ? Math.round((amt / total) * 100) : 0;
+                  const catInfo = BASE_CATS.find((c) => c.name === cat);
+                  return (
+                    <div key={cat} style={{ marginBottom: 6 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: 2 }}>
+                        <span>{catInfo?.icon ?? '📦'} {cat}</span>
+                        <span style={{ color: 'var(--text-secondary)' }}>{amt.toLocaleString()} ر.س · {pct}%</span>
+                      </div>
+                      <div style={{ height: 6, background: 'var(--border)', borderRadius: 4 }}>
+                        <div style={{ width: `${pct}%`, height: '100%', background: catInfo?.color ?? 'var(--primary)', borderRadius: 4, transition: 'width 0.5s' }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
+        </>
+      )}
+
       {hint && <div className="hint-msg ok">{hint}</div>}
 
       <ConfirmDialog
         open={deleteId !== null}
         title="تأكيد الحذف"
-        message="هل تريد حذف هذه الحركة نهائياً؟"
+        message="متأكد تبي تحذف هالحركة؟"
         confirmLabel="حذف"
         danger
         onConfirm={() => {

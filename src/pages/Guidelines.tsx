@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { useCore } from '../core/useCore';
 import BackButton from '../components/BackButton';
+import PageHero from '../components/PageHero';
 
 const MAX_IMAGE_BYTES = 1_500_000;
 
@@ -37,14 +38,13 @@ export default function Guidelines({ embedded = false }: { embedded?: boolean })
     <div className="page">
       {!embedded && <BackButton />}
 
-      <div className="hero">
-        <div className="hero-icon">💪</div>
-        <div className="hero-title">إرشادات أساسية قبل البدء</div>
-        <div className="hero-sub">
-          نظام المدرب سعود يستهدف عضلات الجسم المختلفة في اليوم نفسه لتحقيق نتائج
-          مضاعفة، مع التركيز على تجنب الإصابات والاستماع إلى إشارات الجسم.
-        </div>
-      </div>
+      <PageHero
+        variant="deep"
+        centered
+        icon="💪"
+        title="إرشادات أساسية قبل البدء"
+        subtitle="نظام المدرب سعود يستهدف عضلات الجسم المختلفة في اليوم نفسه لتحقيق نتائج مضاعفة، مع التركيز على تجنب الإصابات والاستماع إلى إشارات الجسم."
+      />
 
       <div className="warn-note">
         ⚠️ <span>يجب التوقف فوراً عن أي تمرين يسبب ألماً في المفاصل أو الأوتار.</span>

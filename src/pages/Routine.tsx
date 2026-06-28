@@ -270,7 +270,7 @@ export default function Routine() {
       <div className={allDone ? 'card pulse' : 'card'}>
         <div className="section-progress">
           {tasks.length === 0
-            ? 'ما فيه مهام — زِد أول وحدة 👇'
+            ? 'ما فيه مهام — ضيف أول مهمة 👇'
             : `خلّصت ${doneCount} من ${tasks.length}`}
           {allDone ? ' — كمّلت القسم، كفو! ✨' : ''}
         </div>
@@ -295,7 +295,7 @@ export default function Routine() {
       <ConfirmDialog
         open={pendingDelete !== null}
         title="تأكيد الحذف"
-        message={`هل تريد حذف «${pendingDelete?.label ?? ''}» نهائياً؟`}
+        message={`متأكد تبي تحذف «${pendingDelete?.label ?? ''}»؟`}
         confirmLabel="حذف"
         danger
         onConfirm={confirmDelete}

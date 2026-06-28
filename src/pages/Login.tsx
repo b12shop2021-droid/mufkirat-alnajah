@@ -42,8 +42,8 @@ export default function Login() {
   return (
     <div className="auth-wrap">
       <div className="auth-logo">
-        <div className="auth-logo-badge">🏆</div>
-        <div className="auth-title">مفكرة النجاح</div>
+        <img src="/logo.png" alt="الهمّة" className="auth-logo-img" />
+        <div className="auth-slogan">الهمّة حتى القمّة</div>
         <div className="auth-sub">
           {mode === 'login' ? 'أهلاً بعودتك — سجّل دخولك للمتابعة' : 'ابدأ رحلتك نحو النجاح'}
         </div>

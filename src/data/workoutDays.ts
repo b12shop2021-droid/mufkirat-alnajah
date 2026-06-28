@@ -25,12 +25,14 @@ export interface CaptainDay {
   title: string;
   focus: string;
   warmup: boolean;
+  image?: string; // صورة الكابتن التوضيحية لليوم (أعلى الصفحة)
   exercises: CaptainExercise[];
 }
 
 export const WORKOUT_DAYS: CaptainDay[] = [
   {
     id: 'push_a',
+    image: '/workouts/push_a.webp',
     label: 'دفع أ',
     title: '💪 يوم الدفع (أ) — Push A',
     focus: 'الصدر، الكتف الأمامي، الترايسبس',
@@ -47,6 +49,7 @@ export const WORKOUT_DAYS: CaptainDay[] = [
   },
   {
     id: 'pull_a',
+    image: '/workouts/pull_a.webp',
     label: 'سحب أ',
     title: '🔄 يوم السحب (أ) — Pull A',
     focus: 'الظهر، الكتف الخلفي، البايسبس',
@@ -62,6 +65,7 @@ export const WORKOUT_DAYS: CaptainDay[] = [
   },
   {
     id: 'legs_a',
+    image: '/workouts/legs_a.webp',
     label: 'أرجل أ',
     title: '🦵 يوم الأرجل (أ) — Legs A',
     focus: 'الجزء السفلي بالكامل',
@@ -76,6 +80,7 @@ export const WORKOUT_DAYS: CaptainDay[] = [
   },
   {
     id: 'push_b',
+    image: '/workouts/push_b.webp',
     label: 'دفع ب',
     title: '💪 يوم الدفع (ب) — Push B',
     focus: 'الصدر، الكتف، الترايسبس — زوايا تركيز مختلفة',
@@ -91,6 +96,7 @@ export const WORKOUT_DAYS: CaptainDay[] = [
   },
   {
     id: 'pull_b',
+    image: '/workouts/pull_b.webp',
     label: 'سحب ب',
     title: '🔄 يوم السحب (ب) — Pull B',
     focus: 'الظهر، الكتف الخلفي، البايسبس — زوايا تركيز مختلفة',
@@ -106,6 +112,7 @@ export const WORKOUT_DAYS: CaptainDay[] = [
   },
   {
     id: 'legs_b',
+    image: '/workouts/legs_b.webp',
     label: 'أرجل ب',
     title: '🦵 يوم الأرجل (ب) — Legs B',
     focus: 'الجزء السفلي بالكامل — إضافة جهاز دفع الأرجل',

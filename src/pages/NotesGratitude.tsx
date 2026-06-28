@@ -46,7 +46,7 @@ export default function NotesGratitude() {
   const handleAddGrat = (preset?: string) => {
     const value = preset ?? gratText;
     if (value.trim() === '') {
-      setHint('⚠️ اكتب ما تشكر عليه');
+      setHint('⚠️ اكتب شي تشكر عليه');
       return;
     }
     const beforeCount = todayGrat.length;
@@ -207,7 +207,7 @@ export default function NotesGratitude() {
       <ConfirmDialog
         open={pendingDelete !== null}
         title="تأكيد الحذف"
-        message={`هل تريد حذف «${pendingDelete?.label ?? ''}» نهائياً؟`}
+        message={`متأكد تبي تحذف «${pendingDelete?.label ?? ''}»؟`}
         confirmLabel="حذف"
         danger
         onConfirm={confirmDelete}

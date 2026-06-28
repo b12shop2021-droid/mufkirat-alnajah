@@ -11,9 +11,17 @@ import {
   useEffect,
   useCallback,
   useMemo,
+  useRef,
   type ReactNode,
 } from 'react';
 import { fireConfetti } from '../components/Confetti';
+import { fireXP } from '../components/XPToast';
+import {
+  WEEKLY_CHALLENGES,
+  isoWeekKey,
+  weekChallengeIndex,
+  type WeeklyChallengeDef,
+} from '../data/weeklyChallenges';
 
 /* ===== الأنواع المشتركة ===== */
 
@@ -204,6 +212,8 @@ export interface CoreState {
   guidelinesImage: string | null; // صورة يوم الأرجل التوضيحية (اختيارية)
   pledges: Pledge[];
   timeCapsule: TimeCapsule | null;
+  occasions: OccasionEntry[];
+  shoppingList: ShoppingItem[];
   expenses: ExpenseEntry[];
   customCategories: CustomCategory[];
   budgets: Record<string, number>; // اسم الفئة → السقف الشهري
@@ -215,6 +225,14 @@ export interface CoreState {
   favoriteMeals: FavoriteMeal[];
   waterLog: WaterEntry[];
   calorieGoal: number;
+  weeklyChallenge: WeeklyChallengeState | null; // التحدّي الأسبوعي العشوائي
+  dailyIntention: { date: string; text: string } | null; // نِيّة اليوم — كلمة/جملة تركيز
+}
+
+/* حالة التحدّي الأسبوعي — الفهرس يُشتق من معرّف الأسبوع، ونخزّن الإتمام فقط */
+export interface WeeklyChallengeState {
+  weekKey: string; // 'YYYY-Www'
+  done: boolean;
 }
 
 export interface NotifItem {
@@ -266,6 +284,17 @@ export interface CustomCategory {
   name: string;
   icon: string;
   note: string;
+}
+
+export interface OccasionEntry {
+  id: string;
+  personName: string;
+  relation: string;        // أخ، أخت، صديق، زوجة، والد، والدة، ...
+  occasionName: string;    // عيد ميلاد، زواج، تخرّج، ...
+  date: string;            // MM-DD للسنوي أو YYYY-MM-DD للمرة الواحدة
+  isAnnual: boolean;
+  notes: string;
+  giftIdeas: string;
 }
 
 export interface Pledge {
@@ -374,6 +403,8 @@ const DEFAULT_STATE: CoreState = {
     { id: 'streak', enabled: true, time: '23:00' },
   ],
   guidelinesImage: null,
+  occasions: [],
+  shoppingList: [],
   pledges: [],
   timeCapsule: null,
   expenses: [],
@@ -395,6 +426,8 @@ const DEFAULT_STATE: CoreState = {
   favoriteMeals: [],
   waterLog: [],
   calorieGoal: 2000,
+  weeklyChallenge: null,
+  dailyIntention: null,
 };
 
 /* قراءة الحالة المحفوظة من localStorage مع دمج آمن مع الافتراضي */
@@ -437,6 +470,8 @@ const loadState = (): CoreState => {
       guidelinesImage: parsed.guidelinesImage ?? null,
       pledges: parsed.pledges ?? [],
       timeCapsule: parsed.timeCapsule ?? null,
+      occasions: parsed.occasions ?? [],
+      shoppingList: parsed.shoppingList ?? [],
       expenses: parsed.expenses ?? [],
       customCategories: parsed.customCategories ?? [],
       budgets: parsed.budgets ?? DEFAULT_STATE.budgets,
@@ -448,6 +483,8 @@ const loadState = (): CoreState => {
       favoriteMeals: parsed.favoriteMeals ?? [],
       waterLog: parsed.waterLog ?? [],
       calorieGoal: parsed.calorieGoal ?? 2000,
+      weeklyChallenge: parsed.weeklyChallenge ?? null,
+      dailyIntention: parsed.dailyIntention ?? null,
     };
   } catch {
     return DEFAULT_STATE;
@@ -460,6 +497,9 @@ interface CoreContextValue {
   level: number; // 0..6
   levelName: string;
   progress: number; // 0..100 تقدّم داخل المستوى الحالي
+  weekly: { def: WeeklyChallengeDef; done: boolean; weekKey: string }; // التحدّي الأسبوعي
+  completeWeeklyChallenge: () => void;
+  setDailyIntention: (text: string) => void;
   addXP: (amount: number) => void;
   updateProfile: (patch: Partial<Profile>) => void;
   markStreakToday: () => void;
@@ -512,6 +552,7 @@ interface CoreContextValue {
   addQuranMinutes: (minutes: number) => void; // +10 وتجميع دقائق اليوم
   // ===== النوم والعلاقات =====
   saveSleep: (sleepTime: string, wakeTime: string) => number; // يعيد عدد الساعات
+  logSleep: (date: string, hours: number) => void; // استيراد مباشر بالتاريخ والساعات
   addRelation: (name: string) => void;
   toggleRelation: (id: string) => void;
   removeRelation: (id: string) => void;
@@ -533,6 +574,13 @@ interface CoreContextValue {
   removePledge: (id: string) => void;
   lockCapsule: (message: string) => void;
   // ===== المصاريف =====
+  addOccasion: (entry: Omit<OccasionEntry, 'id'>) => void;
+  updateOccasion: (id: string, partial: Partial<OccasionEntry>) => void;
+  removeOccasion: (id: string) => void;
+  addShoppingItem: (text: string) => void;
+  toggleShoppingItem: (id: string) => void;
+  removeShoppingItem: (id: string) => void;
+  clearBoughtItems: () => void;
   addExpense: (entry: Omit<ExpenseEntry, 'id'>) => void;
   removeExpense: (id: string) => void;
   addCustomCategory: (name: string, icon: string, note: string) => boolean;
@@ -596,10 +644,28 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     return state.xp % 100;
   }, [state.xp, level]);
 
-  /* إضافة نقاط — موحّدة كـ useCallback (المرجع الوحيد لكل الصفحات) */
+  /* مرجع حيّ لقيمة النقاط (لاكتشاف صعود المستوى خارج محدِّث الحالة
+     حتى لا تتكرّر الرسالة/الاحتفال تحت StrictMode) */
+  const xpRef = useRef(state.xp);
+  useEffect(() => {
+    xpRef.current = state.xp;
+  }, [state.xp]);
+
+  /* إضافة نقاط — موحّدة كـ useCallback (المرجع الوحيد لكل الصفحات)
+     ترسل رسالة تحفيز منبثقة تلقائياً، واحتفالاً خاصاً عند صعود المستوى */
   const addXP = useCallback((amount: number) => {
     const safe = clampNum(Math.round(amount), 0, 10000);
     if (safe === 0) return;
+    const before = xpRef.current;
+    const after = before + safe;
+    xpRef.current = after;
+    const lvlOf = (xp: number) => Math.min(Math.floor(xp / 100), LEVELS.length - 1);
+    if (lvlOf(after) > lvlOf(before)) {
+      fireConfetti();
+      fireXP(safe, LEVELS[lvlOf(after)]);
+    } else {
+      fireXP(safe);
+    }
     setState((s) => ({ ...s, xp: s.xp + safe }));
   }, []);
 
@@ -1288,6 +1354,14 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     [addXP],
   );
 
+  /* استيراد سجل نوم مباشر (للاستيراد من Apple Health / Google Fit) */
+  const logSleep = useCallback((date: string, hours: number) => {
+    setState((s) => {
+      const others = s.sleepLog.filter((e) => e.date !== date);
+      return { ...s, sleepLog: [...others, { date, hours }] };
+    });
+  }, []);
+
   /* إضافة شخص لدائرة العلاقات */
   const addRelation = useCallback((name: string) => {
     const t = clean(name);
@@ -1460,6 +1534,38 @@ export function CoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   /* إضافة حركة مالية (دخل/مصروف) مع تنظيف وحصر القيم */
+  /* ===== المناسبات ===== */
+  const addOccasion = useCallback((entry: Omit<OccasionEntry, 'id'>) => {
+    setState((s) => ({ ...s, occasions: [...s.occasions, { ...entry, id: crypto.randomUUID() }] }));
+  }, []);
+
+  const updateOccasion = useCallback((id: string, partial: Partial<OccasionEntry>) => {
+    setState((s) => ({ ...s, occasions: s.occasions.map((o) => o.id === id ? { ...o, ...partial } : o) }));
+  }, []);
+
+  const removeOccasion = useCallback((id: string) => {
+    setState((s) => ({ ...s, occasions: s.occasions.filter((o) => o.id !== id) }));
+  }, []);
+
+  /* ===== قائمة المشتريات ===== */
+  const addShoppingItem = useCallback((text: string) => {
+    const t = clean(text);
+    if (!t) return;
+    setState((s) => ({ ...s, shoppingList: [...s.shoppingList, { id: crypto.randomUUID(), text: t, bought: false }] }));
+  }, []);
+
+  const toggleShoppingItem = useCallback((id: string) => {
+    setState((s) => ({ ...s, shoppingList: s.shoppingList.map((i) => i.id === id ? { ...i, bought: !i.bought } : i) }));
+  }, []);
+
+  const removeShoppingItem = useCallback((id: string) => {
+    setState((s) => ({ ...s, shoppingList: s.shoppingList.filter((i) => i.id !== id) }));
+  }, []);
+
+  const clearBoughtItems = useCallback(() => {
+    setState((s) => ({ ...s, shoppingList: s.shoppingList.filter((i) => !i.bought) }));
+  }, []);
+
   const addExpense = useCallback((entry: Omit<ExpenseEntry, 'id'>) => {
     setState((s) => ({
       ...s,
@@ -1706,12 +1812,44 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  /* التحدّي الأسبوعي العشوائي — يُشتق تحدٍّ ثابت لكل أسبوع، والإتمام يُعاد ضبطه تلقائياً مع الأسبوع الجديد */
+  const weekly = useMemo(() => {
+    const weekKey = isoWeekKey();
+    const def = WEEKLY_CHALLENGES[weekChallengeIndex(weekKey)];
+    const done = state.weeklyChallenge?.weekKey === weekKey && state.weeklyChallenge.done;
+    return { def, done, weekKey };
+  }, [state.weeklyChallenge]);
+
+  const completeWeeklyChallenge = useCallback(() => {
+    const weekKey = isoWeekKey();
+    const cur = state.weeklyChallenge;
+    if (cur?.weekKey === weekKey && cur.done) return; // أُنجز هذا الأسبوع
+    setState((s) => ({ ...s, weeklyChallenge: { weekKey, done: true } }));
+    addXP(WEEKLY_CHALLENGES[weekChallengeIndex(weekKey)].reward);
+    fireConfetti();
+  }, [state.weeklyChallenge, addXP]);
+
+  /* نِيّة اليوم — كلمة/جملة تركيز يكتبها المستخدم؛ مكافأة + احتفال أول مرة باليوم فقط */
+  const setDailyIntention = useCallback((text: string) => {
+    const t = clean(text);
+    const today = todayStr();
+    const isFirstToday = state.dailyIntention?.date !== today;
+    setState((s) => ({ ...s, dailyIntention: t ? { date: today, text: t } : null }));
+    if (t && isFirstToday) {
+      addXP(5);
+      fireConfetti();
+    }
+  }, [state.dailyIntention, addXP]);
+
   const value = useMemo<CoreContextValue>(
     () => ({
       state,
       level,
       levelName,
       progress,
+      weekly,
+      completeWeeklyChallenge,
+      setDailyIntention,
       addXP,
       updateProfile,
       markStreakToday,
@@ -1753,6 +1891,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       cycleJuz,
       addQuranMinutes,
       saveSleep,
+      logSleep,
       addRelation,
       toggleRelation,
       removeRelation,
@@ -1769,6 +1908,13 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       resetPledge,
       removePledge,
       lockCapsule,
+      addOccasion,
+      updateOccasion,
+      removeOccasion,
+      addShoppingItem,
+      toggleShoppingItem,
+      removeShoppingItem,
+      clearBoughtItems,
       addExpense,
       removeExpense,
       addCustomCategory,
@@ -1793,6 +1939,9 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       level,
       levelName,
       progress,
+      weekly,
+      completeWeeklyChallenge,
+      setDailyIntention,
       addXP,
       updateProfile,
       markStreakToday,
@@ -1834,6 +1983,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       cycleJuz,
       addQuranMinutes,
       saveSleep,
+      logSleep,
       addRelation,
       toggleRelation,
       removeRelation,
@@ -1850,6 +2000,13 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       resetPledge,
       removePledge,
       lockCapsule,
+      addOccasion,
+      updateOccasion,
+      removeOccasion,
+      addShoppingItem,
+      toggleShoppingItem,
+      removeShoppingItem,
+      clearBoughtItems,
       addExpense,
       removeExpense,
       addCustomCategory,

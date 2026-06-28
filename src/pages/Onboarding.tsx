@@ -29,9 +29,10 @@ export default function Onboarding() {
   return (
     <div className="auth-wrap">
       <div className="auth-logo">
-        <div className="auth-logo-badge">🏆</div>
+        <img src="/logo.png" alt="الهمّة" className="auth-logo-img" />
+        <div className="auth-slogan">الهمّة حتى القمّة</div>
         <div className="auth-title">يا هلا فيك!</div>
-        <div className="auth-sub">خلّنا نجهّز مفكرتك بثوانٍ</div>
+        <div className="auth-sub">خلّنا نجهّز همّتك في ثوانٍ</div>
       </div>
 
       {step === 1 && (

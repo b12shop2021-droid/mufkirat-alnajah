@@ -4,9 +4,11 @@
    كل القيم من useCore المركزي.
    =================================================================== */
 
+import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { useCore } from '../core/useCore';
 import XPBar from '../components/XPBar';
+import { getDailyQuote } from '../data/quotes';
 
 const DAY_NAMES = ['أحد', 'اثن', 'ثلا', 'أرب', 'خمي', 'جمع', 'سبت'];
 
@@ -29,7 +31,18 @@ export default function Home() {
   const [, navigate] = useLocation();
   const today = dateBefore(0);
 
-  const greeting = s.profile.nickname || s.profile.name || 'يا بطل';
+  const greeting = s.profile.nickname || s.profile.name || 'بطل';
+
+  /* تحية حسب توقيت اليوم (لهجة سعودية شبابية) */
+  const getTimeGreet = () => {
+    const h = new Date().getHours();
+    if (h >= 4 && h < 11) return { text: 'صباح النشاط', badge: '🌅', night: false };
+    if (h >= 11 && h < 15) return { text: 'نهارك سعيد', badge: '🌞', night: false };
+    if (h >= 15 && h < 18) return { text: 'مساء الخير', badge: '🌇', night: false };
+    if (h >= 18 && h < 23) return { text: 'مساك ورد', badge: '🌙', night: true };
+    return { text: 'ليلة هادئة', badge: '✨', night: true };
+  };
+  const tg = getTimeGreet();
 
   /* إنجاز اليوم من الروتين */
   const routine = [...s.routine.morning, ...s.routine.evening];
@@ -54,7 +67,7 @@ export default function Home() {
     yChips >= 3
       ? `🔥 صباح النجاح يا ${greeting}! أمس كان ولا أروع — ${v('كمّل', 'كمّلي')} عالخطى`
       : yChips >= 1
-        ? `💪 يومٍ جديد يا ${greeting} — فرصتك ${v('تكون', 'تكونين')} أحسن من أمس`
+        ? `💪 يومٌ جديد يا ${greeting} — فرصتك ${v('تكون', 'تكونين')} أحسن من أمس`
         : `🌱 ${v('ابدأ', 'ابدئي')} بخطوة صغيرة يا ${greeting} — المهم ما ${v('توقف', 'توقفين')}`;
 
   /* خطوتك اليوم — اقتراح ذكي لأهم إجراء ناقص */
@@ -79,29 +92,47 @@ export default function Home() {
 
   const motiv = MOTIVATIONS[new Date().getDate() % MOTIVATIONS.length];
 
+  /* نِيّة اليوم — كلمة/جملة تركيز يكتبها البطل */
+  const intentionToday = s.dailyIntention?.date === today ? s.dailyIntention.text : '';
+  const [intentDraft, setIntentDraft] = useState('');
+  const [editingIntent, setEditingIntent] = useState(false);
+  const saveIntent = () => {
+    if (intentDraft.trim() === '') return;
+    core.setDailyIntention(intentDraft);
+    setIntentDraft('');
+    setEditingIntent(false);
+  };
+
   const tiles = [
-    { icon: '📖', label: 'مفكرة النجاح', to: '/more', streak: s.streak.current },
-    { icon: '🔄', label: 'العادات', to: '/routine' },
-    { icon: '🎯', label: 'الأهداف', to: '/goals' },
-    { icon: '💳', label: 'المصاريف', to: '/expenses' },
-    { icon: '🏋️', label: 'التمارين', to: '/workouts' },
-    { icon: '🍽️', label: 'الوجبات', to: '/meals' },
-    { icon: '📊', label: 'التحليلات', to: '/analytics' },
-    { icon: '🛡️', label: 'العهود', to: '/pledges' },
-    { icon: '🏆', label: 'إنجازاتي', to: '/achievements' },
+    { icon: '/icons/more.webp', label: 'الهمّة', to: '/more', streak: s.streak.current },
+    { icon: '/icons/routine.webp', label: 'العادات', to: '/routine' },
+    { icon: '/icons/goals.webp', label: 'الأهداف', to: '/goals' },
+    { icon: '/icons/expenses.webp', label: 'المصاريف', to: '/expenses' },
+    { icon: '/icons/workouts.webp', label: 'التمارين', to: '/workouts' },
+    { icon: '/icons/meals.webp', label: 'الوجبات', to: '/meals' },
+    { icon: '/icons/analytics.webp', label: 'التحليلات', to: '/analytics' },
+    { icon: '/icons/pledges.webp', label: 'العهود', to: '/pledges' },
+    { icon: '/icons/achievements.webp', label: 'إنجازاتي', to: '/achievements' },
   ];
 
   return (
     <div className="page">
       <XPBar />
 
-      <div className="home-hero">
+      <div className={tg.night ? 'home-hero night' : 'home-hero'}>
+        <div className="home-hero-stars" aria-hidden="true">
+          {Array.from({ length: 9 }).map((_, i) => (
+            <span key={i} className="hero-star" style={{ ['--i' as string]: i }} />
+          ))}
+        </div>
         <div className="home-hero-row">
           <div>
+            <div className="home-hero-greet">
+              {tg.badge} {tg.text} يا {greeting}
+            </div>
             <div className="home-hero-title">حقق حلمك وكن ملهماً ✨</div>
-            <div className="home-hero-sub">{s.profile.name || 'مرحباً بك'}</div>
           </div>
-          <div className="home-hero-badge">🏆</div>
+          <div className="home-hero-badge">{tg.badge}</div>
         </div>
         <div className="home-progress-wrap">
           <span className="home-progress-label">{dayPct}%</span>
@@ -110,6 +141,47 @@ export default function Home() {
           </div>
           <span className="home-progress-label">إنجاز يومك</span>
         </div>
+      </div>
+
+      <div className={intentionToday && !editingIntent ? 'intent-card set' : 'intent-card'}>
+        {intentionToday && !editingIntent ? (
+          <>
+            <div className="intent-head">
+              <span className="intent-tag">🎯 نِيّة اليوم</span>
+              <button
+                className="intent-edit"
+                aria-label="غيّر نِيّتك"
+                onClick={() => {
+                  setIntentDraft(intentionToday);
+                  setEditingIntent(true);
+                }}
+              >
+                ✏️
+              </button>
+            </div>
+            <div className="intent-text">«{intentionToday}»</div>
+            <div className="intent-sub">عليها نمشي اليوم — وش تبي أكثر من كذا 💪</div>
+          </>
+        ) : (
+          <>
+            <div className="intent-tag">🎯 وش نِيّتك اليوم يا {greeting}؟</div>
+            <div className="intent-sub">اكتب كلمة أو جملة تركّز عليها — مثل «صبر» أو «أنجز مشروعي»</div>
+            <div className="intent-input-row">
+              <input
+                className="intent-input"
+                type="text"
+                maxLength={60}
+                value={intentDraft}
+                placeholder="نِيّة اليوم..."
+                onChange={(e) => setIntentDraft(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && saveIntent()}
+              />
+              <button className="intent-btn" onClick={saveIntent} disabled={intentDraft.trim() === ''}>
+                {v('ثبّتها', 'ثبّتيها')} ✋
+              </button>
+            </div>
+          </>
+        )}
       </div>
 
       {routine.length > 0 && doneToday === routine.length && (
@@ -123,12 +195,34 @@ export default function Home() {
         <span>←</span>
       </button>
 
+      <div className={core.weekly.done ? 'weekly-card done' : 'weekly-card'}>
+        <div className="weekly-head">
+          <span className="weekly-tag">🎯 تحدّي الأسبوع</span>
+          <span className="weekly-reward">+{core.weekly.def.reward} نقطة</span>
+        </div>
+        <div className="weekly-title">
+          {core.weekly.def.emoji} {core.weekly.def.title}
+        </div>
+        <div className="weekly-hint">{core.weekly.def.hint}</div>
+        {core.weekly.done ? (
+          <div className="weekly-done-badge">✅ {v('أنجزته', 'أنجزتِه')} — كفو! نشوفك بالتحدّي الجاي</div>
+        ) : (
+          <button className="weekly-btn" onClick={() => core.completeWeeklyChallenge()}>
+            {v('أنجزت التحدّي', 'أنجزتِ التحدّي')} ✋
+          </button>
+        )}
+      </div>
+
       <h2 className="section-title">🧭 رحلتك اليوم</h2>
       <div className="home-grid">
         {tiles.map((t) => (
           <button key={t.label + t.to} className="tile" onClick={() => navigate(t.to)}>
-            <div className={t.label === 'مفكرة النجاح' ? 'tile-circle glow' : 'tile-circle'}>
-              <span>{t.icon}</span>
+            <div className={t.label === 'الهمّة' ? 'tile-circle glow' : 'tile-circle'}>
+              {t.icon.startsWith('/') ? (
+                <img className="tile-img" src={t.icon} alt="" width={42} height={42} />
+              ) : (
+                <span>{t.icon}</span>
+              )}
               {t.streak ? <div className="tile-streak-dot">{t.streak}</div> : null}
             </div>
             <div className="tile-label">{t.label}</div>
@@ -140,6 +234,19 @@ export default function Home() {
         <div style={{ fontSize: '1.6rem', marginBottom: 6 }}>✨</div>
         <div className="motiv-text">{motiv}</div>
       </div>
+
+      {/* اقتباس اليوم */}
+      {(() => {
+        const lastMood = s.moodLog.length > 0 ? s.moodLog[s.moodLog.length - 1].moodIdx : undefined;
+        const q = getDailyQuote(lastMood);
+        return (
+          <div className="quote-card">
+            <div className="quote-mark">"</div>
+            <div className="quote-text">{q.text}</div>
+            <div className="quote-author">— {q.author}</div>
+          </div>
+        );
+      })()}
 
       <div className="week-card">
         <div className="week-head">

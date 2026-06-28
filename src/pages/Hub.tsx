@@ -1,7 +1,5 @@
 /* ===================================================================
    Hub.tsx — مفكرة النجاح / المزيد
-   تنظيم أقسام التطبيق في 4 تبويبات + تبويب العهود المستقل البارز.
-   روابط لكل الصفحات المبنية (نفس بنية التبويبات المعتمدة).
    =================================================================== */
 
 import { useState } from 'react';
@@ -11,7 +9,7 @@ import BackButton from '../components/BackButton';
 type Tab = 'daily' | 'journey' | 'deep' | 'achievements';
 
 interface Link {
-  icon: string;
+  iconClass: string;
   label: string;
   to: string;
 }
@@ -21,44 +19,45 @@ const TABS: { id: Tab; label: string; links: Link[] }[] = [
     id: 'daily',
     label: '☀️ حياتي',
     links: [
-      { icon: '🏠', label: 'الملخص الذكي', to: '/' },
-      { icon: '🔄', label: 'الروتين الصباحي/المسائي', to: '/routine' },
-      { icon: '😊', label: 'المزاج ولحظة الفخر', to: '/mood' },
-      { icon: '📝', label: 'الملاحظات وشكر اليوم', to: '/notes' },
-      { icon: '📖', label: 'القرآن والتقويم', to: '/quran' },
-      { icon: '🍽️', label: 'الوجبات', to: '/meals' },
+      { iconClass: 'ic-routine',  label: 'الروتين الصباحي/المسائي',   to: '/routine' },
+      { iconClass: 'ic-mood',     label: 'المزاج ولحظة الفخر',        to: '/mood'   },
+      { iconClass: 'ic-notes',    label: 'الملاحظات وشكر اليوم',      to: '/notes'  },
+      { iconClass: 'ic-quran',    label: 'القرآن والتقويم',            to: '/quran'  },
+      { iconClass: 'ic-meals',    label: 'الوجبات',                   to: '/meals'  },
     ],
   },
   {
     id: 'journey',
     label: '🔥 التزامي',
     links: [
-      { icon: '😴', label: 'النوم ودائرة العلاقات', to: '/sleep' },
-      { icon: '🛡️', label: 'العهود وصندوق الزمن', to: '/pledges' },
-      { icon: '🏋️', label: 'التمارين', to: '/workouts' },
+      { iconClass: 'ic-workouts',    label: 'التمارين',                   to: '/workouts' },
+      { iconClass: 'ic-sleep',       label: 'النوم ودائرة العلاقات',      to: '/sleep'      },
+      { iconClass: 'ic-mood',        label: 'العلاقات والمناسبات',        to: '/occasions'  },
+      { iconClass: 'ic-timecapsule', label: 'العهود وصندوق الزمن',        to: '/pledges'  },
+      { iconClass: 'ic-habits',      label: 'مؤقت البومودورو',            to: '/pomodoro' },
+      { iconClass: 'ic-expenses',    label: 'المصاريف',                   to: '/expenses' },
     ],
   },
   {
     id: 'deep',
     label: '🌱 تطوّري',
     links: [
-      { icon: '🪪', label: 'تطوير الذات (الهوية والمراجعة)', to: '/self-dev' },
-      { icon: '🎯', label: 'الأهداف', to: '/goals' },
-      { icon: '💳', label: 'المصاريف', to: '/expenses' },
+      { iconClass: 'ic-selfdev',  label: 'تطوير الذات (الهوية والمراجعة)', to: '/self-dev' },
+      { iconClass: 'ic-goals',    label: 'الأهداف',                       to: '/goals'    },
     ],
   },
   {
     id: 'achievements',
     label: '🏆 فخري',
     links: [
-      { icon: '🖼️', label: 'إنجازاتي (السلسلة والمعرض والمحطات)', to: '/achievements' },
-      { icon: '📊', label: 'التحليلات', to: '/analytics' },
+      { iconClass: 'ic-achievements', label: 'إنجازاتي (السلسلة والمعرض والمحطات)', to: '/achievements' },
+      { iconClass: 'ic-analytics',    label: 'التحليلات',                           to: '/analytics'    },
     ],
   },
 ];
 
 const EXTRA: Link[] = [
-  { icon: '⚙️', label: 'الإعدادات والإشعارات', to: '/settings' },
+  { iconClass: 'ic-settings', label: 'الإعدادات والإشعارات', to: '/settings' },
 ];
 
 export default function Hub() {
@@ -69,7 +68,7 @@ export default function Hub() {
   return (
     <div className="page">
       <BackButton to="/" />
-      <h1 className="section-title">📖 مفكرة النجاح</h1>
+      <h1 className="section-title">📖 الهمّة</h1>
 
       {/* تبويب العهود المستقل البارز */}
       <button
@@ -77,7 +76,7 @@ export default function Hub() {
         style={{ background: 'linear-gradient(150deg, var(--deep), var(--deep-2))', color: '#fff' }}
         onClick={() => navigate('/pledges')}
       >
-        <div className="hub-link-icon" style={{ background: 'rgba(255,255,255,0.18)' }}>🛡️</div>
+        <span className="app-icon sm ic-pledges hub-link-icon" style={{ background: 'rgba(255,255,255,0.18)', borderRadius: 10 }} />
         <div className="hub-link-label">العهود (قطع العادات السلبية)</div>
         <div className="hub-link-arrow" style={{ color: '#fff' }}>‹</div>
       </button>
@@ -97,7 +96,7 @@ export default function Hub() {
 
       {active.links.map((l) => (
         <button key={l.label} className="hub-link" onClick={() => navigate(l.to)}>
-          <div className="hub-link-icon">{l.icon}</div>
+          <span className={`app-icon sm ${l.iconClass} hub-link-icon`} />
           <div className="hub-link-label">{l.label}</div>
           <div className="hub-link-arrow">‹</div>
         </button>
@@ -106,7 +105,7 @@ export default function Hub() {
       <h2 className="section-title" style={{ marginTop: 18 }}>أقسام أخرى</h2>
       {EXTRA.map((l) => (
         <button key={l.label} className="hub-link" onClick={() => navigate(l.to)}>
-          <div className="hub-link-icon">{l.icon}</div>
+          <span className={`app-icon sm ${l.iconClass} hub-link-icon`} />
           <div className="hub-link-label">{l.label}</div>
           <div className="hub-link-arrow">‹</div>
         </button>

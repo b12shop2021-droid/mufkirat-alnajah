@@ -135,7 +135,7 @@ export default function Goals() {
         )}
 
         <div className="goal-meta">
-          {total === 0 ? 'زِد خطوات عشان تخلّص الهدف' : `خلّصت ${done} من ${total} (${pct}%)`}
+          {total === 0 ? 'ضيف خطوات عشان تخلّص الهدف' : `خلّصت ${done} من ${total} (${pct}%)`}
         </div>
         <div className="progress-track">
           <div className="progress-fill" style={{ width: `${pct}%` }} />
@@ -207,7 +207,7 @@ export default function Goals() {
       {goals.length === 0 && (
         <div className="card">
           <p style={{ color: 'var(--text-secondary)' }}>
-            ما عندك أهداف لين الحين — زِد أول هدف وخلنا نبدأ 👇
+            ما عندك أهداف لين الحين — ضيف أول هدف وخلنا نبدأ 👇
           </p>
         </div>
       )}
@@ -246,7 +246,7 @@ export default function Goals() {
           onChange={(e) => setNewDeadline(e.target.value)}
         />
         <button className="btn-primary" style={{ width: '100%' }} onClick={handleAddGoal}>
-          زِد الهدف 🚀
+          ضيف الهدف 🚀
         </button>
       </div>
 
