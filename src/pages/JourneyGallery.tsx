@@ -60,6 +60,36 @@ export default function JourneyGallery({ embedded = false }: { embedded?: boolea
   ];
   const earnedTitles = achievements.filter((a) => a.earned).length;
 
+  /* مشاركة ملخص الشهر فعلياً (Web Share أو نسخ) + احتفال */
+  const [shared, setShared] = useState(false);
+  const handleShareMonth = async () => {
+    fireConfetti();
+    const text = `📊 شهري في الهمّة (${MONTHS[now.getMonth()]} ${now.getFullYear()})
+
+🗓️ ${disciplinedDays} يوم منضبط
+⭐ ${s.xp} نقطة XP
+📖 ${juzCount} جزء قرآن
+🏅 ${earnedTitles} لقب مكتسب
+🏆 مستواي: ${core.levelName}
+
+#الهمّة #الهمّة_حتى_القمّة`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ text });
+        return;
+      }
+    } catch {
+      /* أُلغيت المشاركة — نرجع للنسخ */
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      setShared(true);
+      setTimeout(() => setShared(false), 2500);
+    } catch {
+      /* النسخ غير مدعوم */
+    }
+  };
+
   return (
     <div className="page">
       {!embedded && <BackButton />}
@@ -102,14 +132,14 @@ export default function JourneyGallery({ embedded = false }: { embedded?: boolea
             </div>
           </div>
           <div className="wrap-highlight">
-            🏆 مستواك الحالي: {core.levelName} — استمر في رحلتك!
+            🏆 مستواك الحالي: {core.levelName} — كمّل رحلتك!
           </div>
           <button
             className="btn-ghost"
             style={{ width: '100%', marginTop: 16, color: '#fff', background: 'rgba(255,255,255,0.18)' }}
-            onClick={fireConfetti}
+            onClick={handleShareMonth}
           >
-            📤 مشاركة ملخص الشهر
+            {shared ? '✅ نسخناها!' : '📤 مشاركة ملخص الشهر'}
           </button>
         </div>
       )}

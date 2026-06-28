@@ -91,7 +91,7 @@ export default function Mood() {
 
       <div className="card">
         <p style={{ textAlign: 'center', fontWeight: 700, marginBottom: 14 }}>
-          اختر ما يصف مزاجك الآن
+          اختر اللي يوصف مزاجك الحين
         </p>
         <div className="mood-grid">
           {MOODS.map((m, i) => (
@@ -143,7 +143,7 @@ export default function Mood() {
         <textarea
           className="input-field"
           rows={2}
-          placeholder="اكتب لحظة تفخر بها اليوم..."
+          placeholder="اكتب لحظة تفتخر فيها اليوم..."
           value={pride}
           maxLength={200}
           onChange={(e) => setPride(e.target.value)}
@@ -173,7 +173,7 @@ export default function Mood() {
           <div style={{ marginTop: 12 }}>
             {core.state.prideArchive.length === 0 ? (
               <div style={{ fontSize: '0.8rem', opacity: 0.8, textAlign: 'center' }}>
-                لا لحظات بعد
+                ما فيه لحظات بعد
               </div>
             ) : (
               core.state.prideArchive.map((p) => (
@@ -212,7 +212,7 @@ export default function Mood() {
                 <span className="hist-energy">⚡ {h.entry.energy}/10</span>
               </div>
             ) : (
-              <span className="hist-empty">لم يُسجّل بعد</span>
+              <span className="hist-empty">ما تسجّل بعد</span>
             )}
           </div>
         ))}

@@ -113,7 +113,7 @@ export default function Meals() {
             className="input-field" type="number" min={0} placeholder="هدف السعرات"
             value={goalInput} onChange={(e) => setGoalInput(e.target.value)}
           />
-          <button className="btn-ghost" onClick={() => { core.setCalorieGoal(Number(goalInput) || 0); setHint('🎯 حُدّث الهدف'); }}>
+          <button className="btn-ghost" onClick={() => { core.setCalorieGoal(Number(goalInput) || 0); setHint('🎯 حدّثنا الهدف'); }}>
             حفظ الهدف
           </button>
         </div>
@@ -217,7 +217,7 @@ export default function Meals() {
       <h2 className="section-title">وجبات اليوم</h2>
       {todayMeals.length === 0 ? (
         <div className="card" style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
-          🍽️ لا وجبات مسجّلة اليوم
+          🍽️ ما سجّلت وجبات اليوم
         </div>
       ) : (
         todayMeals.map((m) => (

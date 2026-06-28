@@ -78,7 +78,7 @@ export default function WeeklyWrapped({ embedded = false }: { embedded?: boolean
 📝 ${stats.notes} ملاحظة
 
 ${encouragement}
-#مفكرة_النجاح`;
+#الهمّة #الهمّة_حتى_القمّة`;
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -159,7 +159,7 @@ ${encouragement}
         <div className="wrapped-msg">{encouragement}</div>
 
         <button className={`wrapped-share-btn ${copied ? 'copied' : ''}`} onClick={handleShare}>
-          {copied ? '✅ تم النسخ!' : '📤 شارك قصتك'}
+          {copied ? '✅ نسخناها!' : '📤 شارك قصتك'}
         </button>
       </div>
     </div>

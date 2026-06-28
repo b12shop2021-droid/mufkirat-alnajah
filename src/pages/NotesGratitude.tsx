@@ -118,7 +118,7 @@ export default function NotesGratitude() {
 
           {core.state.notes.length === 0 ? (
             <div className="card" style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
-              📭 لا ملاحظات بعد — اكتب أول فكرة تخطر ببالك
+              📭 ما فيه ملاحظات بعد — اكتب أول فكرة تجيك
             </div>
           ) : (
             core.state.notes.map((n) => (
@@ -164,7 +164,7 @@ export default function NotesGratitude() {
 
           {gratFull ? (
             <div className="card" style={{ textAlign: 'center', color: 'var(--primary)', fontWeight: 700 }}>
-              ✨ يوم مليء بالامتنان — اكتملت ٣ لحظات شكر لهذا اليوم
+              ✨ يوم مليان امتنان — كمّلت ٣ لحظات شكر اليوم
             </div>
           ) : (
             <div className="card">

@@ -123,7 +123,7 @@ export default function SleepRelations() {
                 />
               </div>
               <div className="sleep-field">
-                <label>⏰ وقت الاستيقاظ</label>
+                <label>⏰ وقت الصحيان</label>
                 <input
                   type="time"
                   className="input-field"
@@ -164,7 +164,7 @@ export default function SleepRelations() {
           <div className="card" style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '1.7rem' }}>👥</div>
             <div style={{ fontWeight: 800, color: 'var(--primary)', marginTop: 6 }}>
-              من تواصلت معه هذا الأسبوع؟ من تحتاج تتصل به؟
+              مين تواصلت معه هالأسبوع؟ ومين ودّك تتصل فيه؟
             </div>
           </div>
 

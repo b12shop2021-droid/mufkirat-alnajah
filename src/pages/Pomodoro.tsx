@@ -51,6 +51,7 @@ export default function Pomodoro({ embedded = false }: { embedded?: boolean }) {
   const [justDone, setJustDone] = useState(false);
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const endRef = useRef<number>(0); // طابع زمني لنهاية الجلسة (يمنع انحراف العدّاد بالخلفية)
 
   const stop = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -71,7 +72,6 @@ export default function Pomodoro({ embedded = false }: { embedded?: boolean }) {
   /* عند انتهاء الوقت */
   const handleComplete = useCallback(() => {
     stop();
-    setJustDone(true);
 
     if (mode === 'work') {
       const next = sessions + 1;
@@ -105,23 +105,30 @@ export default function Pomodoro({ embedded = false }: { embedded?: boolean }) {
     } catch {
       /* AudioContext غير مدعوم */
     }
+
+    /* يُضبط بعد switchMode (الذي يصفّره) ليبقى true ويظهر رسالة الإكمال */
+    setJustDone(true);
   }, [mode, sessions, stop, switchMode, core]);
 
-  /* تشغيل المؤقت */
+  /* تشغيل المؤقت — يعتمد على وقت نهاية مطلق فلا ينحرف لو صار التبويب بالخلفية */
   useEffect(() => {
     if (!running) return;
+    /* نحسب نهاية الجلسة من المتبقّي لحظة التشغيل/الاستئناف */
+    endRef.current = Date.now() + remaining * 1000;
     intervalRef.current = setInterval(() => {
-      setRemaining((r) => {
-        if (r <= 1) {
-          handleComplete();
-          return 0;
-        }
-        return r - 1;
-      });
-    }, 1000);
+      const left = Math.round((endRef.current - Date.now()) / 1000);
+      if (left <= 0) {
+        setRemaining(0);
+        handleComplete();
+      } else {
+        setRemaining(left);
+      }
+    }, 250);
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
+    // remaining مقصود استبعاده: نلتقط قيمته عند بدء التشغيل فقط
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [running, handleComplete]);
 
   /* تحديث عنوان المتصفح بالوقت المتبقي */

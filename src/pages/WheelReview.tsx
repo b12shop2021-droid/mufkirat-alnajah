@@ -29,7 +29,7 @@ export default function WheelReview({ embedded = false }: { embedded?: boolean }
     setRev1('');
     setRev2('');
     setRev3('');
-    setHint('🪞 تم حفظ مراجعتك!');
+    setHint('🪞 حفظنا مراجعتك!');
   };
 
   return (
@@ -77,7 +77,7 @@ export default function WheelReview({ embedded = false }: { embedded?: boolean }
       <h2 className="section-title">📂 أرشيف المراجعات السابقة</h2>
       {weeklyReviews.length === 0 ? (
         <div className="card" style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
-          لا مراجعات بعد
+          ما فيه مراجعات بعد
         </div>
       ) : (
         weeklyReviews.map((r) => (
