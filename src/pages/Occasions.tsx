@@ -8,10 +8,9 @@ import { useCore, todayStr } from '../core/useCore';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
 
-const RELATIONS = ['والد', 'والدة', 'أخ', 'أخت', 'زوج/زوجة', 'صديق', 'صديقة', 'زميل', 'قريب', 'أخرى'];
 const OCCASIONS_LIST = ['ذكرى زواج', 'تخرّج', 'عقد قران', 'مولود جديد', 'نجاح', 'عيد فطر', 'عيد أضحى', 'أخرى'];
 
-type Tab = 'upcoming' | 'all' | 'add';
+type Tab = 'upcoming' | 'all' | 'circle' | 'add';
 
 /* ====================== مساعدات التاريخ ====================== */
 
@@ -45,7 +44,7 @@ function formatCountdown(days: number): { label: string; color: string } {
 
 const EMPTY_FORM = {
   personName: '',
-  relation: 'صديق',
+  relation: '',
   occasionName: 'ذكرى زواج',
   customOccasion: '',
   date: '',
@@ -56,7 +55,7 @@ const EMPTY_FORM = {
 
 export default function Occasions() {
   const core = useCore();
-  const { occasions } = core.state;
+  const { occasions, relations } = core.state;
 
   const [tab, setTab] = useState<Tab>('upcoming');
   const [form, setForm] = useState(EMPTY_FORM);
@@ -64,6 +63,15 @@ export default function Occasions() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [hint, setHint] = useState('');
+
+  /* دائرة التواصل (منقولة من صفحة النوم) */
+  const [relName, setRelName] = useState('');
+  const [relDelete, setRelDelete] = useState<{ id: string; label: string } | null>(null);
+  const handleAddRel = () => {
+    if (relName.trim() === '') { setHint('اكتب اسم الشخص'); return; }
+    core.addRelation(relName);
+    setRelName('');
+  };
 
   /* ترتيب المناسبات بالأقرب */
   const sorted = useMemo(() => {
@@ -155,10 +163,10 @@ export default function Occasions() {
       {hint && <div className="hint-msg ok" style={{ marginBottom: 8 }}>{hint}</div>}
 
       <div className="subtabs">
-        {(['upcoming', 'all', 'add'] as Tab[]).map((t) => (
+        {(['upcoming', 'all', 'circle', 'add'] as Tab[]).map((t) => (
           <button key={t} className={tab === t ? 'subtab active' : 'subtab'}
             onClick={() => { setTab(t); if (t !== 'add') { setEditing(null); setForm(EMPTY_FORM); } }}>
-            {t === 'upcoming' ? '📅 القادمة' : t === 'all' ? '👥 الكل' : editing ? '✏️ تعديل' : '➕ إضافة'}
+            {t === 'upcoming' ? '📅 القادمة' : t === 'all' ? '🎉 المناسبات' : t === 'circle' ? '🤝 دائرة التواصل' : editing ? '✏️ تعديل' : '➕ إضافة'}
           </button>
         ))}
       </div>
@@ -204,23 +212,73 @@ export default function Occasions() {
         </>
       )}
 
+      {/* ===== تبويب دائرة التواصل (منقول من صفحة النوم) ===== */}
+      {tab === 'circle' && (
+        <>
+          <div className="card" style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '1.7rem' }}>🤝</div>
+            <div style={{ fontWeight: 800, color: 'var(--primary)', marginTop: 6 }}>
+              مين تواصلت معه هالأسبوع؟ ومين ودّك تتصل فيه؟
+            </div>
+            <div style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', marginTop: 4 }}>
+              صِل رحمك واهتم بناسك — وتابع مين كلّمت
+            </div>
+          </div>
+
+          <div className="add-row">
+            <input
+              className="input-field"
+              placeholder="اسم شخص ودّك تتواصل معه..."
+              value={relName}
+              maxLength={60}
+              onChange={(e) => setRelName(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleAddRel()}
+            />
+            <button className="btn-primary" onClick={handleAddRel}>إضافة</button>
+          </div>
+
+          {relations.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-icon">🤝</div>
+              <div>ما فيه أحد بالقائمة بعد — ضيف اسم شخص ودّك تتواصل معه</div>
+            </div>
+          ) : (
+            relations.map((r) => (
+              <div className="rel-card" key={r.id}>
+                <div className="rel-avatar">{r.name.charAt(0)}</div>
+                <div className="rel-info">
+                  <div className="rel-name">{r.name}</div>
+                  <div className={r.contacted ? 'rel-status done' : 'rel-status'}>
+                    {r.contacted ? '✓ تواصلت معه هالأسبوع' : 'لسا ما تواصلت'}
+                  </div>
+                </div>
+                <button
+                  className={r.contacted ? 'rel-check-btn done' : 'rel-check-btn'}
+                  aria-label="تأكيد التواصل"
+                  onClick={() => core.toggleRelation(r.id)}
+                >
+                  {r.contacted ? '✓' : ''}
+                </button>
+                <button
+                  className="icon-btn"
+                  aria-label="حذف"
+                  onClick={() => setRelDelete({ id: r.id, label: r.name })}
+                >
+                  🗑️
+                </button>
+              </div>
+            ))
+          )}
+        </>
+      )}
+
       {/* ===== تبويب الإضافة/التعديل ===== */}
       {tab === 'add' && (
         <div className="card">
           <div className="auth-field">
             <label>اسم الشخص *</label>
-            <input className="input-field" placeholder="مثال: أحمد" value={form.personName}
+            <input className="input-field" placeholder="مثال: سعود" value={form.personName}
               onChange={(e) => setForm((f) => ({ ...f, personName: e.target.value }))} maxLength={60} />
-          </div>
-
-          <div className="auth-field">
-            <label>نوع العلاقة</label>
-            <div className="chip-row" style={{ flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
-              {RELATIONS.map((r) => (
-                <button key={r} className={form.relation === r ? 'chip active' : 'chip'}
-                  onClick={() => setForm((f) => ({ ...f, relation: r }))}>{r}</button>
-              ))}
-            </div>
           </div>
 
           <div className="auth-field">
@@ -280,6 +338,16 @@ export default function Occasions() {
         onConfirm={() => { if (deleteId) core.removeOccasion(deleteId); setDeleteId(null); }}
         onCancel={() => setDeleteId(null)}
       />
+
+      <ConfirmDialog
+        open={relDelete !== null}
+        title="تأكيد الحذف"
+        message={`تبي تشيل «${relDelete?.label ?? ''}» من دائرة التواصل؟`}
+        confirmLabel="حذف"
+        danger
+        onConfirm={() => { if (relDelete) core.removeRelation(relDelete.id); setRelDelete(null); }}
+        onCancel={() => setRelDelete(null)}
+      />
     </div>
   );
 }
@@ -297,7 +365,7 @@ function OccasionCard({ o, expanded, onExpand, onEdit, onDelete }: {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} onClick={onExpand}>
         <div>
           <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>{item.occasionName} — {item.personName}</div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{item.relation} {item.isAnnual ? '· يتكرر سنوياً' : ''}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{[item.relation, item.isAnnual ? 'يتكرر سنوياً' : ''].filter(Boolean).join(' · ')}</div>
         </div>
         <div style={{ textAlign: 'left', minWidth: 80 }}>
           <div style={{ fontWeight: 800, fontSize: '0.88rem', color: cd.color }}>{cd.label}</div>
