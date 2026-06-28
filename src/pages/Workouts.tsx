@@ -1,5 +1,5 @@
 /* ===================================================================
-   Workouts.tsx — التمارين (مجمّعة): الكابتن سعود · جدولي المخصص · الإرشادات
+   Workouts.tsx — التمارين (مجمّعة): المدرب سعود · جدولي المخصص · الإرشادات
    تدمج الصفحات الثلاث في تبويبات داخل صفحة واحدة.
    =================================================================== */
 
@@ -18,7 +18,7 @@ export default function Workouts() {
       <BackButton to="/" />
       <div className="subtabs">
         <button className={tab === 'captain' ? 'subtab active' : 'subtab'} onClick={() => setTab('captain')}>
-          🏋️ الكابتن سعود
+          🏋️ المدرب سعود
         </button>
         <button className={tab === 'custom' ? 'subtab active' : 'subtab'} onClick={() => setTab('custom')}>
           🛠️ جدولي

@@ -586,7 +586,7 @@ interface CoreContextValue {
   addCustomCategory: (name: string, icon: string, note: string) => boolean;
   removeCustomCategory: (id: string, name: string) => void;
   setBudget: (category: string, amount: number) => void;
-  // ===== جدول الكابتن سعود =====
+  // ===== جدول المدرب سعود =====
   toggleExerciseDone: (key: string) => void; // +15 عند الإكمال
   setWorkoutDayImage: (dayId: string, image: string) => void;
   recordPR: (key: string, weight: number) => boolean; // true إذا رقم شخصي جديد
