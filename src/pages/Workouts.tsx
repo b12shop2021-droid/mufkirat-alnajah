@@ -1,15 +1,25 @@
 /* ===================================================================
    Workouts.tsx — التمارين (مجمّعة): المدرب سعود · جدولي المخصص · الإرشادات
-   تدمج الصفحات الثلاث في تبويبات داخل صفحة واحدة.
+   تبويبات داخل صفحة واحدة. كل تبويب يُحمّل كسولاً (lazy) عند فتحه فقط
+   — فالحزمة الأولية أخف بكثير ولا تُحمّل التبويبات غير المعروضة.
    =================================================================== */
 
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import BackButton from '../components/BackButton';
-import CaptainWorkout from './CaptainWorkout';
-import CustomWorkout from './CustomWorkout';
-import Guidelines from './Guidelines';
+
+const CaptainWorkout = lazy(() => import('./CaptainWorkout'));
+const CustomWorkout = lazy(() => import('./CustomWorkout'));
+const Guidelines = lazy(() => import('./Guidelines'));
 
 type Tab = 'captain' | 'custom' | 'guide';
+
+function TabLoader() {
+  return (
+    <div className="card" style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '28px 0' }}>
+      ⏳ لحظة...
+    </div>
+  );
+}
 
 export default function Workouts() {
   const [tab, setTab] = useState<Tab>('captain');
@@ -27,9 +37,11 @@ export default function Workouts() {
           📋 الإرشادات
         </button>
       </div>
-      {tab === 'captain' && <CaptainWorkout embedded />}
-      {tab === 'custom' && <CustomWorkout embedded />}
-      {tab === 'guide' && <Guidelines embedded />}
+      <Suspense fallback={<TabLoader />}>
+        {tab === 'captain' && <CaptainWorkout embedded />}
+        {tab === 'custom' && <CustomWorkout embedded />}
+        {tab === 'guide' && <Guidelines embedded />}
+      </Suspense>
     </div>
   );
 }

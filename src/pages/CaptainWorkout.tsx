@@ -125,12 +125,14 @@ export default function CaptainWorkout({ embedded = false }: { embedded?: boolea
           alt={`صورة تمارين ${day.label}`}
           width={760}
           height={1602}
+          loading="lazy"
+          decoding="async"
         />
       )}
 
       <label className="day-photo">
         {dayImage ? (
-          <img src={dayImage} alt="صورة اليوم" />
+          <img src={dayImage} alt="صورة اليوم" loading="lazy" decoding="async" />
         ) : (
           <div className="day-photo-empty">
             <div style={{ fontSize: '1.8rem' }}>📸</div>
