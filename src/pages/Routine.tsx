@@ -26,6 +26,26 @@ const PRIO_CLASS: Record<Priority, string> = {
 /* هل التاريخ المخزّن هو اليوم؟ */
 const isToday = (d: string): boolean => d === todayStr();
 
+/* تاريخ YYYY-MM-DD قبل offset يوماً */
+const dateBefore = (offset: number): string => {
+  const d = new Date();
+  d.setDate(d.getDate() - offset);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
+/* سلسلة العادة: أيام متتالية أُنجزت فيها (تبدأ من اليوم إن أُنجز، وإلا من أمس) */
+const habitStreak = (history?: string[]): number => {
+  if (!history || history.length === 0) return 0;
+  const set = new Set(history);
+  const start = set.has(todayStr()) ? 0 : 1;
+  let n = 0;
+  for (let i = start; ; i++) {
+    if (set.has(dateBefore(i))) n++;
+    else break;
+  }
+  return n;
+};
+
 /* القسم الافتراضي حسب الساعة: قبل 16:00 صباحي، بعدها مسائي */
 const defaultSection = (): RoutineSection =>
   new Date().getHours() < 16 ? 'morning' : 'evening';
@@ -107,6 +127,7 @@ export default function Routine() {
     const taskDone = isToday(task.doneDate);
     const isEditing = editKey === `task|${task.id}`;
     const isOpen = expanded.has(task.id);
+    const streak = habitStreak(task.history);
     return (
       <div key={task.id}>
         <div className="task-row">
@@ -138,6 +159,11 @@ export default function Routine() {
               onClick={() => startEdit(`task|${task.id}`, task.text)}
             >
               {task.text}
+            </span>
+          )}
+          {streak >= 2 && (
+            <span className="habit-streak" title={`${streak} يوم متتالي على هالعادة`}>
+              🔥 {streak}
             </span>
           )}
           <button

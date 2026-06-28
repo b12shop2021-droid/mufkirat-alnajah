@@ -4950,6 +4950,18 @@ select {
 .ic-notes        { background-position: 80%  100%; }
 .ic-quran        { background-position: 100% 100%; }
 
+/* سلسلة كل عادة في الروتين */
+.habit-streak {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--celebrate);
+  background: color-mix(in srgb, var(--celebrate) 14%, transparent);
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
 /* ===== رؤى التحليلات الإضافية ===== */
 .insight-line {
   font-size: 0.84rem;

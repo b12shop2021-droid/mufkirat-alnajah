@@ -84,6 +84,7 @@ export interface RoutineTask {
   text: string;
   priority: Priority;
   doneDate: string; // YYYY-MM-DD لآخر يوم أُنجزت فيه
+  history?: string[]; // تواريخ الأيام التي أُنجزت فيها (لحساب سلسلة العادة)
   subtasks: SubTask[];
 }
 
@@ -776,7 +777,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       if (!t) return;
       updateSection(section, (list) => [
         ...list,
-        { id: crypto.randomUUID(), text: t, priority: 'med', doneDate: '', subtasks: [] },
+        { id: crypto.randomUUID(), text: t, priority: 'med', doneDate: '', history: [], subtasks: [] },
       ]);
     },
     [updateSection],
@@ -818,7 +819,11 @@ export function CoreProvider({ children }: { children: ReactNode }) {
           if (task.id !== id) return task;
           const wasDone = task.doneDate === today;
           if (!wasDone) earned = true;
-          return { ...task, doneDate: wasDone ? '' : today };
+          const hist = task.history ?? [];
+          const history = wasDone
+            ? hist.filter((d) => d !== today)
+            : hist.includes(today) ? hist : [...hist, today];
+          return { ...task, doneDate: wasDone ? '' : today, history };
         });
         const allDone =
           nextList.length > 0 && nextList.every((t) => t.doneDate === today);
@@ -1779,7 +1784,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     d.setDate(d.getDate() + 21);
     const deadline = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     const mk = (text: string): RoutineTask => ({
-      id: crypto.randomUUID(), text, priority: 'med', doneDate: '', subtasks: [],
+      id: crypto.randomUUID(), text, priority: 'med', doneDate: '', history: [], subtasks: [],
     });
     setState((s) => {
       if (s.challenge21Started) return s;
