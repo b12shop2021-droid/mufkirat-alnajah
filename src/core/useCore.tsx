@@ -215,6 +215,7 @@ export interface CoreState {
   timeCapsule: TimeCapsule | null;
   occasions: OccasionEntry[];
   shoppingList: ShoppingItem[];
+  quickShopItems: string[]; // عناصر الإضافة السريعة في المشتريات (قابلة للتعديل)
   expenses: ExpenseEntry[];
   customCategories: CustomCategory[];
   budgets: Record<string, number>; // اسم الفئة → السقف الشهري
@@ -407,6 +408,7 @@ const DEFAULT_STATE: CoreState = {
   guidelinesImage: null,
   occasions: [],
   shoppingList: [],
+  quickShopItems: ['حليب', 'خبز', 'ماء', 'بنزين', 'بيض', 'أرز', 'دجاج', 'خضار', 'فاكهة', 'تمر'],
   pledges: [],
   timeCapsule: null,
   expenses: [],
@@ -475,6 +477,7 @@ const loadState = (): CoreState => {
       timeCapsule: parsed.timeCapsule ?? null,
       occasions: parsed.occasions ?? [],
       shoppingList: parsed.shoppingList ?? [],
+      quickShopItems: parsed.quickShopItems ?? DEFAULT_STATE.quickShopItems,
       expenses: parsed.expenses ?? [],
       customCategories: parsed.customCategories ?? [],
       budgets: parsed.budgets ?? DEFAULT_STATE.budgets,
@@ -588,7 +591,11 @@ interface CoreContextValue {
   addExpense: (entry: Omit<ExpenseEntry, 'id'>) => void;
   removeExpense: (id: string) => void;
   addCustomCategory: (name: string, icon: string, note: string) => boolean;
+  updateCustomCategory: (id: string, name: string, icon: string, note: string) => boolean;
   removeCustomCategory: (id: string, name: string) => void;
+  addQuickShopItem: (text: string) => boolean;
+  updateQuickShopItem: (index: number, text: string) => boolean;
+  removeQuickShopItem: (index: number) => void;
   setBudget: (category: string, amount: number) => void;
   // ===== جدول المدرب سعود =====
   toggleExerciseDone: (key: string) => void; // +15 عند الإكمال
@@ -1574,6 +1581,36 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     setState((s) => ({ ...s, shoppingList: s.shoppingList.filter((i) => !i.bought) }));
   }, []);
 
+  /* ===== عناصر الإضافة السريعة (قابلة للتعديل) ===== */
+  const addQuickShopItem = useCallback((text: string): boolean => {
+    const t = clean(text);
+    if (!t) return false;
+    let ok = false;
+    setState((s) => {
+      if (s.quickShopItems.includes(t)) return s;
+      ok = true;
+      return { ...s, quickShopItems: [...s.quickShopItems, t] };
+    });
+    return ok;
+  }, []);
+
+  const updateQuickShopItem = useCallback((index: number, text: string): boolean => {
+    const t = clean(text);
+    if (!t) return false;
+    let ok = false;
+    setState((s) => {
+      if (index < 0 || index >= s.quickShopItems.length) return s;
+      if (s.quickShopItems.some((q, i) => i !== index && q === t)) return s; // مكرر
+      ok = true;
+      return { ...s, quickShopItems: s.quickShopItems.map((q, i) => (i === index ? t : q)) };
+    });
+    return ok;
+  }, []);
+
+  const removeQuickShopItem = useCallback((index: number) => {
+    setState((s) => ({ ...s, quickShopItems: s.quickShopItems.filter((_, i) => i !== index) }));
+  }, []);
+
   const addExpense = useCallback((entry: Omit<ExpenseEntry, 'id'>) => {
     setState((s) => ({
       ...s,
@@ -1619,6 +1656,40 @@ export function CoreProvider({ children }: { children: ReactNode }) {
         };
       });
       return added;
+    },
+    [],
+  );
+
+  /* تعديل فئة مخصصة (الاسم/الإيموجي/الملاحظة) — يعيد false إذا الاسم الجديد مكرر/فارغ.
+     عند تغيير الاسم: تُنقل ميزانيتها وتُحدَّث المصاريف المرتبطة بها. */
+  const updateCustomCategory = useCallback(
+    (id: string, name: string, icon: string, note: string): boolean => {
+      const nm = clean(name);
+      if (!nm) return false;
+      let ok = false;
+      setState((s) => {
+        const cat = s.customCategories.find((c) => c.id === id);
+        if (!cat) return s;
+        const oldName = cat.name;
+        /* تحقّق التكرار مع غيرها (مع السماح ببقاء نفس الاسم) */
+        if (nm !== oldName && (s.customCategories.some((c) => c.id !== id && c.name === nm) || nm in s.budgets)) {
+          return s;
+        }
+        ok = true;
+        const customCategories = s.customCategories.map((c) =>
+          c.id === id ? { ...c, name: nm, icon: clean(icon) || '🏷️', note: clean(note) } : c,
+        );
+        /* نقل الميزانية والمصاريف عند تغيّر الاسم */
+        let budgets = s.budgets;
+        let expenses = s.expenses;
+        if (nm !== oldName) {
+          const { [oldName]: limit, ...rest } = s.budgets;
+          budgets = { ...rest, [nm]: limit ?? 200 };
+          expenses = s.expenses.map((e) => (e.category === oldName ? { ...e, category: nm } : e));
+        }
+        return { ...s, customCategories, budgets, expenses };
+      });
+      return ok;
     },
     [],
   );
@@ -1935,7 +2006,11 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       addExpense,
       removeExpense,
       addCustomCategory,
+      updateCustomCategory,
       removeCustomCategory,
+      addQuickShopItem,
+      updateQuickShopItem,
+      removeQuickShopItem,
       setBudget,
       toggleExerciseDone,
       setWorkoutDayImage,
@@ -2027,7 +2102,11 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       addExpense,
       removeExpense,
       addCustomCategory,
+      updateCustomCategory,
       removeCustomCategory,
+      addQuickShopItem,
+      updateQuickShopItem,
+      removeQuickShopItem,
       setBudget,
       toggleExerciseDone,
       setWorkoutDayImage,

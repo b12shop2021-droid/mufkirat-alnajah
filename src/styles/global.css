@@ -2972,6 +2972,11 @@ select {
   margin-bottom: 8px;
 }
 
+.cat-manage-item.editing {
+  outline: 2px solid var(--primary);
+  background: color-mix(in srgb, var(--primary) 8%, var(--bg));
+}
+
 .cat-manage-emoji {
   font-size: 1.2rem;
   width: 34px;

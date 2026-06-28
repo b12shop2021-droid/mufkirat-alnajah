@@ -25,12 +25,10 @@ const BASE_CATS: { name: string; icon: string; color: string }[] = [
 const CUSTOM_COLORS = ['var(--chart-7)', 'var(--chart-6)', 'var(--chart-5)', 'var(--chart-4)'];
 const monthOf = (d: string) => d.slice(0, 7);
 
-/* مشتريات متكررة شائعة */
-const QUICK_ITEMS = ['حليب', 'خبز', 'ماء', 'بنزين', 'بيض', 'أرز', 'دجاج', 'خضار', 'فاكهة', 'تمر'];
 
 export default function Expenses() {
   const core = useCore();
-  const { expenses, customCategories, budgets, shoppingList } = core.state;
+  const { expenses, customCategories, budgets, shoppingList, quickShopItems } = core.state;
 
   const [tab, setTab] = useState<Tab>('overview');
   const [adding, setAdding] = useState(false);
@@ -51,7 +49,13 @@ export default function Expenses() {
   });
   const [sadaqah, setSadaqah] = useState('');
   const [newCat, setNewCat] = useState({ icon: '', name: '', note: '' });
+  const [editingCat, setEditingCat] = useState<string | null>(null); // id الفئة قيد التعديل
   const [budgetForm, setBudgetForm] = useState({ category: 'طعام', amount: '' });
+  /* تعديل عناصر الإضافة السريعة */
+  const [editQuick, setEditQuick] = useState(false);
+  const [newQuick, setNewQuick] = useState('');
+  const [quickEditIdx, setQuickEditIdx] = useState<number | null>(null);
+  const [quickEditVal, setQuickEditVal] = useState('');
 
   /* بيانات الفئات المجمّعة (أساسية + مخصصة) */
   const allCats = [
@@ -149,6 +153,14 @@ export default function Expenses() {
   };
 
   const handleAddCat = () => {
+    if (editingCat) {
+      const ok = core.updateCustomCategory(editingCat, newCat.name, newCat.icon, newCat.note);
+      if (!ok) { setHint('⚠️ اسم الفئة فاضي أو مكرر'); return; }
+      setNewCat({ icon: '', name: '', note: '' });
+      setEditingCat(null);
+      setHint('✏️ عدّلنا الفئة');
+      return;
+    }
     const ok = core.addCustomCategory(newCat.name, newCat.icon, newCat.note);
     if (!ok) {
       setHint('⚠️ اسم الفئة فاضي أو مكرر');
@@ -156,6 +168,23 @@ export default function Expenses() {
     }
     setNewCat({ icon: '', name: '', note: '' });
     setHint('🏷️ ضِفنا الفئة');
+  };
+
+  const startEditCat = (c: { id: string; icon: string; name: string; note: string }) => {
+    setEditingCat(c.id);
+    setNewCat({ icon: c.icon, name: c.name, note: c.note });
+  };
+
+  /* عناصر الإضافة السريعة */
+  const handleAddQuick = () => {
+    if (!core.addQuickShopItem(newQuick)) { setHint('⚠️ العنصر فاضي أو مكرر'); return; }
+    setNewQuick('');
+  };
+  const handleSaveQuickEdit = () => {
+    if (quickEditIdx === null) return;
+    if (!core.updateQuickShopItem(quickEditIdx, quickEditVal)) { setHint('⚠️ العنصر فاضي أو مكرر'); return; }
+    setQuickEditIdx(null);
+    setQuickEditVal('');
   };
 
   const sadaqahTotal = catTotals['صندوق الخير'] || 0;
@@ -366,12 +395,15 @@ export default function Expenses() {
                 </div>
               )}
               {customCategories.map((c) => (
-                <div className="cat-manage-item" key={c.id}>
+                <div className={editingCat === c.id ? 'cat-manage-item editing' : 'cat-manage-item'} key={c.id}>
                   <div className="cat-manage-emoji">{c.icon}</div>
                   <div className="cat-manage-info">
                     <div className="cat-manage-name">{c.name}</div>
                     {c.note && <div className="cat-manage-note">📌 {c.note}</div>}
                   </div>
+                  <button className="icon-btn" aria-label="تعديل" onClick={() => startEditCat(c)}>
+                    ✏️
+                  </button>
                   <button className="icon-btn" aria-label="حذف" onClick={() => core.removeCustomCategory(c.id, c.name)}>
                     🗑️
                   </button>
@@ -393,8 +425,16 @@ export default function Expenses() {
                 value={newCat.note} onChange={(e) => setNewCat({ ...newCat, note: e.target.value })}
               />
               <button className="btn-primary" style={{ width: '100%', marginTop: 12 }} onClick={handleAddCat}>
-                ➕ إضافة الفئة
+                {editingCat ? '💾 حفظ تعديل الفئة' : '➕ إضافة الفئة'}
               </button>
+              {editingCat && (
+                <button
+                  className="btn-ghost" style={{ width: '100%', marginTop: 8 }}
+                  onClick={() => { setEditingCat(null); setNewCat({ icon: '', name: '', note: '' }); }}
+                >
+                  إلغاء التعديل
+                </button>
+              )}
             </div>
           )}
         </>
@@ -445,16 +485,55 @@ export default function Expenses() {
               <button className="btn-primary" style={{ padding: '0 16px' }}
                 onClick={() => { if (shopInput.trim()) { core.addShoppingItem(shopInput); setShopInput(''); } }}>+</button>
             </div>
-            {/* مشتريات متكررة */}
+            {/* مشتريات متكررة (قابلة للتعديل) */}
             <div style={{ marginTop: 10 }}>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', marginBottom: 6 }}>إضافة سريعة:</div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                {QUICK_ITEMS.map((item) => (
-                  <button key={item} className="chip"
-                    onClick={() => core.addShoppingItem(item)}
-                    style={{ fontSize: '0.75rem' }}>{item}</button>
-                ))}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>إضافة سريعة:</span>
+                <button
+                  style={{ fontSize: '0.72rem', color: 'var(--primary)', fontWeight: 800, background: 'none', border: 'none', cursor: 'pointer' }}
+                  onClick={() => { setEditQuick((v) => !v); setQuickEditIdx(null); }}
+                >
+                  {editQuick ? '✓ تم' : '✏️ تعديل'}
+                </button>
               </div>
+
+              {!editQuick ? (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {quickShopItems.map((item) => (
+                    <button key={item} className="chip"
+                      onClick={() => core.addShoppingItem(item)}
+                      style={{ fontSize: '0.75rem' }}>{item}</button>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {quickShopItems.map((item, i) =>
+                      quickEditIdx === i ? (
+                        <span key={i} style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                          <input className="input-field" style={{ marginBottom: 0, width: 110, padding: '4px 8px', fontSize: '0.75rem' }}
+                            value={quickEditVal} maxLength={60} autoFocus
+                            onChange={(e) => setQuickEditVal(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSaveQuickEdit()} />
+                          <button className="chip" style={{ fontSize: '0.75rem' }} onClick={handleSaveQuickEdit}>✓</button>
+                        </span>
+                      ) : (
+                        <span key={i} className="chip" style={{ fontSize: '0.75rem', display: 'inline-flex', gap: 6, alignItems: 'center' }}>
+                          <span onClick={() => { setQuickEditIdx(i); setQuickEditVal(item); }} style={{ cursor: 'pointer' }}>{item}</span>
+                          <span onClick={() => core.removeQuickShopItem(i)} style={{ cursor: 'pointer', color: 'var(--danger)' }}>✕</span>
+                        </span>
+                      ),
+                    )}
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                    <input className="input-field" placeholder="عنصر سريع جديد..." value={newQuick}
+                      onChange={(e) => setNewQuick(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleAddQuick()}
+                      style={{ flex: 1, marginBottom: 0 }} maxLength={60} />
+                    <button className="btn-primary" style={{ padding: '0 16px' }} onClick={handleAddQuick}>+</button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
