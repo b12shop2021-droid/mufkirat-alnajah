@@ -96,12 +96,24 @@ export default function Home() {
   const intentionToday = s.dailyIntention?.date === today ? s.dailyIntention.text : '';
   const [intentDraft, setIntentDraft] = useState('');
   const [editingIntent, setEditingIntent] = useState(false);
+  const [showIntentArchive, setShowIntentArchive] = useState(false);
   const saveIntent = () => {
     if (intentDraft.trim() === '') return;
     core.setDailyIntention(intentDraft);
     setIntentDraft('');
     setEditingIntent(false);
   };
+
+  /* عدّاد الالتزام: كم يوم متتالي (شامل اليوم) كتبت فيه نِيّة */
+  const intentStreak = (() => {
+    const dates = new Set(s.intentionLog.map((e) => e.date));
+    let n = 0;
+    for (let i = 0; ; i++) {
+      if (dates.has(dateBefore(i))) n++;
+      else break;
+    }
+    return n;
+  })();
 
   const tiles = [
     { icon: '/icons/more.webp', label: 'الهمّة', to: '/more', streak: s.streak.current },
@@ -160,7 +172,30 @@ export default function Home() {
               </button>
             </div>
             <div className="intent-text">«{intentionToday}»</div>
-            <div className="intent-sub">عليها نمشي اليوم — وش تبي أكثر من كذا 💪</div>
+            <div className="intent-sub">
+              عليها نمشي اليوم — وش تبي أكثر من كذا 💪
+              {intentStreak > 1 && <> · 🔥 {intentStreak} يوم متتالي على نِيّة</>}
+            </div>
+            {s.intentionLog.length > 1 && (
+              <>
+                <button
+                  className="intent-archive-toggle"
+                  onClick={() => setShowIntentArchive((v) => !v)}
+                >
+                  📿 نِيّاتك السابقة ({s.intentionLog.length}) {showIntentArchive ? '▲' : '▾'}
+                </button>
+                {showIntentArchive && (
+                  <div className="intent-archive">
+                    {s.intentionLog.filter((e) => e.date !== today).slice(0, 14).map((e) => (
+                      <div className="intent-archive-row" key={e.date}>
+                        <span className="intent-archive-date">{e.date}</span>
+                        <span className="intent-archive-text">«{e.text}»</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
           </>
         ) : (
           <>

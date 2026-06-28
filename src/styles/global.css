@@ -3988,6 +3988,44 @@ select {
   opacity: 0.5;
 }
 
+.intent-archive-toggle {
+  margin-top: 12px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: var(--deep);
+  background: color-mix(in srgb, var(--deep) 8%, transparent);
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+
+.intent-archive {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.intent-archive-row {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  font-size: 0.78rem;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.intent-archive-date {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.intent-archive-text {
+  color: var(--text);
+  font-weight: 600;
+}
+
 .home-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -4877,4 +4915,42 @@ select {
 .ic-mood         { background-position: 60%  100%; }
 .ic-notes        { background-position: 80%  100%; }
 .ic-quran        { background-position: 100% 100%; }
+
+/* ===== رؤى التحليلات الإضافية ===== */
+.insight-line {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+.insight-line strong { color: var(--primary); }
+
+.energy-avg-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.energy-avg-num {
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.energy-avg-num span {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+.energy-avg-bar-bg {
+  flex: 1;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+}
+.energy-avg-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--warning), var(--primary));
+  transition: width 0.5s;
+}
 

@@ -95,14 +95,67 @@ export default function Analytics() {
     { icon: '🔥', name: 'لا يُقهر', earned: s.streak.longest >= 30 },
   ];
 
-  /* خط الاتجاه: نشاط 7 أيام كنسبة */
+  /* سلسلة الاتجاه حسب الفلتر: أسبوع=7 أيام · شهر=4 أسابيع · سنة=12 شهر */
+  const MONTH_ABBR = ['ينا', 'فبر', 'مار', 'أبر', 'ماي', 'يون', 'يول', 'أغس', 'سبت', 'أكت', 'نوف', 'ديس'];
+  const trend = (() => {
+    if (filter === 'week') {
+      return Array.from({ length: 7 }, (_, i) => {
+        const date = dateBefore(6 - i);
+        return { label: DAY_NAMES[new Date(date + 'T00:00:00').getDay()], val: hasOn(date) };
+      });
+    }
+    if (filter === 'month') {
+      return Array.from({ length: 4 }, (_, wk) => {
+        let sum = 0;
+        for (let d = 0; d < 7; d++) sum += hasOn(dateBefore((3 - wk) * 7 + d));
+        return { label: `أسبوع ${wk + 1}`, val: sum };
+      });
+    }
+    return Array.from({ length: 12 }, (_, mi) => {
+      const dt = new Date();
+      dt.setMonth(dt.getMonth() - (11 - mi));
+      const prefix = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}`;
+      const val =
+        s.moodLog.filter((m) => m.date.startsWith(prefix)).length +
+        s.gratitudeLog.filter((g) => g.date.startsWith(prefix)).length +
+        s.quranMinutes.filter((q) => q.date.startsWith(prefix)).length +
+        s.notes.filter((n) => n.date.startsWith(prefix)).length +
+        s.sleepLog.filter((e) => e.date.startsWith(prefix)).length;
+      return { label: MONTH_ABBR[dt.getMonth()], val };
+    });
+  })();
+
+  /* خط الاتجاه (مقياس Y ديناميكي حسب أعلى قيمة) */
   const w = 320, h = 140, pad = 20;
-  const linePts = week.map((d, i) => {
-    const x = pad + i * ((w - 2 * pad) / 6);
-    const y = h - pad - (d.val / 5) * (h - 2 * pad);
-    return { x, y };
-  });
+  const trendMax = Math.max(1, ...trend.map((t) => t.val));
+  const stepX = trend.length > 1 ? (w - 2 * pad) / (trend.length - 1) : 0;
+  const linePts = trend.map((d, i) => ({
+    x: pad + i * stepX,
+    y: h - pad - (d.val / trendMax) * (h - 2 * pad),
+  }));
   const linePath = linePts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
+  const trendTitle = filter === 'week' ? 'آخر 7 أيام' : filter === 'month' ? 'آخر 4 أسابيع' : 'آخر 12 شهر';
+
+  /* أنشط أيام الأسبوع (متوسط النشاط لكل يوم عبر آخر 8 أسابيع) */
+  const wdTotals = Array(7).fill(0);
+  const wdCounts = Array(7).fill(0);
+  for (let off = 0; off < 56; off++) {
+    const date = dateBefore(off);
+    const wd = new Date(date + 'T00:00:00').getDay();
+    wdTotals[wd] += hasOn(date);
+    wdCounts[wd] += 1;
+  }
+  const wdAvg = wdTotals.map((t, i) => (wdCounts[i] ? t / wdCounts[i] : 0));
+  const wdMax = Math.max(0.0001, ...wdAvg);
+  const bestWd = wdAvg.indexOf(Math.max(...wdAvg));
+  const FULL_DAYS = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+  const hasAnyActivity = wdTotals.some((t) => t > 0);
+
+  /* متوسط الطاقة ضمن الفترة المختارة */
+  const moodInRange = s.moodLog.filter((m) => inRange(m.date));
+  const avgEnergy = moodInRange.length
+    ? Math.round((moodInRange.reduce((a, m) => a + m.energy, 0) / moodInRange.length) * 10) / 10
+    : 0;
 
   return (
     <div className="page">
@@ -151,19 +204,55 @@ export default function Analytics() {
       </div>
 
       <div className="card">
-        <div className="section-title">📈 نشاطك خلال آخر 7 أيام</div>
+        <div className="section-title">📈 نشاطك خلال {trendTitle}</div>
         <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="xMidYMid meet">
-          <path d={linePath} fill="none" stroke="var(--primary)" strokeWidth={2.5} strokeLinecap="round" />
+          <path d={linePath} fill="none" stroke="var(--primary)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
           {linePts.map((p, i) => (
             <circle key={i} cx={p.x} cy={p.y} r={4} fill="var(--primary)" />
           ))}
-          {week.map((d, i) => (
-            <text key={i} x={pad + i * ((w - 2 * pad) / 6)} y={h - 4} fontSize={9} fill="var(--text-secondary)" textAnchor="middle">
-              {d.day}
+          {trend.map((d, i) => (
+            <text key={i} x={linePts[i].x} y={h - 4} fontSize={8} fill="var(--text-secondary)" textAnchor="middle">
+              {d.label}
             </text>
           ))}
         </svg>
       </div>
+
+      {hasAnyActivity && (
+        <div className="card">
+          <div className="section-title">🗓️ أنشط أيام أسبوعك</div>
+          <div className="insight-line">أكثر يوم تنشط فيه عادةً: <strong>{FULL_DAYS[bestWd]}</strong></div>
+          <div className="habit-activity-grid" style={{ marginTop: 10 }}>
+            {wdAvg.map((v, i) => (
+              <div className="ha-col" key={i}>
+                <div className="ha-bar-wrap">
+                  <div
+                    className="ha-bar"
+                    style={{ height: `${Math.max(6, (v / wdMax) * 70)}px`, opacity: i === bestWd ? 1 : 0.55 }}
+                  />
+                </div>
+                <div className="ha-day">{DAY_NAMES[i]}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {moodInRange.length > 0 && (
+        <div className="card">
+          <div className="section-title">⚡ متوسط طاقتك ({filter === 'week' ? 'الأسبوع' : filter === 'month' ? 'الشهر' : 'السنة'})</div>
+          <div className="energy-avg-row">
+            <div className="energy-avg-num">{avgEnergy}<span>/10</span></div>
+            <div className="energy-avg-bar-bg">
+              <div className="energy-avg-bar-fill" style={{ width: `${(avgEnergy / 10) * 100}%` }} />
+            </div>
+          </div>
+          <div className="insight-line" style={{ marginTop: 8 }}>
+            من {moodInRange.length} يوم سجّلت فيه مزاجك
+            {avgEnergy >= 7 ? ' — طاقتك ممتازة، كفو! 🔥' : avgEnergy >= 4 ? ' — طاقتك متوسطة، تقدر ترفعها 💪' : ' — طاقتك منخفضة، ريّح نفسك واهتم بنومك 😴'}
+          </div>
+        </div>
+      )}
 
       <div className="card">
         <div className="section-title">🎯 الأهداف</div>

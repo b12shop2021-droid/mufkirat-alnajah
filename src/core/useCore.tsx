@@ -227,6 +227,7 @@ export interface CoreState {
   calorieGoal: number;
   weeklyChallenge: WeeklyChallengeState | null; // التحدّي الأسبوعي العشوائي
   dailyIntention: { date: string; text: string } | null; // نِيّة اليوم — كلمة/جملة تركيز
+  intentionLog: { date: string; text: string }[]; // أرشيف النِيّات السابقة (لكل يوم)
 }
 
 /* حالة التحدّي الأسبوعي — الفهرس يُشتق من معرّف الأسبوع، ونخزّن الإتمام فقط */
@@ -428,6 +429,7 @@ const DEFAULT_STATE: CoreState = {
   calorieGoal: 2000,
   weeklyChallenge: null,
   dailyIntention: null,
+  intentionLog: [],
 };
 
 /* قراءة الحالة المحفوظة من localStorage مع دمج آمن مع الافتراضي */
@@ -485,6 +487,7 @@ const loadState = (): CoreState => {
       calorieGoal: parsed.calorieGoal ?? 2000,
       weeklyChallenge: parsed.weeklyChallenge ?? null,
       dailyIntention: parsed.dailyIntention ?? null,
+      intentionLog: parsed.intentionLog ?? [],
     };
   } catch {
     return DEFAULT_STATE;
@@ -1829,12 +1832,21 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     fireConfetti();
   }, [state.weeklyChallenge, addXP]);
 
-  /* نِيّة اليوم — كلمة/جملة تركيز يكتبها المستخدم؛ مكافأة + احتفال أول مرة باليوم فقط */
+  /* نِيّة اليوم — كلمة/جملة تركيز يكتبها المستخدم؛ مكافأة + احتفال أول مرة باليوم فقط.
+     تُحفظ أيضاً في الأرشيف (سجل لكل يوم) لتتبّع الالتزام. */
   const setDailyIntention = useCallback((text: string) => {
     const t = clean(text);
     const today = todayStr();
     const isFirstToday = state.dailyIntention?.date !== today;
-    setState((s) => ({ ...s, dailyIntention: t ? { date: today, text: t } : null }));
+    setState((s) => {
+      const log = s.intentionLog.filter((e) => e.date !== today);
+      if (t) log.push({ date: today, text: t });
+      return {
+        ...s,
+        dailyIntention: t ? { date: today, text: t } : null,
+        intentionLog: log.sort((a, b) => (a.date < b.date ? 1 : -1)),
+      };
+    });
     if (t && isFirstToday) {
       addXP(5);
       fireConfetti();
