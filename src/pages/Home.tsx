@@ -117,14 +117,14 @@ export default function Home() {
 
   const tiles = [
     { icon: '/icons/more.webp', label: 'الهمّة', to: '/more', streak: s.streak.current },
-    { icon: '/icons/routine.webp', label: 'العادات', to: '/routine' },
+    { icon: '/icons/routine.webp', label: 'روتيني الصح', to: '/routine' },
     { icon: '/icons/goals.webp', label: 'الأهداف', to: '/goals' },
-    { icon: '/icons/expenses.webp', label: 'المصاريف', to: '/expenses' },
-    { icon: '/icons/workouts.webp', label: 'التمارين', to: '/workouts' },
-    { icon: '/icons/meals.webp', label: 'الوجبات', to: '/meals' },
-    { icon: '/icons/analytics.webp', label: 'التحليلات', to: '/analytics' },
-    { icon: '/icons/pledges.webp', label: 'العهود', to: '/pledges' },
-    { icon: '/icons/achievements.webp', label: 'إنجازاتي', to: '/achievements' },
+    { icon: '/icons/expenses.webp', label: 'دراهمي', to: '/expenses' },
+    { icon: '/icons/workouts.webp', label: 'قم لـ جيم', to: '/workouts' },
+    { icon: '/icons/meals.webp', label: 'أكلي الصح', to: '/meals' },
+    { icon: '/icons/analytics.webp', label: 'إنجازي الأسبوعي', to: '/analytics' },
+    { icon: '/icons/pledges.webp', label: 'وعد الحر دين', to: '/pledges' },
+    { icon: '/icons/achievements.webp', label: 'منصة التتويج', to: '/achievements' },
   ];
 
   return (

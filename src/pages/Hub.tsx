@@ -19,22 +19,22 @@ const TABS: { id: Tab; label: string; links: Link[] }[] = [
     id: 'daily',
     label: '☀️ حياتي',
     links: [
-      { iconClass: 'ic-routine',  label: 'الروتين الصباحي/المسائي',   to: '/routine' },
-      { iconClass: 'ic-mood',     label: 'المزاج ولحظة الفخر',        to: '/mood'   },
-      { iconClass: 'ic-notes',    label: 'الملاحظات وشكر اليوم',      to: '/notes'  },
-      { iconClass: 'ic-quran',    label: 'القرآن والتقويم',            to: '/quran'  },
-      { iconClass: 'ic-meals',    label: 'الوجبات',                   to: '/meals'  },
+      { iconClass: 'ic-routine',  label: 'روتيني الصح',               to: '/routine' },
+      { iconClass: 'ic-mood',     label: 'مودي اليوم',                to: '/mood'   },
+      { iconClass: 'ic-notes',    label: 'فضفضة وامتنان',             to: '/notes'  },
+      { iconClass: 'ic-quran',    label: 'وردي اليومي',               to: '/quran'  },
+      { iconClass: 'ic-meals',    label: 'أكلي الصح',                 to: '/meals'  },
     ],
   },
   {
     id: 'journey',
     label: '🔥 التزامي',
     links: [
-      { iconClass: 'ic-workouts',    label: 'التمارين',                   to: '/workouts' },
+      { iconClass: 'ic-workouts',    label: 'قم لـ جيم',                  to: '/workouts' },
       { iconClass: 'ic-mood',        label: 'العلاقات والمناسبات',        to: '/occasions'  },
-      { iconClass: 'ic-timecapsule', label: 'العهود وصندوق الزمن',        to: '/pledges'  },
+      { iconClass: 'ic-timecapsule', label: 'وعد الحر دين',               to: '/pledges'  },
       { iconClass: 'ic-habits',      label: 'مؤقت البومودورو',            to: '/pomodoro' },
-      { iconClass: 'ic-expenses',    label: 'المصاريف',                   to: '/expenses' },
+      { iconClass: 'ic-expenses',    label: 'دراهمي',                     to: '/expenses' },
     ],
   },
   {
@@ -49,14 +49,14 @@ const TABS: { id: Tab; label: string; links: Link[] }[] = [
     id: 'achievements',
     label: '🏆 فخري',
     links: [
-      { iconClass: 'ic-achievements', label: 'إنجازاتي (السلسلة والمعرض والمحطات)', to: '/achievements' },
-      { iconClass: 'ic-analytics',    label: 'التحليلات',                           to: '/analytics'    },
+      { iconClass: 'ic-achievements', label: 'منصة التتويج (السلسلة والمعرض والمحطات)', to: '/achievements' },
+      { iconClass: 'ic-analytics',    label: 'إنجازي الأسبوعي',                       to: '/analytics'    },
     ],
   },
 ];
 
 const EXTRA: Link[] = [
-  { iconClass: 'ic-settings', label: 'الإعدادات والإشعارات', to: '/settings' },
+  { iconClass: 'ic-settings', label: 'الكواليس والأمان', to: '/settings' },
 ];
 
 export default function Hub() {
@@ -76,7 +76,7 @@ export default function Hub() {
         onClick={() => navigate('/pledges')}
       >
         <span className="app-icon sm ic-pledges hub-link-icon" style={{ background: 'rgba(255,255,255,0.18)', borderRadius: 10 }} />
-        <div className="hub-link-label">العهود (قطع العادات السلبية)</div>
+        <div className="hub-link-label">وعد الحر دين (قطع العادات السلبية)</div>
         <div className="hub-link-arrow" style={{ color: '#fff' }}>‹</div>
       </button>
 
