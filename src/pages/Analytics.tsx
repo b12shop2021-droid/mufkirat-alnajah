@@ -33,16 +33,18 @@ export default function Analytics() {
     ? Math.round((doneToday / routineToday.length) * 100)
     : 0;
 
-  /* مرصد الانسجام — يُقاس تلقائياً من نشاطك الفعلي عبر مجالات التطبيق (آخر 7 أيام) */
-  const within7 = (date: string) => date >= dateBefore(6);
+  /* مرصد الانسجام — يُقاس تلقائياً من نشاطك الفعلي عبر كل مجالات التطبيق (آخر 7 أيام).
+     كل مجال يجمّع الأقسام المرتبطة به ليعكس التطبيق كاملاً. */
+  const within7 = (date?: string) => !!date && date >= dateBefore(6);
   const domains = [
     { name: 'العبادة', active: s.quranMinutes.some((q) => within7(q.date)) },
-    { name: 'الصحة', active: s.workoutLogs.some((l) => within7(l.date)) || s.sleepLog.some((e) => within7(e.date)) },
+    { name: 'الصحة', active: s.workoutLogs.some((l) => within7(l.date)) || s.sleepLog.some((e) => within7(e.date)) || s.meals.some((m) => within7(m.date)) },
     { name: 'الامتنان', active: s.gratitudeLog.some((g) => within7(g.date)) },
     { name: 'المزاج', active: s.moodLog.some((m) => within7(m.date)) },
-    { name: 'الإنتاجية', active: [...s.routine.morning, ...s.routine.evening].some((t) => within7(t.doneDate)) },
+    { name: 'الإنتاجية', active: [...s.routine.morning, ...s.routine.evening].some((t) => within7(t.doneDate)) || s.notes.some((n) => within7(n.date)) || s.intentionLog.some((e) => within7(e.date)) },
+    { name: 'الطموح', active: s.goals.some((g) => !g.completed) || s.pledges.length > 0 },
     { name: 'المال', active: s.expenses.some((e) => within7(e.date)) },
-    { name: 'العلاقات', active: s.relations.some((r) => r.contacted) },
+    { name: 'العلاقات', active: s.relations.some((r) => within7(r.contactedDate)) },
   ];
   const activeDomains = domains.filter((d) => d.active).length;
   const coverage = Math.round((activeDomains / domains.length) * 100);

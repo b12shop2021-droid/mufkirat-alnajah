@@ -164,6 +164,7 @@ export interface Relation {
   id: string;
   name: string;
   contacted: boolean;
+  contactedDate?: string; // YYYY-MM-DD آخر يوم تواصلت فيه (لقياس آخر 7 أيام)
 }
 
 export interface WeeklyReview {
@@ -1407,7 +1408,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
         relations: s.relations.map((r) => {
           if (r.id !== id) return r;
           nowContacted = !r.contacted;
-          return { ...r, contacted: !r.contacted };
+          return { ...r, contacted: nowContacted, contactedDate: nowContacted ? todayStr() : undefined };
         }),
       }));
       if (nowContacted) addXP(5);
