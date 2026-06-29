@@ -131,8 +131,9 @@ export default function Analytics() {
   const w = 320, h = 140, pad = 20;
   const trendMax = Math.max(1, ...trend.map((t) => t.val));
   const stepX = trend.length > 1 ? (w - 2 * pad) / (trend.length - 1) : 0;
+  /* RTL: الأقدم يمين واليوم يسار ليتّسق مع بقية المخططات (الأعمدة) */
   const linePts = trend.map((d, i) => ({
-    x: pad + i * stepX,
+    x: w - pad - i * stepX,
     y: h - pad - (d.val / trendMax) * (h - 2 * pad),
   }));
   const linePath = linePts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
