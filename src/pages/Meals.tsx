@@ -90,7 +90,10 @@ export default function Meals() {
       <BackButton />
       <XPBar />
 
-      <h1 className="section-title">🍽️ الوجبات</h1>
+      <h1 className="section-title">🍽️ أكلي الصح</h1>
+      <div className="intro-card">
+        💊 <strong>الجرعة المحفزة:</strong> وش طبخت اليوم؟ رتب وجباتك وخلك خفيف ونشيط.
+      </div>
 
       {/* السعرات اليومية */}
       <div className="card">

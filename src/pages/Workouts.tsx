@@ -26,6 +26,10 @@ export default function Workouts() {
   return (
     <div className="page">
       <BackButton to="/" />
+      <h1 className="section-title">🏋️ وحش النادي</h1>
+      <div className="intro-card">
+        💊 <strong>الجرعة المحفزة:</strong> شد حيلك مع المدرب سعود، الصحة هيبة والنشاط طاقة!
+      </div>
       <div className="subtabs">
         <button className={tab === 'captain' ? 'subtab active' : 'subtab'} onClick={() => setTab('captain')}>
           🏋️ المدرب سعود

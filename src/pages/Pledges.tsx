@@ -126,6 +126,11 @@ export default function Pledges() {
     <div className="page">
       <BackButton />
 
+      <h1 className="section-title">🛡️ وعد الحر دين</h1>
+      <div className="intro-card">
+        💊 <strong>الجرعة المحفزة:</strong> عهد قطعته على نفسك؟ التزم به ولا تتراجع خطوة ورا.
+      </div>
+
       <div className="subtabs">
         <button className={tab === 'pledges' ? 'subtab active' : 'subtab'} onClick={() => setTab('pledges')}>
           🛡️ العهود

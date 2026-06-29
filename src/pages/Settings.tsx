@@ -21,6 +21,8 @@ export default function Settings() {
     <div className="page">
       <BackButton />
 
+      <h1 className="section-title">⚙️ الكواليس والأمان</h1>
+
       <ProfileSection setHint={setHint} />
       <AppearanceSection />
       <NotificationsSection setHint={setHint} />

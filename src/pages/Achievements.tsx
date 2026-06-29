@@ -27,6 +27,10 @@ export default function Achievements() {
     <div className="page">
       <BackButton to="/" />
       <XPBar />
+      <h1 className="section-title">🏆 منصة التتويج</h1>
+      <div className="intro-card">
+        💊 <strong>الجرعة المحفزة:</strong> وثّق بطولاتك وإنجازاتك، لأنك تعبت وتستاهل تحتفل بها!
+      </div>
       <div className="subtabs">
         <button className={tab === 'streak' ? 'subtab active' : 'subtab'} onClick={() => setTab('streak')}>
           🔥 السلسلة والألقاب

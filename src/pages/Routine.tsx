@@ -279,6 +279,11 @@ export default function Routine() {
       <BackButton />
       <XPBar />
 
+      <h1 className="section-title">☀️ روتيني الصح</h1>
+      <div className="intro-card">
+        💊 <strong>الجرعة المحفزة:</strong> رتب يومك، حبة حبة، وكل خطوة تقربك للي تبيه!
+      </div>
+
       <div className="routine-tabs">
         <button
           className={active === 'morning' ? 'routine-tab active' : 'routine-tab'}

@@ -74,6 +74,11 @@ export default function NotesGratitude() {
       <BackButton />
       <XPBar />
 
+      <h1 className="section-title">📝 فضفضة وامتنان</h1>
+      <div className="intro-card">
+        💊 <strong>الجرعة المحفزة:</strong> اكتب اللي بخاطرك، واشكر ربك على النعم البسيطة اللي تسعدك.
+      </div>
+
       <div className="subtabs">
         <button
           className={tab === 'notes' ? 'subtab active' : 'subtab'}

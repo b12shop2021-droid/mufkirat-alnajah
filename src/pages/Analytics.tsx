@@ -164,6 +164,11 @@ export default function Analytics() {
       <BackButton />
       <XPBar />
 
+      <h1 className="section-title">📊 إنجازي الأسبوعي</h1>
+      <div className="intro-card">
+        💊 <strong>الجرعة المحفزة:</strong> شف أرقامك وتطورك وتأكد إنك جالس تبدع وتتقدم!
+      </div>
+
       <div className="harmony-card">
         <div className="harmony-label">⚖️ مرصد الانسجام</div>
         <div className="harmony-status">{harmony.txt}</div>
