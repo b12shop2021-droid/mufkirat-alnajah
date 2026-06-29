@@ -3,7 +3,8 @@
    ملخص نشاط آخر 7 أيام بتصميم بطاقة احتفالية + زر نسخ/مشاركة.
    =================================================================== */
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { toPng } from 'html-to-image';
 import { useCore } from '../core/useCore';
 
 const toDateStr = (d: Date): string =>
@@ -21,6 +22,25 @@ export default function WeeklyWrapped({ embedded = false }: { embedded?: boolean
   const core = useCore();
   const s = core.state;
   const [copied, setCopied] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [saving, setSaving] = useState(false);
+
+  /* حفظ البطاقة كصورة PNG */
+  const handleSaveImage = async () => {
+    if (!cardRef.current) return;
+    setSaving(true);
+    try {
+      const url = await toPng(cardRef.current, { pixelRatio: 2, cacheBust: true });
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `qissati-${start}.png`;
+      a.click();
+    } catch {
+      /* فشل التحويل — نتجاهل بهدوء */
+    } finally {
+      setSaving(false);
+    }
+  };
 
   /* نطاق الأسبوع الماضي (آخر 7 أيام بما فيها اليوم) */
   const days = Array.from({ length: 7 }, (_, i) => dateBefore(6 - i));
@@ -102,7 +122,7 @@ ${encouragement}
 
   return (
     <div className={embedded ? '' : 'page'}>
-      <div className="wrapped-card">
+      <div className="wrapped-card" ref={cardRef}>
         <div className="wrapped-header">
           <div className="wrapped-title">قصة الأسبوع ✨</div>
           <div className="wrapped-range">{fmt(start)} — {fmt(end)}</div>
@@ -157,11 +177,14 @@ ${encouragement}
         </div>
 
         <div className="wrapped-msg">{encouragement}</div>
-
-        <button className={`wrapped-share-btn ${copied ? 'copied' : ''}`} onClick={handleShare}>
-          {copied ? '✅ نسخناها!' : '📤 شارك قصتك'}
-        </button>
       </div>
+
+      <button className={`wrapped-share-btn ${copied ? 'copied' : ''}`} onClick={handleShare}>
+        {copied ? '✅ نسخناها!' : '📤 شارك قصتك'}
+      </button>
+      <button className="wrapped-share-btn" style={{ marginTop: 8, background: 'var(--deep)' }} onClick={handleSaveImage} disabled={saving}>
+        {saving ? '⏳ نجهّز الصورة...' : '🖼️ احفظها كصورة'}
+      </button>
     </div>
   );
 }
