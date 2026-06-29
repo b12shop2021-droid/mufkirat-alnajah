@@ -856,12 +856,14 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     (section: RoutineSection, id: string) => {
       const today = todayStr();
       let earned = false;
+      let undone = false;
       setState((s) => {
         const list = s.routine[section];
         const nextList = list.map((task) => {
           if (task.id !== id) return task;
           const wasDone = task.doneDate === today;
           if (!wasDone) earned = true;
+          else undone = true;
           const hist = task.history ?? [];
           const history = wasDone
             ? hist.filter((d) => d !== today)
@@ -871,11 +873,15 @@ export function CoreProvider({ children }: { children: ReactNode }) {
         const allDone =
           nextList.length > 0 && nextList.every((t) => t.doneDate === today);
         if (earned && allDone) fireConfetti();
-        return { ...s, routine: { ...s.routine, [section]: nextList } };
+        // إلغاء التحديد يخصم النقاط ليبقى الرصيد متسقاً (لا تُكسب نقاط لمهمة غير منجزة)
+        const xp = undone ? Math.max(0, s.xp - 5) : s.xp;
+        return { ...s, xp, routine: { ...s.routine, [section]: nextList } };
       });
       if (earned) {
         addXP(5);
         markStreakToday();
+      } else if (undone) {
+        xpRef.current = Math.max(0, xpRef.current - 5); // مزامنة المرجع مع الخصم
       }
     },
     [addXP, markStreakToday],
