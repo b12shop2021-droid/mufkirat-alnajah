@@ -10,7 +10,10 @@
   "background_color": "#FAFAFA",
   "theme_color": "#05AD98",
   "icons": [
-    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
     {
@@ -18,28 +21,28 @@
       "short_name": "الروتين",
       "description": "افتح روتين الصباح مباشرة",
       "url": "/routine",
-      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+      "icons": [{ "src": "/icon-192.png", "sizes": "any" }]
     },
     {
       "name": "سجّل مزاجك",
       "short_name": "المزاج",
       "description": "سجّل مزاجك اليومي",
       "url": "/mood",
-      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+      "icons": [{ "src": "/icon-192.png", "sizes": "any" }]
     },
     {
       "name": "أهدافي",
       "short_name": "الأهداف",
       "description": "تابع أهدافك",
       "url": "/goals",
-      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+      "icons": [{ "src": "/icon-192.png", "sizes": "any" }]
     },
     {
       "name": "البومودورو",
       "short_name": "تركيز",
       "description": "ابدأ جلسة تركيز",
       "url": "/pomodoro",
-      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+      "icons": [{ "src": "/icon-192.png", "sizes": "any" }]
     }
   ]
 }

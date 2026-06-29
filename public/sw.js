@@ -43,8 +43,8 @@ self.addEventListener('message', (e) => {
       self.registration.showNotification(title, {
         body,
         tag,
-        icon: '/icon.svg',
-        badge: '/icon.svg',
+        icon: '/icon-192.png',
+        badge: '/icon-192.png',
         dir: 'rtl',
         lang: 'ar',
         vibrate: [200, 100, 200],
