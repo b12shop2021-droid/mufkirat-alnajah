@@ -25,7 +25,7 @@ const dateBefore = (offset: number): string => {
 export default function SleepRelations({ embedded = false }: { embedded?: boolean }) {
   const core = useCore();
   const { sleepLog } = core.state;
-  const fem = core.state.profile.gender === 'female';
+  const nick = core.state.profile.nickname || core.state.profile.name || 'بطل';
 
   const [sleepTime, setSleepTime] = useState('23:30');
   const [wakeTime, setWakeTime] = useState('06:00');
@@ -98,7 +98,7 @@ export default function SleepRelations({ embedded = false }: { embedded?: boolea
           </div>
         </div>
         <button className="btn-primary" style={{ width: '100%' }} onClick={handleSaveSleep}>
-          {saveLabel(fem)}
+          {saveLabel(nick)}
         </button>
       </div>
 

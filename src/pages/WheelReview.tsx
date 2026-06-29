@@ -14,7 +14,7 @@ import ConfirmDialog from '../components/ConfirmDialog';
 export default function WheelReview({ embedded = false }: { embedded?: boolean }) {
   const core = useCore();
   const { weeklyReviews } = core.state;
-  const fem = core.state.profile.gender === 'female';
+  const nick = core.state.profile.nickname || core.state.profile.name || 'بطل';
 
   const [rev1, setRev1] = useState('');
   const [rev2, setRev2] = useState('');
@@ -75,7 +75,7 @@ export default function WheelReview({ embedded = false }: { embedded?: boolean }
         />
 
         <button className="btn-primary" style={{ width: '100%', marginTop: 16 }} onClick={handleSave}>
-          {saveLabel(fem)}
+          {saveLabel(nick)}
         </button>
       </div>
 

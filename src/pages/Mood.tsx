@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { useCore, todayStr } from '../core/useCore';
+import { saveLabel } from '../core/saveLabel';
 import XPBar from '../components/XPBar';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
@@ -135,7 +136,7 @@ export default function Mood() {
           style={{ width: '100%', marginTop: 16 }}
           onClick={handleSaveMood}
         >
-          كفو يا {nick} أنا قدها 💪
+          {saveLabel(nick)}
         </button>
       </div>
 
