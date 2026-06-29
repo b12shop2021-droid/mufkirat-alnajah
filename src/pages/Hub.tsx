@@ -41,7 +41,7 @@ const TABS: { id: Tab; label: string; links: Link[] }[] = [
     id: 'deep',
     label: '🌱 تطوّري',
     links: [
-      { iconClass: 'ic-selfdev',  label: 'تطوير الذات (الهوية والمراجعة)', to: '/self-dev' },
+      { iconClass: 'ic-selfdev',  label: 'نسختي الأفضل (الهوية والمراجعة)', to: '/self-dev' },
       { iconClass: 'ic-goals',    label: 'الأهداف',                       to: '/goals'    },
     ],
   },

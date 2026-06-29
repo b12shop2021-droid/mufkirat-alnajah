@@ -26,6 +26,10 @@ export default function SelfDev() {
     <div className="page">
       <BackButton to="/" />
       <XPBar />
+      <h1 className="section-title">🌱 نسختي الأفضل</h1>
+      <div className="intro-card">
+        💊 <strong>الجرعة المحفزة:</strong> مراجعة مع الذات عشان تبني الشخصية اللي تفتخر فيها قدام.
+      </div>
       <div className="subtabs">
         <button className={tab === 'identity' ? 'subtab active' : 'subtab'} onClick={() => setTab('identity')}>
           🪪 الهوية والدستور
