@@ -167,6 +167,12 @@ export default function Routine() {
               🔥 {streak}
             </span>
           )}
+          <button className="icon-btn reorder" aria-label="فوق" onClick={() => core.moveRoutineTask(active, task.id, -1)}>
+            ▲
+          </button>
+          <button className="icon-btn reorder" aria-label="تحت" onClick={() => core.moveRoutineTask(active, task.id, 1)}>
+            ▼
+          </button>
           <button
             className="icon-btn"
             aria-label="المهام الفرعية"

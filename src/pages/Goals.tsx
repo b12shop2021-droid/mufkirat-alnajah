@@ -207,6 +207,8 @@ export default function Goals() {
                     {step.text}
                   </span>
                 )}
+                <button className="icon-btn reorder" aria-label="فوق" onClick={() => core.moveGoalStep(goal.id, step.id, -1)}>▲</button>
+                <button className="icon-btn reorder" aria-label="تحت" onClick={() => core.moveGoalStep(goal.id, step.id, 1)}>▼</button>
                 <button
                   className="icon-btn" aria-label="حذف الخطوة"
                   onClick={() => setPendingDelete({ goalId: goal.id, stepId: step.id, label: step.text })}

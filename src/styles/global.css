@@ -4965,6 +4965,18 @@ select {
 .ic-notes        { background-position: 80%  100%; }
 .ic-quran        { background-position: 100% 100%; }
 
+/* أزرار إعادة الترتيب (▲▼) — صغيرة وخفيفة */
+.icon-btn.reorder {
+  font-size: 0.62rem;
+  padding: 2px 4px;
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+.icon-btn.reorder:active {
+  opacity: 1;
+  color: var(--primary);
+}
+
 /* سلسلة كل عادة في الروتين */
 .habit-streak {
   flex-shrink: 0;

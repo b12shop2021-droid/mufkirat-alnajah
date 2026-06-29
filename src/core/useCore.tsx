@@ -535,6 +535,8 @@ interface CoreContextValue {
   editGoalStep: (goalId: string, stepId: string, text: string) => void;
   toggleGoalStep: (goalId: string, stepId: string) => void;
   removeGoalStep: (goalId: string, stepId: string) => void;
+  moveGoalStep: (goalId: string, stepId: string, dir: -1 | 1) => void;
+  moveRoutineTask: (section: RoutineSection, id: string, dir: -1 | 1) => void;
   // ===== الجدول المخصص =====
   addCustomDay: () => void;
   renameCustomDay: (dayId: string, name: string) => void;
@@ -855,6 +857,21 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     [updateSection],
   );
 
+  /* إعادة ترتيب مهمة روتين (dir: -1 لأعلى، +1 لأسفل) */
+  const moveRoutineTask = useCallback(
+    (section: RoutineSection, id: string, dir: -1 | 1) => {
+      updateSection(section, (list) => {
+        const idx = list.findIndex((t) => t.id === id);
+        const j = idx + dir;
+        if (idx < 0 || j < 0 || j >= list.length) return list;
+        const next = [...list];
+        [next[idx], next[j]] = [next[j], next[idx]];
+        return next;
+      });
+    },
+    [updateSection],
+  );
+
   /* إضافة مهمة فرعية تحت مهمة */
   const addSubTask = useCallback(
     (section: RoutineSection, taskId: string, text: string) => {
@@ -1078,6 +1095,24 @@ export function CoreProvider({ children }: { children: ReactNode }) {
             ? { ...g, steps: g.steps.filter((st) => st.id !== stepId) }
             : g,
         ),
+      );
+    },
+    [updateGoals],
+  );
+
+  /* إعادة ترتيب خطوة هدف (dir: -1 لأعلى، +1 لأسفل) */
+  const moveGoalStep = useCallback(
+    (goalId: string, stepId: string, dir: -1 | 1) => {
+      updateGoals((list) =>
+        list.map((g) => {
+          if (g.id !== goalId) return g;
+          const idx = g.steps.findIndex((st) => st.id === stepId);
+          const j = idx + dir;
+          if (idx < 0 || j < 0 || j >= g.steps.length) return g;
+          const steps = [...g.steps];
+          [steps[idx], steps[j]] = [steps[j], steps[idx]];
+          return { ...g, steps };
+        }),
       );
     },
     [updateGoals],
@@ -1975,6 +2010,8 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       editGoalStep,
       toggleGoalStep,
       removeGoalStep,
+      moveGoalStep,
+      moveRoutineTask,
       addCustomDay,
       renameCustomDay,
       removeCustomDay,
@@ -2072,6 +2109,8 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       editGoalStep,
       toggleGoalStep,
       removeGoalStep,
+      moveGoalStep,
+      moveRoutineTask,
       addCustomDay,
       renameCustomDay,
       removeCustomDay,
