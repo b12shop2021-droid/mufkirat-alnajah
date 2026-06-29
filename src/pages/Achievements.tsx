@@ -10,8 +10,9 @@ import XPBar from '../components/XPBar';
 const Streak = lazy(() => import('./Streak'));
 const JourneyGallery = lazy(() => import('./JourneyGallery'));
 const WeeklyWrapped = lazy(() => import('./WeeklyWrapped'));
+const Badges = lazy(() => import('./Badges'));
 
-type Tab = 'streak' | 'journey' | 'wrapped';
+type Tab = 'streak' | 'badges' | 'journey' | 'wrapped';
 
 function TabLoader() {
   return (
@@ -35,6 +36,9 @@ export default function Achievements() {
         <button className={tab === 'streak' ? 'subtab active' : 'subtab'} onClick={() => setTab('streak')}>
           🔥 السلسلة والألقاب
         </button>
+        <button className={tab === 'badges' ? 'subtab active' : 'subtab'} onClick={() => setTab('badges')}>
+          🎖️ الأوسمة
+        </button>
         <button className={tab === 'journey' ? 'subtab active' : 'subtab'} onClick={() => setTab('journey')}>
           🖼️ المعرض والمحطات
         </button>
@@ -44,6 +48,7 @@ export default function Achievements() {
       </div>
       <Suspense fallback={<TabLoader />}>
         {tab === 'streak' && <Streak embedded />}
+        {tab === 'badges' && <Badges />}
         {tab === 'journey' && <JourneyGallery embedded />}
         {tab === 'wrapped' && <WeeklyWrapped embedded />}
       </Suspense>
