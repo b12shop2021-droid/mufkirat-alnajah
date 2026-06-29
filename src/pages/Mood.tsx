@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { useCore, todayStr } from '../core/useCore';
+import { saveLabel } from '../core/saveLabel';
 import XPBar from '../components/XPBar';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
@@ -41,6 +42,7 @@ const dateBefore = (offset: number): string => {
 export default function Mood() {
   const core = useCore();
   const today = todayStr();
+  const fem = core.state.profile.gender === 'female';
   const todayEntry = core.state.moodLog.find((m) => m.date === today);
 
   const [selected, setSelected] = useState<number | null>(
@@ -130,7 +132,7 @@ export default function Mood() {
           style={{ width: '100%', marginTop: 16 }}
           onClick={handleSaveMood}
         >
-          💾 حفظ مزاج اليوم
+          {saveLabel(fem)}
         </button>
       </div>
 

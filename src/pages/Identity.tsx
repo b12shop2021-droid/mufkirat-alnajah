@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { useCore } from '../core/useCore';
+import { saveLabel } from '../core/saveLabel';
 import XPBar from '../components/XPBar';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
@@ -12,6 +13,7 @@ import ConfirmDialog from '../components/ConfirmDialog';
 export default function Identity({ embedded = false }: { embedded?: boolean }) {
   const core = useCore();
   const { identityStatement, constitution } = core.state;
+  const fem = core.state.profile.gender === 'female';
 
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(identityStatement);
@@ -96,7 +98,7 @@ export default function Identity({ embedded = false }: { embedded?: boolean }) {
             style={{ width: '100%', marginTop: 12 }}
             onClick={handleSaveIdentity}
           >
-            💾 حفظ بطاقتي
+            {saveLabel(fem)}
           </button>
         </div>
       )}

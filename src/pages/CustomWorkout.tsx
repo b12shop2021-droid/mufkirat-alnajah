@@ -6,6 +6,7 @@
 
 import { useState } from 'react';
 import { useCore, type Difficulty } from '../core/useCore';
+import { saveLabel } from '../core/saveLabel';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { fireConfetti } from '../components/Confetti';
@@ -23,6 +24,7 @@ interface PendingDelete {
 export default function CustomWorkout({ embedded = false }: { embedded?: boolean }) {
   const core = useCore();
   const days = core.state.customWorkout;
+  const fem = core.state.profile.gender === 'female';
 
   const [openDay, setOpenDay] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(null);
@@ -284,7 +286,7 @@ export default function CustomWorkout({ embedded = false }: { embedded?: boolean
       {hint && <div className={`hint-msg ${hint.kind}`}>{hint.text}</div>}
 
       <button className="btn-primary" style={{ width: '100%' }} onClick={handleSave}>
-        تـم — حفظ برنامجي المخصّص
+        {saveLabel(fem)}
       </button>
 
       <ConfirmDialog

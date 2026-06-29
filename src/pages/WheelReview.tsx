@@ -6,6 +6,7 @@
 
 import { useState } from 'react';
 import { useCore } from '../core/useCore';
+import { saveLabel } from '../core/saveLabel';
 import XPBar from '../components/XPBar';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
@@ -14,7 +15,6 @@ export default function WheelReview({ embedded = false }: { embedded?: boolean }
   const core = useCore();
   const { weeklyReviews } = core.state;
   const fem = core.state.profile.gender === 'female';
-  const saveLabel = fem ? 'كفو عليّ يا زينة أنا قدها 💪' : 'كفو عليّ يا زيني أنا قدها 💪';
 
   const [rev1, setRev1] = useState('');
   const [rev2, setRev2] = useState('');
@@ -75,7 +75,7 @@ export default function WheelReview({ embedded = false }: { embedded?: boolean }
         />
 
         <button className="btn-primary" style={{ width: '100%', marginTop: 16 }} onClick={handleSave}>
-          {saveLabel}
+          {saveLabel(fem)}
         </button>
       </div>
 
