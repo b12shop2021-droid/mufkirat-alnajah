@@ -16,6 +16,7 @@ import {
 } from 'react';
 import { fireConfetti } from '../components/Confetti';
 import { fireXP } from '../components/XPToast';
+import { setSoundEnabled, playSuccess, playLevelUp } from './sound';
 import {
   WEEKLY_CHALLENGES,
   isoWeekKey,
@@ -193,6 +194,7 @@ export interface CoreState {
   dark: boolean;
   autoDark: boolean; // وضع ليلي تلقائي حسب الوقت
   fontScale: 'normal' | 'large'; // حجم الخط
+  soundOn: boolean; // أصوات النجاح (مطفأة افتراضياً)
   countedMemorizedJuz: number[]; // أجزاء حُسبت +50 لمنع التكرار
   countedReadJuz: number[]; // أجزاء حُسبت +20 لمنع التكرار
   quranJuz: Record<number, QuranStatus>; // حالة كل جزء
@@ -383,6 +385,7 @@ const DEFAULT_STATE: CoreState = {
   dark: false,
   autoDark: false,
   fontScale: 'normal',
+  soundOn: false,
   countedMemorizedJuz: [],
   countedReadJuz: [],
   quranJuz: {},
@@ -456,6 +459,7 @@ const loadState = (): CoreState => {
       streak: { ...DEFAULT_STATE.streak, ...parsed.streak },
       autoDark: parsed.autoDark ?? false,
       fontScale: parsed.fontScale ?? 'normal',
+      soundOn: parsed.soundOn ?? false,
       countedMemorizedJuz: parsed.countedMemorizedJuz ?? [],
       countedReadJuz: parsed.countedReadJuz ?? [],
       quranJuz: parsed.quranJuz ?? {},
@@ -523,6 +527,7 @@ interface CoreContextValue {
   setAccent: (accent: AccentName) => void;
   toggleDark: () => void;
   toggleAutoDark: () => void;
+  toggleSound: () => void;
   setFontScale: (scale: 'normal' | 'large') => void;
   markMemorizedJuz: (juz: number) => boolean; // true إذا احتُسبت لأول مرة
   // ===== الروتين =====
@@ -676,6 +681,11 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     root.setAttribute('data-font', state.fontScale);
   }, [state.accent, state.dark, state.autoDark, state.fontScale]);
 
+  /* مزامنة تفعيل أصوات النجاح مع الحالة (عند الإقلاع وأي تغيير) */
+  useEffect(() => {
+    setSoundEnabled(state.soundOn);
+  }, [state.soundOn]);
+
   /* المستوى: كل 100 نقطة = مستوى، بحد أقصى 7 مستويات */
   const level = useMemo(
     () => Math.min(Math.floor(state.xp / 100), LEVELS.length - 1),
@@ -709,6 +719,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     const lvlOf = (xp: number) => Math.min(Math.floor(xp / 100), LEVELS.length - 1);
     if (lvlOf(after) > lvlOf(before)) {
       fireConfetti();
+      playLevelUp();
       fireXP(safe, LEVELS[lvlOf(after)]);
     } else {
       fireXP(safe);
@@ -784,6 +795,16 @@ export function CoreProvider({ children }: { children: ReactNode }) {
   /* تبديل الوضع الليلي التلقائي */
   const toggleAutoDark = useCallback(() => {
     setState((s) => ({ ...s, autoDark: !s.autoDark }));
+  }, []);
+
+  /* تبديل أصوات النجاح (مع تشغيل نغمة عيّنة عند التفعيل) */
+  const toggleSound = useCallback(() => {
+    setState((s) => {
+      const next = !s.soundOn;
+      setSoundEnabled(next);
+      if (next) playSuccess(); // عيّنة فورية عند التفعيل
+      return { ...s, soundOn: next };
+    });
   }, []);
 
   /* ضبط حجم الخط */
@@ -879,6 +900,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       });
       if (earned) {
         navigator.vibrate?.(12); // نبضة خفيفة تعطي إحساس الإنجاز
+        playSuccess();
         addXP(5);
         markStreakToday();
       } else if (undone) {
@@ -2041,6 +2063,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       setAccent,
       toggleDark,
       toggleAutoDark,
+      toggleSound,
       setFontScale,
       markMemorizedJuz,
       addRoutineTask,
@@ -2145,6 +2168,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       setAccent,
       toggleDark,
       toggleAutoDark,
+      toggleSound,
       setFontScale,
       markMemorizedJuz,
       addRoutineTask,

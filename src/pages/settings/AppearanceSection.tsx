@@ -17,7 +17,7 @@ const ACCENTS: { id: AccentName; cls: string }[] = [
 
 export default function AppearanceSection() {
   const core = useCore();
-  const { dark, accent, autoDark, fontScale } = core.state;
+  const { dark, accent, autoDark, fontScale, soundOn } = core.state;
 
   return (
     <>
@@ -44,6 +44,17 @@ export default function AppearanceSection() {
           </div>
           <label className="switch">
             <input type="checkbox" checked={autoDark} onChange={core.toggleAutoDark} />
+            <span className="switch-slider" />
+          </label>
+        </div>
+        <div className="settings-row">
+          <div className="settings-icon">{soundOn ? '🔊' : '🔇'}</div>
+          <div className="settings-text">
+            <div className="settings-label">أصوات النجاح</div>
+            <div className="settings-sub">نغمة خفيفة عند إنجاز مهمة أو صعود مستوى</div>
+          </div>
+          <label className="switch">
+            <input type="checkbox" checked={soundOn} onChange={core.toggleSound} />
             <span className="switch-slider" />
           </label>
         </div>

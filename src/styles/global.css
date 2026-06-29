@@ -3709,15 +3709,20 @@ select {
   overflow: hidden;
   border-radius: var(--radius);
   margin-bottom: 18px;
-  background: linear-gradient(135deg, var(--primary-light), var(--primary) 55%, var(--deep));
+  /* توهّج ذهبي علوي يربط الثيم بالشعار الذهبي */
+  background:
+    radial-gradient(130% 90% at 92% -10%, rgba(232, 196, 95, 0.45), transparent 48%),
+    linear-gradient(135deg, var(--primary-light), var(--primary) 55%, var(--deep));
   padding: 24px 22px;
   box-shadow: var(--shadow-soft);
   color: #fff;
 }
 
-/* تدرّج ليلي أعمق مساءً */
+/* تدرّج ليلي أعمق مساءً — مع نفس التوهّج الذهبي */
 .home-hero.night {
-  background: var(--grad-night);
+  background:
+    radial-gradient(130% 90% at 92% -10%, rgba(232, 196, 95, 0.4), transparent 48%),
+    var(--grad-night);
 }
 
 /* طبقة النجوم المتلألئة في الترحيب */
