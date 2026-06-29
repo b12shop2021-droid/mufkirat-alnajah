@@ -508,6 +508,9 @@ const loadState = (): CoreState => {
 /* ===== سياق النواة ===== */
 interface CoreContextValue {
   state: CoreState;
+  storageFull: boolean; // امتلأ التخزين وفشل آخر حفظ — نُنبّه المستخدم
+  dismissStorageWarning: () => void;
+  exportData: () => void; // تنزيل نسخة احتياطية JSON (يستخدمه شريط تنبيه الامتلاء)
   level: number; // 0..6
   levelName: string;
   progress: number; // 0..100 تقدّم داخل المستوى الحالي
@@ -631,13 +634,34 @@ const CoreContext = createContext<CoreContextValue | null>(null);
 
 export function CoreProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<CoreState>(loadState);
+  /* امتلاء التخزين: لو فشل الحفظ ننبّه المستخدم بدل ما تضيع بياناته بصمت */
+  const [storageFull, setStorageFull] = useState(false);
 
   /* حفظ أي تغيير في الحالة تلقائياً */
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      setStorageFull((prev) => (prev ? false : prev)); // نجح الحفظ — ارفع التنبيه إن وُجد
     } catch {
-      /* تجاهل امتلاء التخزين بصمت */
+      /* امتلأ التخزين: لم تُحفظ التغييرات — نبّه المستخدم ليصدّر نسخة احتياطية */
+      setStorageFull(true);
+    }
+  }, [state]);
+
+  const dismissStorageWarning = useCallback(() => setStorageFull(false), []);
+
+  /* تصدير نسخة احتياطية كملف JSON يُنزّله المستخدم */
+  const exportData = useCallback(() => {
+    try {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `الهمّة-نسخة-${todayStr()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      /* تجاهل — نادر جداً */
     }
   }, [state]);
 
@@ -1995,6 +2019,9 @@ export function CoreProvider({ children }: { children: ReactNode }) {
   const value = useMemo<CoreContextValue>(
     () => ({
       state,
+      storageFull,
+      dismissStorageWarning,
+      exportData,
       level,
       levelName,
       progress,
@@ -2096,6 +2123,9 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     }),
     [
       state,
+      storageFull,
+      dismissStorageWarning,
+      exportData,
       level,
       levelName,
       progress,

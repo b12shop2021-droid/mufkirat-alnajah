@@ -8,6 +8,8 @@ import { Route, Switch } from 'wouter';
 import BottomNav from './components/BottomNav';
 import Confetti from './components/Confetti';
 import XPToast from './components/XPToast';
+import ErrorBoundary from './components/ErrorBoundary';
+import StorageBanner from './components/StorageBanner';
 import { useCore } from './core/useCore';
 import { isPinEnabled, isSessionUnlocked } from './core/pinUtils';
 import { scheduleNotifications, schedulePrayerNotifications } from './core/notificationScheduler';
@@ -95,6 +97,8 @@ export default function App() {
 
   return (
     <>
+      <StorageBanner />
+      <ErrorBoundary>
       <Suspense fallback={<Loader />}>
       <Switch>
         <Route path="/" component={Home} />
@@ -117,6 +121,7 @@ export default function App() {
         <Route component={NotFound} />
       </Switch>
       </Suspense>
+      </ErrorBoundary>
       <BottomNav />
       <Confetti />
       <XPToast />

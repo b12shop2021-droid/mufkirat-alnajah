@@ -5058,3 +5058,44 @@ select {
   transition: width 0.5s;
 }
 
+/* ===== شريط تنبيه امتلاء التخزين ===== */
+.storage-banner {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  background: var(--danger);
+  color: #fff;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+.storage-banner-text {
+  flex: 1;
+  min-width: 180px;
+  line-height: 1.5;
+}
+.storage-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.storage-banner-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+.storage-banner-btn.primary {
+  background: #fff;
+  color: var(--danger);
+}
+
