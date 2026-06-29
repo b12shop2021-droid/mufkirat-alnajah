@@ -4448,6 +4448,45 @@ select {
   line-height: 1.7;
 }
 
+/* ===== التنبيه الذكي السياقي (الرئيسية) ===== */
+.smart-nudge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, rgba(232, 196, 95, 0.18), rgba(5, 173, 152, 0.12));
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+}
+.smart-nudge-emoji {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+.smart-nudge-body {
+  flex: 1;
+  min-width: 0;
+}
+.smart-nudge-text {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.5;
+}
+.smart-nudge-action {
+  margin-top: 6px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+.smart-nudge-close {
+  align-self: flex-start;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  padding: 2px;
+}
+
 /* ===== بطاقات القوالب ===== */
 .tpl-head {
   display: flex;

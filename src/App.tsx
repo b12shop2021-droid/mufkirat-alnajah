@@ -65,9 +65,18 @@ export default function App() {
      لأن جدولة الـSW عبر setTimeout تنتهي بإغلاق التطبيق، فنعيد تسليحها كل جلسة */
   useEffect(() => {
     if (!state.session.loggedIn || !state.onboarded) return;
-    if (state.notifMaster) void scheduleNotifications({ masterEnabled: true, items: state.notifItems });
+    if (state.notifMaster) {
+      /* تذكير ذكي: لا نُرسل تنبيه السلسلة إذا أُنجز نشاط اليوم فعلاً */
+      const today = new Date();
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      const activeToday = state.streak.lastDoneDate === todayStr;
+      const items = activeToday
+        ? state.notifItems.filter((i) => i.id !== 'streak')
+        : state.notifItems;
+      void scheduleNotifications({ masterEnabled: true, items });
+    }
     if (state.prayerNotif) void schedulePrayerNotifications(state.prayerCoords);
-  }, [state.session.loggedIn, state.onboarded, state.notifMaster, state.notifItems, state.prayerNotif, state.prayerCoords]);
+  }, [state.session.loggedIn, state.onboarded, state.notifMaster, state.notifItems, state.prayerNotif, state.prayerCoords, state.streak.lastDoneDate]);
 
   /* بوابة المصادقة: بدون تسجيل دخول تُعرض صفحة الدخول فقط */
   if (!state.session.loggedIn) {

@@ -108,6 +108,57 @@ export default function Home() {
   const [intentDraft, setIntentDraft] = useState('');
   const [editingIntent, setEditingIntent] = useState(false);
   const [showIntentArchive, setShowIntentArchive] = useState(false);
+  const [nudgeDismissed, setNudgeDismissed] = useState(false);
+
+  /* تنبيه ذكي سياقي: يختار أهم تذكير حسب حالتك اليوم (الأعلى أولوية) */
+  const smartNudge = (() => {
+    // ١) السلسلة في خطر
+    if (s.streak.current > 0 && s.streak.lastDoneDate !== today) {
+      return {
+        emoji: '🔥',
+        text: `سلسلتك ${s.streak.current} ${s.streak.current === 1 ? 'يوم' : 'أيام'} بتنكسر! ${v('أنجز', 'أنجزي')} أي مهمة اليوم وثبّتها`,
+        to: '/routine',
+        action: 'كمّل روتينك',
+      };
+    }
+    // ٢) ما سجّل مزاجه اليوم
+    if (!s.moodLog.some((m) => m.date === today)) {
+      return {
+        emoji: '🙂',
+        text: `ما ${v('سجّلت', 'سجّلتِ')} مزاجك اليوم — كيف حالك؟ سجّله بثانية`,
+        to: '/mood',
+        action: 'سجّل مزاجك',
+      };
+    }
+    // ٣) رؤية استباقية: نوم قليل آخر ٥ أيام
+    const recent = s.sleepLog
+      .filter((e) => {
+        const diff = (Date.now() - new Date(e.date + 'T00:00:00').getTime()) / 86_400_000;
+        return diff >= 0 && diff < 5;
+      })
+      .map((e) => e.hours);
+    if (recent.length >= 3) {
+      const avg = recent.reduce((a, b) => a + b, 0) / recent.length;
+      if (avg < 6) {
+        return {
+          emoji: '😴',
+          text: `نومك آخر أيام ${avg.toFixed(1)} ساعة بس — طاقتك بتفرق لو ${v('تنام', 'تنامين')} بدري`,
+          to: '/routine',
+          action: 'روتين النوم',
+        };
+      }
+    }
+    // ٤) ما سجّل امتنان اليوم
+    if (!s.gratitudeLog.some((g) => g.date === today)) {
+      return {
+        emoji: '🙏',
+        text: `${v('سجّل', 'سجّلي')} شي تشكر الله عليه اليوم — يرفع مزاجك فعلاً`,
+        to: '/notes',
+        action: 'لحظة شكر',
+      };
+    }
+    return null;
+  })();
   const saveIntent = () => {
     if (intentDraft.trim() === '') return;
     core.setDailyIntention(intentDraft);
@@ -166,6 +217,19 @@ export default function Home() {
           <span className="home-progress-label">إنجاز يومك</span>
         </div>
       </div>
+
+      {smartNudge && !nudgeDismissed && (
+        <div className="smart-nudge">
+          <span className="smart-nudge-emoji">{smartNudge.emoji}</span>
+          <div className="smart-nudge-body">
+            <div className="smart-nudge-text">{smartNudge.text}</div>
+            <button className="smart-nudge-action" onClick={() => navigate(smartNudge.to)}>
+              {smartNudge.action} ←
+            </button>
+          </div>
+          <button className="smart-nudge-close" aria-label="إخفاء" onClick={() => setNudgeDismissed(true)}>✕</button>
+        </div>
+      )}
 
       <div className={intentionToday && !editingIntent ? 'intent-card set' : 'intent-card'}>
         {intentionToday && !editingIntent ? (
