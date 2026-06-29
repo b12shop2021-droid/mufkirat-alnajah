@@ -8,7 +8,7 @@ import { useCore, todayStr } from '../core/useCore';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
 
-const OCCASIONS_LIST = ['ذكرى زواج', 'تخرّج', 'عقد قران', 'مولود جديد', 'نجاح', 'عيد فطر', 'عيد أضحى', 'أخرى'];
+const OCCASIONS_LIST = ['ذكرى زواج', 'تخرّج', 'عقد قران', 'مولود جديد', 'نجاح', 'عيد فطر', 'عيد أضحى', 'اليوم الوطني 🇸🇦', 'يوم التأسيس', 'أخرى'];
 
 type Tab = 'upcoming' | 'all' | 'circle' | 'add';
 
@@ -277,7 +277,7 @@ export default function Occasions() {
         <div className="card">
           <div className="auth-field">
             <label>اسم الشخص *</label>
-            <input className="input-field" placeholder="مثال: سعود" value={form.personName}
+            <input className="input-field" placeholder="مثال: لمى أو سعود" value={form.personName}
               onChange={(e) => setForm((f) => ({ ...f, personName: e.target.value }))} maxLength={60} />
           </div>
 

@@ -106,6 +106,16 @@ export default function Login() {
             {mode === 'login' ? 'أنشئ حساباً' : 'سجّل دخولك'}
           </button>
         </div>
+
+        <div className="auth-divider"><span>أو</span></div>
+
+        <button
+          className="btn-ghost"
+          style={{ width: '100%' }}
+          onClick={() => core.login('')}
+        >
+          🚀 جرّب بدون حساب
+        </button>
       </div>
 
       <div className="auth-note">

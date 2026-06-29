@@ -26,7 +26,7 @@ import {
 /* ===== الأنواع المشتركة ===== */
 
 export type Gender = 'male' | 'female';
-export type AccentName = 'emerald' | 'ocean' | 'violet' | 'rose' | 'amber';
+export type AccentName = 'saudi' | 'gold' | 'emerald' | 'ocean' | 'violet' | 'rose' | 'amber';
 
 export interface Profile {
   name: string;
@@ -318,13 +318,13 @@ export interface TimeCapsule {
 
 /* ===== المستويات السبعة (المرجع الوحيد) ===== */
 export const LEVELS = [
-  'مبتدئ 🌱',
-  'متعلم 📚',
-  'منضبط ⚡',
-  'مثابر 💪',
+  'طاير 🐣',
+  'صاعد 🚀',
+  'نمر 🐅',
+  'وحش 🔥',
   'محترف 🎯',
-  'متميز 🌟',
-  'بطل النجاح 🏆',
+  'أسطورة 👑',
+  'قمة الهمّة 🏔️',
 ] as const;
 
 const STORAGE_KEY = 'mufkirat_core_v1';
@@ -379,7 +379,7 @@ const DEFAULT_STATE: CoreState = {
   },
   xp: 0,
   streak: { current: 0, longest: 0, lastDoneDate: '', freezeMonth: '' },
-  accent: 'emerald',
+  accent: 'saudi',
   dark: false,
   autoDark: false,
   fontScale: 'normal',
@@ -878,6 +878,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
         return { ...s, xp, routine: { ...s.routine, [section]: nextList } };
       });
       if (earned) {
+        navigator.vibrate?.(12); // نبضة خفيفة تعطي إحساس الإنجاز
         addXP(5);
         markStreakToday();
       } else if (undone) {

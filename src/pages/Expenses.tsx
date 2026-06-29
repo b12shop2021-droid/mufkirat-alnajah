@@ -232,7 +232,7 @@ export default function Expenses() {
             ))}
           </div>
           <input
-            className="input-field" type="number" min={0} placeholder="المبلغ (ر.س)"
+            className="input-field" type="number" min={0} placeholder="المبلغ (﷼)"
             style={{ marginBottom: 10 }}
             value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })}
           />
@@ -320,7 +320,7 @@ export default function Expenses() {
                 <div style={{ fontSize: '0.72rem', opacity: 0.8 }}>مبلغ بسيط ثابت أسبوعياً</div>
               </div>
             </div>
-            <div className="sadaqah-total">{sadaqahTotal} ر.س</div>
+            <div className="sadaqah-total">{sadaqahTotal} ﷼</div>
             <div style={{ fontSize: '0.72rem', opacity: 0.85 }}>إجمالي ما تصدّقت به</div>
             <div className="add-row">
               <input
@@ -348,7 +348,7 @@ export default function Expenses() {
                       <div className="budget-icon">{catMeta(cat).icon}</div>
                       <div className="budget-name">{cat}</div>
                     </div>
-                    <div className="budget-amounts"><strong>{spent}</strong> / {limit} ر.س</div>
+                    <div className="budget-amounts"><strong>{spent}</strong> / {limit} ﷼</div>
                   </div>
                   <div className="budget-bar-bg">
                     <div className={`budget-bar-fill ${cls}`} style={{ width: `${pct}%` }} />
@@ -370,7 +370,7 @@ export default function Expenses() {
             </select>
             <div className="add-row" style={{ marginTop: 0 }}>
               <input
-                className="input-field" type="number" min={0} placeholder="السقف الشهري (ر.س)"
+                className="input-field" type="number" min={0} placeholder="السقف الشهري (﷼)"
                 value={budgetForm.amount} onChange={(e) => setBudgetForm({ ...budgetForm, amount: e.target.value })}
               />
               <button
@@ -464,7 +464,7 @@ export default function Expenses() {
                     </div>
                   </div>
                   <div className={isIncome ? 'exp-amount income' : 'exp-amount expense'}>
-                    {isIncome ? '+' : '-'}{e.amount} ر.س
+                    {isIncome ? '+' : '-'}{e.amount} ﷼
                   </div>
                   <button className="icon-btn" aria-label="حذف" onClick={() => setDeleteId(e.id)}>
                     🗑️
@@ -586,7 +586,7 @@ export default function Expenses() {
                 <div style={{ fontWeight: 700, fontSize: '0.85rem', marginBottom: 10 }}>📊 ملخص هذا الشهر</div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
                   <span style={{ color: 'var(--text-secondary)', fontSize: '0.82rem' }}>إجمالي المصروف</span>
-                  <span style={{ fontWeight: 800, color: 'var(--danger)' }}>{total.toLocaleString()} ر.س</span>
+                  <span style={{ fontWeight: 800, color: 'var(--danger)' }}>{total.toLocaleString()} ﷼</span>
                 </div>
                 {topCats.map(([cat, amt]) => {
                   const pct = total > 0 ? Math.round((amt / total) * 100) : 0;
@@ -595,7 +595,7 @@ export default function Expenses() {
                     <div key={cat} style={{ marginBottom: 6 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: 2 }}>
                         <span>{catInfo?.icon ?? '📦'} {cat}</span>
-                        <span style={{ color: 'var(--text-secondary)' }}>{amt.toLocaleString()} ر.س · {pct}%</span>
+                        <span style={{ color: 'var(--text-secondary)' }}>{amt.toLocaleString()} ﷼ · {pct}%</span>
                       </div>
                       <div style={{ height: 6, background: 'var(--border)', borderRadius: 4 }}>
                         <div style={{ width: `${pct}%`, height: '100%', background: catInfo?.color ?? 'var(--primary)', borderRadius: 4, transition: 'width 0.5s' }} />

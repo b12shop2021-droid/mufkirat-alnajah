@@ -99,7 +99,9 @@
   --overlay: rgba(0, 0, 0, 0.6);
 }
 
-/* مبدّل الثيمات (5 ألوان) — يغيّر --primary فقط، يُحفظ بالاسم */
+/* مبدّل الثيمات — يغيّر --primary فقط، يُحفظ بالاسم */
+:root[data-accent='saudi']   { --primary: #006c35; --primary-light: #2e9c63; } /* أخضر العلم السعودي */
+:root[data-accent='gold']    { --primary: #b8860b; --primary-light: #e8c45f; } /* ذهبي يطابق الشعار */
 :root[data-accent='emerald'] { --primary: #05ad98; --primary-light: #2bcfce; }
 :root[data-accent='ocean']   { --primary: #2a7de1; --primary-light: #67b3ff; }
 :root[data-accent='violet']  { --primary: #7c5cff; --primary-light: #b9a6ff; }
@@ -2398,6 +2400,8 @@ select {
   border-color: var(--text);
 }
 
+.sw-saudi { background: #006c35; }
+.sw-gold { background: linear-gradient(135deg, #e8c45f, #b8860b); }
 .sw-emerald { background: #05ad98; }
 .sw-ocean { background: #2a7de1; }
 .sw-violet { background: #7c5cff; }
@@ -3774,6 +3778,13 @@ select {
   color: #fff;
 }
 
+.home-hero-date {
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
 .home-hero-title {
   font-size: 1.18rem;
   font-weight: 800;
@@ -4430,6 +4441,22 @@ select {
   color: var(--text-secondary);
   text-align: center;
   line-height: 1.7;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 12px;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
 }
 
 /* ===== خريطة العام الحرارية ===== */

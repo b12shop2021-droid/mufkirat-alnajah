@@ -33,6 +33,17 @@ export default function Home() {
 
   const greeting = s.profile.nickname || s.profile.name || 'بطل';
 
+  /* التاريخ الهجري (أم القرى) — لمسة سعودية */
+  const hijriDate = (() => {
+    try {
+      return new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', {
+        weekday: 'long', day: 'numeric', month: 'long',
+      }).format(new Date());
+    } catch {
+      return '';
+    }
+  })();
+
   /* تحية حسب توقيت اليوم (لهجة سعودية شبابية) */
   const getTimeGreet = () => {
     const h = new Date().getHours();
@@ -142,6 +153,7 @@ export default function Home() {
             <div className="home-hero-greet">
               {tg.badge} {tg.text} يا {greeting}
             </div>
+            {hijriDate && <div className="home-hero-date">🗓️ {hijriDate} هـ</div>}
             <div className="home-hero-title">حقق حلمك وكن ملهماً ✨</div>
           </div>
           <div className="home-hero-badge">{tg.badge}</div>

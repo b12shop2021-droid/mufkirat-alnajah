@@ -6,6 +6,8 @@
 import { useCore, type AccentName } from '../../core/useCore';
 
 const ACCENTS: { id: AccentName; cls: string }[] = [
+  { id: 'saudi', cls: 'sw-saudi' },
+  { id: 'gold', cls: 'sw-gold' },
   { id: 'emerald', cls: 'sw-emerald' },
   { id: 'ocean', cls: 'sw-ocean' },
   { id: 'violet', cls: 'sw-violet' },
