@@ -160,6 +160,25 @@ export default function Analytics() {
     ? Math.round((moodInRange.reduce((a, m) => a + m.energy, 0) / moodInRange.length) * 10) / 10
     : 0;
 
+  /* رؤية ترابطية: أثر النوم على الطاقة (نطابق المزاج بالنوم حسب اليوم) */
+  const sleepByDate = new Map(s.sleepLog.map((e) => [e.date, e.hours]));
+  const moodWithSleep = s.moodLog.filter((m) => sleepByDate.has(m.date));
+  const avgEn = (arr: typeof moodWithSleep) =>
+    arr.length ? arr.reduce((a, m) => a + m.energy, 0) / arr.length : 0;
+  const lowNights = moodWithSleep.filter((m) => (sleepByDate.get(m.date) ?? 0) < 6);
+  const goodNights = moodWithSleep.filter((m) => (sleepByDate.get(m.date) ?? 0) >= 6);
+  const sleepInsight =
+    lowNights.length >= 2 && goodNights.length >= 2
+      ? (() => {
+          const lo = avgEn(lowNights);
+          const hi = avgEn(goodNights);
+          const diff = hi > 0 ? Math.round(((hi - lo) / hi) * 100) : 0;
+          return diff > 5
+            ? `لمّا تنام ٦ ساعات فأكثر، طاقتك تطلع أعلى بـ ${diff}% 💪 — النوم فرق كبير!`
+            : 'نومك وطاقتك ماشيين عدل — كمّل كذا 🌙';
+        })()
+      : null;
+
   return (
     <div className="page">
       <BackButton />
@@ -259,6 +278,13 @@ export default function Analytics() {
             من {moodInRange.length} يوم سجّلت فيه مزاجك
             {avgEnergy >= 7 ? ' — طاقتك ممتازة، كفو! 🔥' : avgEnergy >= 4 ? ' — طاقتك متوسطة، تقدر ترفعها 💪' : ' — طاقتك منخفضة، ريّح نفسك واهتم بنومك 😴'}
           </div>
+        </div>
+      )}
+
+      {sleepInsight && (
+        <div className="card">
+          <div className="section-title">🔎 رؤية ذكية</div>
+          <div className="insight-line">😴 {sleepInsight}</div>
         </div>
       )}
 
