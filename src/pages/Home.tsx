@@ -207,7 +207,7 @@ export default function Home() {
             {hijriDate && <div className="home-hero-date">🗓️ {hijriDate} هـ</div>}
             <div className="home-hero-title">حقق حلمك وكن ملهماً ✨</div>
           </div>
-          <div className="home-hero-badge">{tg.badge}</div>
+          <button className="home-hero-search" aria-label="بحث شامل" onClick={() => navigate('/search')}>🔍</button>
         </div>
         <div className="home-progress-wrap">
           <span className="home-progress-label">{dayPct}%</span>
