@@ -8,6 +8,8 @@ import { useState } from 'react';
 import { useCore, todayStr } from '../core/useCore';
 import XPBar from '../components/XPBar';
 import BackButton from '../components/BackButton';
+import { getPrayerTimes, fmtTime, requestCoords, DEFAULT_COORDS } from '../core/prayerTimes';
+import { requestNotifPermission, schedulePrayerNotifications } from '../core/notificationScheduler';
 
 type Tab = 'quran' | 'cal';
 
@@ -35,6 +37,23 @@ export default function QuranCalendar() {
 
   const [tab, setTab] = useState<Tab>('quran');
   const [minInput, setMinInput] = useState('');
+  const [prayerHint, setPrayerHint] = useState('');
+
+  /* مواقيت اليوم — من الإحداثيات المحفوظة أو الافتراضي (مكة) */
+  const coords = core.state.prayerCoords ?? DEFAULT_COORDS;
+  const prayers = getPrayerTimes(coords);
+  const nextPrayer = prayers.find((p) => p.time.getTime() > Date.now());
+
+  const handleEnablePrayer = async () => {
+    const perm = await requestNotifPermission();
+    if (perm !== 'granted') { setPrayerHint('⚠️ لازم تأذن للإشعارات أول'); return; }
+    const c = await requestCoords();
+    core.setPrayerCoords(c);
+    core.setPrayerNotif(true);
+    await schedulePrayerNotifications(c);
+    setPrayerHint('🕌 فعّلنا تذكير الصلوات! بتوصلك بوقتها اليوم');
+  };
+
   const now = new Date();
   const [calY, setCalY] = useState(now.getFullYear());
   const [calM, setCalM] = useState(now.getMonth());
@@ -168,6 +187,32 @@ export default function QuranCalendar() {
             <div className="time-week">
               إجمالي هذا الأسبوع: <strong>{weekTotal}</strong> دقيقة
             </div>
+          </div>
+
+          {/* مواقيت الصلاة اليوم */}
+          <div className="card">
+            <div className="section-title">🕌 مواقيت الصلاة اليوم</div>
+            <div className="prayer-grid">
+              {prayers.map((p) => (
+                <div className={nextPrayer?.key === p.key ? 'prayer-slot next' : 'prayer-slot'} key={p.key}>
+                  <div className="prayer-name">{p.name}</div>
+                  <div className="prayer-time">{fmtTime(p.time)}</div>
+                </div>
+              ))}
+            </div>
+            {!core.state.prayerCoords && (
+              <div className="settings-sub" style={{ marginTop: 8 }}>
+                📍 المواقيت حسب مكة المكرمة — فعّل التذكير لتحديد موقعك بدقة.
+              </div>
+            )}
+            {core.state.prayerNotif ? (
+              <div className="hint-msg ok" style={{ marginTop: 10 }}>✅ تذكير الصلوات مفعّل</div>
+            ) : (
+              <button className="btn-primary" style={{ width: '100%', marginTop: 12 }} onClick={handleEnablePrayer}>
+                🔔 فعّل تذكير الصلوات
+              </button>
+            )}
+            {prayerHint && <div className="hint-msg ok" style={{ marginTop: 8 }}>{prayerHint}</div>}
           </div>
         </>
       )}

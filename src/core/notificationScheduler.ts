@@ -59,6 +59,26 @@ export async function scheduleNotifications(opts: ScheduleOptions): Promise<void
   }
 }
 
+/* جدولة تذكيرات الصلوات القادمة اليوم (عبر SW، طالما المتصفح مفتوح).
+   coords فارغة = الافتراضي (مكة). adhan يُحمّل ديناميكياً فلا يثقل الحزمة الرئيسية. */
+export async function schedulePrayerNotifications(coords: { lat: number; lng: number } | null): Promise<void> {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  if (!navigator.serviceWorker?.controller) return;
+  const { getPrayerTimes, DEFAULT_COORDS } = await import('./prayerTimes');
+  const now = Date.now();
+  for (const p of getPrayerTimes(coords ?? DEFAULT_COORDS)) {
+    const delayMs = p.time.getTime() - now;
+    if (delayMs <= 0) continue; // مضى وقتها
+    navigator.serviceWorker.controller.postMessage({
+      type: 'SCHEDULE_NOTIFICATION',
+      title: `🕌 حان وقت صلاة ${p.name}`,
+      body: 'قُم وصلِّ، وخلّ بركة يومك تبدأ من هنا 🤍',
+      delayMs,
+      tag: `prayer-${p.key}`,
+    });
+  }
+}
+
 /* طلب إذن الإشعارات */
 export async function requestNotifPermission(): Promise<NotificationPermission> {
   if (!('Notification' in window)) return 'denied';

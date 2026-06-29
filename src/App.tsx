@@ -10,7 +10,7 @@ import Confetti from './components/Confetti';
 import XPToast from './components/XPToast';
 import { useCore } from './core/useCore';
 import { isPinEnabled, isSessionUnlocked } from './core/pinUtils';
-import { scheduleNotifications } from './core/notificationScheduler';
+import { scheduleNotifications, schedulePrayerNotifications } from './core/notificationScheduler';
 import Login from './pages/Login';
 import Onboarding from './pages/Onboarding';
 import Home from './pages/Home';
@@ -62,9 +62,9 @@ export default function App() {
      لأن جدولة الـSW عبر setTimeout تنتهي بإغلاق التطبيق، فنعيد تسليحها كل جلسة */
   useEffect(() => {
     if (!state.session.loggedIn || !state.onboarded) return;
-    if (!state.notifMaster) return;
-    void scheduleNotifications({ masterEnabled: true, items: state.notifItems });
-  }, [state.session.loggedIn, state.onboarded, state.notifMaster, state.notifItems]);
+    if (state.notifMaster) void scheduleNotifications({ masterEnabled: true, items: state.notifItems });
+    if (state.prayerNotif) void schedulePrayerNotifications(state.prayerCoords);
+  }, [state.session.loggedIn, state.onboarded, state.notifMaster, state.notifItems, state.prayerNotif, state.prayerCoords]);
 
   /* بوابة المصادقة: بدون تسجيل دخول تُعرض صفحة الدخول فقط */
   if (!state.session.loggedIn) {

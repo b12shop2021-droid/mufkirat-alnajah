@@ -211,6 +211,8 @@ export interface CoreState {
   constitution: RecurringItem[]; // دستور الذات (حد 5 قواعد)
   notifMaster: boolean; // مفتاح الإشعارات العام
   notifItems: NotifItem[]; // تفضيلات أنواع التذكيرات (واجهة فقط)
+  prayerNotif: boolean; // تذكير أوقات الصلاة
+  prayerCoords: { lat: number; lng: number } | null; // إحداثيات حساب المواقيت
   guidelinesImage: string | null; // صورة يوم الأرجل التوضيحية (اختيارية)
   pledges: Pledge[];
   timeCapsule: TimeCapsule | null;
@@ -406,6 +408,8 @@ const DEFAULT_STATE: CoreState = {
     { id: 'gratitude', enabled: true, time: '20:00' },
     { id: 'streak', enabled: true, time: '23:00' },
   ],
+  prayerNotif: false,
+  prayerCoords: null,
   guidelinesImage: null,
   occasions: [],
   shoppingList: [],
@@ -473,6 +477,8 @@ const loadState = (): CoreState => {
       constitution: parsed.constitution ?? [],
       notifMaster: parsed.notifMaster ?? true,
       notifItems: parsed.notifItems ?? DEFAULT_STATE.notifItems,
+      prayerNotif: parsed.prayerNotif ?? false,
+      prayerCoords: parsed.prayerCoords ?? null,
       guidelinesImage: parsed.guidelinesImage ?? null,
       pledges: parsed.pledges ?? [],
       timeCapsule: parsed.timeCapsule ?? null,
@@ -576,6 +582,8 @@ interface CoreContextValue {
   removeConstRule: (id: string) => void;
   // ===== الإشعارات (واجهة فقط) =====
   setNotifMaster: (on: boolean) => void;
+  setPrayerNotif: (on: boolean) => void;
+  setPrayerCoords: (coords: { lat: number; lng: number } | null) => void;
   toggleNotif: (id: string) => void;
   setNotifTime: (id: string, time: string) => void;
   setGuidelinesImage: (image: string | null) => void;
@@ -1523,6 +1531,14 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     setState((s) => ({ ...s, notifMaster: on }));
   }, []);
 
+  /* تذكير الصلاة: التفعيل + حفظ الإحداثيات */
+  const setPrayerNotif = useCallback((on: boolean) => {
+    setState((s) => ({ ...s, prayerNotif: on }));
+  }, []);
+  const setPrayerCoords = useCallback((coords: { lat: number; lng: number } | null) => {
+    setState((s) => ({ ...s, prayerCoords: coords }));
+  }, []);
+
   /* تبديل تفعيل نوع تذكير */
   const toggleNotif = useCallback((id: string) => {
     setState((s) => ({
@@ -2039,6 +2055,8 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       addConstRule,
       removeConstRule,
       setNotifMaster,
+      setPrayerNotif,
+      setPrayerCoords,
       toggleNotif,
       setNotifTime,
       setGuidelinesImage,
@@ -2138,6 +2156,8 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       addConstRule,
       removeConstRule,
       setNotifMaster,
+      setPrayerNotif,
+      setPrayerCoords,
       toggleNotif,
       setNotifTime,
       setGuidelinesImage,
