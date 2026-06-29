@@ -26,7 +26,7 @@ export default function Workouts() {
   return (
     <div className="page">
       <BackButton to="/" />
-      <h1 className="section-title">🏋️ وحش النادي</h1>
+      <h1 className="section-title">🏋️ قم لـ جيم</h1>
       <div className="intro-card">
         💊 <strong>الجرعة المحفزة:</strong> شد حيلك مع المدرب سعود، الصحة هيبة والنشاط طاقة!
       </div>

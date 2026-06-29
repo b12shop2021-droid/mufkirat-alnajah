@@ -89,7 +89,7 @@ export default function QuranCalendar() {
       <BackButton />
       <XPBar />
 
-      <h1 className="section-title">📖 نوري اليومي</h1>
+      <h1 className="section-title">📖 وردي اليومي</h1>
       <div className="intro-card">
         💊 <strong>الجرعة المحفزة:</strong> تغذية لروحك وجدول لصلاتك وقرآنك، بركة يومك تبدأ من هنا.
       </div>

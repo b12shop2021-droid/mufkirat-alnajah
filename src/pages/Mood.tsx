@@ -89,7 +89,7 @@ export default function Mood() {
       <BackButton />
       <XPBar />
 
-      <h1 className="section-title">❤️ المود اليوم</h1>
+      <h1 className="section-title">❤️ مودي اليوم</h1>
       <div className="intro-card">
         💊 <strong>الجرعة المحفزة:</strong> افهم ميرادك ونفسيتك عشان تعرف كيف تدير يومك صح.
       </div>

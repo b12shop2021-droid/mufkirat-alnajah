@@ -193,7 +193,7 @@ export default function Expenses() {
     <div className="page">
       <BackButton />
 
-      <h1 className="section-title">💰 دراهمي وين راحت؟</h1>
+      <h1 className="section-title">💰 دراهمي</h1>
       <div className="intro-card">
         💊 <strong>الجرعة المحفزة:</strong> ضبط ميزانيتك الحين، عشان تستانس وتدخر للمستقبل بدون ضغط.
       </div>
