@@ -52,6 +52,15 @@ export default function Goals() {
   const [newStepFor, setNewStepFor] = useState<string | null>(null);
   const [newStep, setNewStep] = useState('');
   const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(null);
+  /* تعديل فئة هدف موجود */
+  const [catEditId, setCatEditId] = useState<string | null>(null);
+  const [catDraft, setCatDraft] = useState('');
+
+  const commitCatEdit = (goalId: string, value: string) => {
+    core.editGoalCategory(goalId, value);
+    setCatEditId(null);
+    setCatDraft('');
+  };
 
   const startEdit = (key: string, current: string) => {
     setEditKey(key);
@@ -122,10 +131,40 @@ export default function Goals() {
           </button>
         </div>
 
-        {/* الفئة والعدّ التنازلي */}
-        {(goal.category || dleft !== null) && (
+        {/* الفئة (قابلة للتعديل) والعدّ التنازلي */}
+        {catEditId === goal.id ? (
+          <div className="goal-cat-edit">
+            <div className="cat-chips">
+              {QUICK_CATS.map((c) => (
+                <button key={c} className="cat-pick" onClick={() => commitCatEdit(goal.id, c)}>{c}</button>
+              ))}
+            </div>
+            <div className="add-row" style={{ marginTop: 8 }}>
+              <input
+                className="input-field" placeholder="فئة خاصة (أو فاضي لإزالتها)" value={catDraft} autoFocus maxLength={200}
+                onChange={(e) => setCatDraft(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && commitCatEdit(goal.id, catDraft)}
+              />
+              <button className="btn-primary" onClick={() => commitCatEdit(goal.id, catDraft)}>حفظ</button>
+            </div>
+          </div>
+        ) : (
           <div className="goal-chips">
-            {goal.category && <span className="goal-chip cat">🏷️ {goal.category}</span>}
+            {goal.category ? (
+              <button
+                className="goal-chip cat"
+                onClick={() => { setCatEditId(goal.id); setCatDraft(goal.category); }}
+              >
+                🏷️ {goal.category} ✏️
+              </button>
+            ) : (
+              <button
+                className="goal-chip cat add"
+                onClick={() => { setCatEditId(goal.id); setCatDraft(''); }}
+              >
+                🏷️ + فئة
+              </button>
+            )}
             {dleft !== null && !goal.completed && (
               <span className={dleft < 0 ? 'goal-chip late' : 'goal-chip due'}>
                 {countdownText(dleft)}

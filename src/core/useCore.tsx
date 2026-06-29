@@ -528,6 +528,7 @@ interface CoreContextValue {
   // ===== الأهداف =====
   addGoal: (title: string, category?: string, deadline?: string) => void;
   editGoalTitle: (goalId: string, title: string) => void;
+  editGoalCategory: (goalId: string, category: string) => void;
   removeGoal: (goalId: string) => void;
   addGoalStep: (goalId: string, text: string) => void;
   editGoalStep: (goalId: string, stepId: string, text: string) => void;
@@ -970,6 +971,16 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       if (!t) return;
       updateGoals((list) =>
         list.map((g) => (g.id === goalId ? { ...g, title: t } : g)),
+      );
+    },
+    [updateGoals],
+  );
+
+  /* تعديل فئة هدف (فارغة = بلا فئة) */
+  const editGoalCategory = useCallback(
+    (goalId: string, category: string) => {
+      updateGoals((list) =>
+        list.map((g) => (g.id === goalId ? { ...g, category: clean(category) } : g)),
       );
     },
     [updateGoals],
@@ -1957,6 +1968,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       removeSubTask,
       addGoal,
       editGoalTitle,
+      editGoalCategory,
       removeGoal,
       addGoalStep,
       editGoalStep,
@@ -2053,6 +2065,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       removeSubTask,
       addGoal,
       editGoalTitle,
+      editGoalCategory,
       removeGoal,
       addGoalStep,
       editGoalStep,

@@ -780,6 +780,16 @@ select {
   background: var(--bg);
   color: var(--deep);
   border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.goal-chip.cat.add {
+  color: var(--text-secondary);
+  border-style: dashed;
+}
+
+.goal-cat-edit {
+  margin-bottom: 8px;
 }
 
 .goal-chip.due {
