@@ -43,6 +43,7 @@ const TABS: { id: Tab; label: string; links: Link[] }[] = [
     links: [
       { iconClass: 'ic-selfdev',  label: 'نسختي الأفضل (الهوية والمراجعة)', to: '/self-dev' },
       { iconClass: 'ic-goals',    label: 'الأهداف',                       to: '/goals'    },
+      { iconClass: 'ic-goals',    label: '🎁 قوالب جاهزة',                 to: '/templates' },
     ],
   },
   {

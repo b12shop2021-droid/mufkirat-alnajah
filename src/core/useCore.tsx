@@ -17,6 +17,7 @@ import {
 import { fireConfetti } from '../components/Confetti';
 import { fireXP } from '../components/XPToast';
 import { setSoundEnabled, playSuccess, playLevelUp } from './sound';
+import type { AnyTemplate } from '../data/templates';
 import {
   WEEKLY_CHALLENGES,
   isoWeekKey,
@@ -633,6 +634,7 @@ interface CoreContextValue {
   logout: () => void;
   setOnboarded: (v: boolean) => void;
   startChallenge21: () => void; // يضيف روتيناً وهدفاً جاهزاً
+  applyTemplate: (t: AnyTemplate) => void; // يطبّق قالباً جاهزاً
 }
 
 const CoreContext = createContext<CoreContextValue | null>(null);
@@ -2007,6 +2009,56 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  /* تطبيق قالب جاهز (هدف/روتين/تحدّي/ميزانية) دفعة واحدة آمنة */
+  const applyTemplate = useCallback((t: AnyTemplate) => {
+    const mkTask = (text: string): RoutineTask => ({
+      id: crypto.randomUUID(), text, priority: 'med', doneDate: '', history: [], subtasks: [],
+    });
+    const deadlineAfter = (days: number) => {
+      const d = new Date();
+      d.setDate(d.getDate() + days);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    };
+    setState((s) => {
+      if (t.kind === 'goal') {
+        return {
+          ...s,
+          goals: [...s.goals, {
+            id: crypto.randomUUID(), title: t.title,
+            steps: t.steps.map((text) => ({ id: crypto.randomUUID(), text, done: false })),
+            completed: false, createdDate: todayStr(), category: t.category, deadline: deadlineAfter(t.days),
+          }],
+        };
+      }
+      if (t.kind === 'routine') {
+        return {
+          ...s,
+          routine: {
+            morning: [...s.routine.morning, ...t.morning.map(mkTask)],
+            evening: [...s.routine.evening, ...t.evening.map(mkTask)],
+          },
+        };
+      }
+      if (t.kind === 'challenge') {
+        return {
+          ...s,
+          routine: {
+            morning: [...s.routine.morning, ...(t.morning ?? []).map(mkTask)],
+            evening: [...s.routine.evening, ...(t.evening ?? []).map(mkTask)],
+          },
+          goals: [...s.goals, {
+            id: crypto.randomUUID(), title: t.goalTitle, steps: [],
+            completed: false, createdDate: todayStr(), category: 'تحدّي', deadline: deadlineAfter(t.days),
+          }],
+        };
+      }
+      // budget
+      return { ...s, budgets: { ...s.budgets, ...t.budgets } };
+    });
+    addXP(5);
+    fireConfetti();
+  }, [addXP]);
+
   /* التحدّي الأسبوعي العشوائي — يُشتق تحدٍّ ثابت لكل أسبوع، والإتمام يُعاد ضبطه تلقائياً مع الأسبوع الجديد */
   const weekly = useMemo(() => {
     const weekKey = isoWeekKey();
@@ -2150,6 +2202,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       logout,
       setOnboarded,
       startChallenge21,
+      applyTemplate,
     }),
     [
       state,
@@ -2255,6 +2308,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       logout,
       setOnboarded,
       startChallenge21,
+      applyTemplate,
     ],
   );
 
