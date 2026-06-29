@@ -51,7 +51,7 @@ export default function AppearanceSection() {
           <div className="settings-icon">{soundOn ? '🔊' : '🔇'}</div>
           <div className="settings-text">
             <div className="settings-label">أصوات النجاح</div>
-            <div className="settings-sub">نغمة خفيفة عند إنجاز مهمة أو صعود مستوى</div>
+            <div className="settings-sub">نغمة حلوة لما تنجز مهمة أو تطلع مستوى</div>
           </div>
           <label className="switch">
             <input type="checkbox" checked={soundOn} onChange={core.toggleSound} />

@@ -29,7 +29,7 @@ export default function Templates() {
       <BackButton />
       <h1 className="section-title">🎁 قوالب جاهزة</h1>
       <div className="intro-card">
-        💊 الجرعة المحفزة: ما تدري وش تكتب؟ ابدأ من قالب جاهز — بضغطة وحدة يتعبّى لك كل شي، وعدّله زي ما تبي.
+        💊 <strong>الجرعة المحفزة:</strong> محتار وش تكتب؟ لا تعقّدها — خذ قالب جاهز، بضغطة وحدة يتعبّى لك كل شي وعدّله على كيفك.
       </div>
 
       <div className="subtabs">
@@ -55,7 +55,7 @@ export default function Templates() {
           </ul>
           <button className={applied === t.id ? 'btn-primary done' : 'btn-primary'} style={{ width: '100%' }}
             disabled={applied === t.id} onClick={() => apply(t)}>
-            {applied === t.id ? '✅ تمت الإضافة لأهدافك' : 'استخدم هذا القالب'}
+            {applied === t.id ? '✅ انضاف لأهدافك — كفو!' : 'خذ هذا القالب'}
           </button>
         </div>
       ))}
@@ -76,7 +76,7 @@ export default function Templates() {
           </ul>
           <button className={applied === t.id ? 'btn-primary done' : 'btn-primary'} style={{ width: '100%' }}
             disabled={applied === t.id} onClick={() => apply(t)}>
-            {applied === t.id ? '✅ أُضيف لروتينك' : 'استخدم هذا الروتين'}
+            {applied === t.id ? '✅ انضاف لروتينك — يا بطل!' : 'خذ هذا الروتين'}
           </button>
         </div>
       ))}
@@ -97,7 +97,7 @@ export default function Templates() {
           </ul>
           <button className={applied === t.id ? 'btn-primary done' : 'btn-primary'} style={{ width: '100%' }}
             disabled={applied === t.id} onClick={() => apply(t)}>
-            {applied === t.id ? '✅ بدأ التحدّي — بالتوفيق!' : 'ابدأ التحدّي'}
+            {applied === t.id ? '✅ بدأ التحدّي — وريهم وش فيك!' : 'ابدأ التحدّي'}
           </button>
         </div>
       ))}
@@ -117,7 +117,7 @@ export default function Templates() {
           </ul>
           <button className={applied === t.id ? 'btn-primary done' : 'btn-primary'} style={{ width: '100%' }}
             disabled={applied === t.id} onClick={() => apply(t)}>
-            {applied === t.id ? '✅ طُبّقت ميزانيتك' : 'طبّق هذه الميزانية'}
+            {applied === t.id ? '✅ ضبطنا ميزانيتك — تمام!' : 'طبّق هذه الميزانية'}
           </button>
         </div>
       ))}
