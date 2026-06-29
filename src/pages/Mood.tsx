@@ -5,7 +5,6 @@
 
 import { useState } from 'react';
 import { useCore, todayStr } from '../core/useCore';
-import { saveLabel } from '../core/saveLabel';
 import XPBar from '../components/XPBar';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
@@ -42,8 +41,9 @@ const dateBefore = (offset: number): string => {
 export default function Mood() {
   const core = useCore();
   const today = todayStr();
-  const fem = core.state.profile.gender === 'female';
   const todayEntry = core.state.moodLog.find((m) => m.date === today);
+  /* اللقب اللي يحب يُنادى فيه (وإلا الاسم، وإلا «بطل») */
+  const nick = core.state.profile.nickname || core.state.profile.name || 'بطل';
 
   const [selected, setSelected] = useState<number | null>(
     todayEntry ? todayEntry.moodIdx : null,
@@ -91,7 +91,7 @@ export default function Mood() {
 
       <h1 className="section-title">❤️ مودي اليوم</h1>
       <div className="intro-card">
-        💊 <strong>الجرعة المحفزة:</strong> افهم ميرادك ونفسيتك عشان تعرف كيف تدير يومك صح.
+        💊 <strong>الجرعة المحفزة:</strong> افهم نفسيتك عشان تعرف كيف تدير يومك صح.
       </div>
 
       <div className="card">
@@ -135,7 +135,7 @@ export default function Mood() {
           style={{ width: '100%', marginTop: 16 }}
           onClick={handleSaveMood}
         >
-          {saveLabel(fem)}
+          كفو يا {nick} أنا قدها 💪
         </button>
       </div>
 
