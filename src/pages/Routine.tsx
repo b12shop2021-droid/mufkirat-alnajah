@@ -5,6 +5,8 @@
    =================================================================== */
 
 import { useState } from 'react';
+import Dose from '../components/Dose';
+import SwipeRow from '../components/SwipeRow';
 import {
   useCore,
   todayStr,
@@ -131,70 +133,76 @@ export default function Routine() {
     const streak = habitStreak(task.history);
     return (
       <div key={task.id}>
-        <div className="task-row">
-          <button
-            className={taskDone ? 'task-check done' : 'task-check'}
-            aria-label="تبديل الإنجاز"
-            onClick={() => core.toggleRoutineDone(active, task.id)}
-          >
-            {taskDone ? '✓' : ''}
-          </button>
-          <button
-            className={PRIO_CLASS[task.priority]}
-            aria-label="تغيير الأولوية"
-            onClick={() => core.cyclePriority(active, task.id)}
-          />
-          {isEditing ? (
-            <input
-              className="input-field"
-              value={draft}
-              autoFocus
-              maxLength={200}
-              onChange={(e) => setDraft(e.target.value)}
-              onBlur={commitEdit}
-              onKeyDown={(e) => e.key === 'Enter' && commitEdit()}
-            />
-          ) : (
-            <span
-              className={taskDone ? 'task-text done' : 'task-text'}
-              onClick={() => startEdit(`task|${task.id}`, task.text)}
+        <SwipeRow
+          done={taskDone}
+          onComplete={() => core.toggleRoutineDone(active, task.id)}
+          onDelete={() => setPendingDelete({ section: active, taskId: task.id, label: task.text })}
+        >
+          <div className="task-row">
+            <button
+              className={taskDone ? 'task-check done' : 'task-check'}
+              aria-label="تبديل الإنجاز"
+              onClick={() => core.toggleRoutineDone(active, task.id)}
             >
-              {task.text}
-            </span>
-          )}
-          {streak >= 2 && (
-            <span className="habit-streak" title={`${streak} يوم متتالي على هالعادة`}>
-              🔥 {streak}
-            </span>
-          )}
-          <button className="icon-btn reorder" aria-label="فوق" onClick={() => core.moveRoutineTask(active, task.id, -1)}>
-            ▲
-          </button>
-          <button className="icon-btn reorder" aria-label="تحت" onClick={() => core.moveRoutineTask(active, task.id, 1)}>
-            ▼
-          </button>
-          <button
-            className="icon-btn"
-            aria-label="المهام الفرعية"
-            onClick={() => toggleExpand(task.id)}
-          >
-            {isOpen ? '▲' : '▾'}
-            {task.subtasks.length > 0 ? ` ${task.subtasks.length}` : ''}
-          </button>
-          <button
-            className="icon-btn"
-            aria-label="حذف المهمة"
-            onClick={() =>
-              setPendingDelete({
-                section: active,
-                taskId: task.id,
-                label: task.text,
-              })
-            }
-          >
-            🗑️
-          </button>
-        </div>
+              {taskDone ? '✓' : ''}
+            </button>
+            <button
+              className={PRIO_CLASS[task.priority]}
+              aria-label="تغيير الأولوية"
+              onClick={() => core.cyclePriority(active, task.id)}
+            />
+            {isEditing ? (
+              <input
+                className="input-field"
+                value={draft}
+                autoFocus
+                maxLength={200}
+                onChange={(e) => setDraft(e.target.value)}
+                onBlur={commitEdit}
+                onKeyDown={(e) => e.key === 'Enter' && commitEdit()}
+              />
+            ) : (
+              <span
+                className={taskDone ? 'task-text done' : 'task-text'}
+                onClick={() => startEdit(`task|${task.id}`, task.text)}
+              >
+                {task.text}
+              </span>
+            )}
+            {streak >= 2 && (
+              <span className="habit-streak" title={`${streak} يوم متتالي على هالعادة`}>
+                🔥 {streak}
+              </span>
+            )}
+            <button className="icon-btn reorder" aria-label="فوق" onClick={() => core.moveRoutineTask(active, task.id, -1)}>
+              ▲
+            </button>
+            <button className="icon-btn reorder" aria-label="تحت" onClick={() => core.moveRoutineTask(active, task.id, 1)}>
+              ▼
+            </button>
+            <button
+              className="icon-btn"
+              aria-label="المهام الفرعية"
+              onClick={() => toggleExpand(task.id)}
+            >
+              {isOpen ? '▲' : '▾'}
+              {task.subtasks.length > 0 ? ` ${task.subtasks.length}` : ''}
+            </button>
+            <button
+              className="icon-btn"
+              aria-label="حذف المهمة"
+              onClick={() =>
+                setPendingDelete({
+                  section: active,
+                  taskId: task.id,
+                  label: task.text,
+                })
+              }
+            >
+              🗑️
+            </button>
+          </div>
+        </SwipeRow>
 
         {isOpen && (
           <div className="subtask-wrap">
@@ -202,49 +210,55 @@ export default function Routine() {
               const subDone = isToday(sub.doneDate);
               const subEditing = editKey === `sub|${task.id}|${sub.id}`;
               return (
-                <div className="subtask-row" key={sub.id}>
-                  <button
-                    className={subDone ? 'sub-check done' : 'sub-check'}
-                    aria-label="تبديل إنجاز الفرعية"
-                    onClick={() => core.toggleSubDone(active, task.id, sub.id)}
-                  >
-                    {subDone ? '✓' : ''}
-                  </button>
-                  {subEditing ? (
-                    <input
-                      className="input-field"
-                      value={draft}
-                      autoFocus
-                      maxLength={200}
-                      onChange={(e) => setDraft(e.target.value)}
-                      onBlur={commitEdit}
-                      onKeyDown={(e) => e.key === 'Enter' && commitEdit()}
-                    />
-                  ) : (
-                    <span
-                      className={subDone ? 'task-text done' : 'task-text'}
+                <SwipeRow
+                  key={sub.id}
+                  done={subDone}
+                  onComplete={() => core.toggleSubDone(active, task.id, sub.id)}
+                >
+                  <div className="subtask-row">
+                    <button
+                      className={subDone ? 'sub-check done' : 'sub-check'}
+                      aria-label="تبديل إنجاز الفرعية"
+                      onClick={() => core.toggleSubDone(active, task.id, sub.id)}
+                    >
+                      {subDone ? '✓' : ''}
+                    </button>
+                    {subEditing ? (
+                      <input
+                        className="input-field"
+                        value={draft}
+                        autoFocus
+                        maxLength={200}
+                        onChange={(e) => setDraft(e.target.value)}
+                        onBlur={commitEdit}
+                        onKeyDown={(e) => e.key === 'Enter' && commitEdit()}
+                      />
+                    ) : (
+                      <span
+                        className={subDone ? 'task-text done' : 'task-text'}
+                        onClick={() =>
+                          startEdit(`sub|${task.id}|${sub.id}`, sub.text)
+                        }
+                      >
+                        {sub.text}
+                      </span>
+                    )}
+                    <button
+                      className="icon-btn"
+                      aria-label="حذف الفرعية"
                       onClick={() =>
-                        startEdit(`sub|${task.id}|${sub.id}`, sub.text)
+                        setPendingDelete({
+                          section: active,
+                          taskId: task.id,
+                          subId: sub.id,
+                          label: sub.text,
+                        })
                       }
                     >
-                      {sub.text}
-                    </span>
-                  )}
-                  <button
-                    className="icon-btn"
-                    aria-label="حذف الفرعية"
-                    onClick={() =>
-                      setPendingDelete({
-                        section: active,
-                        taskId: task.id,
-                        subId: sub.id,
-                        label: sub.text,
-                      })
-                    }
-                  >
-                    🗑️
-                  </button>
-                </div>
+                      🗑️
+                    </button>
+                  </div>
+                </SwipeRow>
               );
             })}
 
@@ -286,9 +300,7 @@ export default function Routine() {
       <XPBar />
 
       <h1 className="section-title">☀️ روتيني الصح</h1>
-      <div className="intro-card">
-        💊 <strong>الجرعة المحفزة:</strong> رتب يومك، حبة حبة، وكل خطوة تقربك للي تبيه!
-      </div>
+      <Dose section="challenges" />
 
       <div className="routine-tabs">
         <button

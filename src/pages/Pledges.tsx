@@ -9,6 +9,7 @@ import { useCore, todayStr, type Pledge } from '../core/useCore';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { fireConfetti } from '../components/Confetti';
+import Dose from '../components/Dose';
 
 type Tab = 'pledges' | 'capsule';
 
@@ -127,9 +128,7 @@ export default function Pledges() {
       <BackButton />
 
       <h1 className="section-title">🛡️ وعد الحر دين</h1>
-      <div className="intro-card">
-        💊 <strong>الجرعة المحفزة:</strong> عهد قطعته على نفسك؟ التزم به ولا تتراجع خطوة ورا.
-      </div>
+      <Dose section="pledges" />
 
       <div className="subtabs">
         <button className={tab === 'pledges' ? 'subtab active' : 'subtab'} onClick={() => setTab('pledges')}>

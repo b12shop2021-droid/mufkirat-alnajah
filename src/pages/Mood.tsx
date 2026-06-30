@@ -9,6 +9,7 @@ import { saveLabel } from '../core/saveLabel';
 import XPBar from '../components/XPBar';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
+import Dose from '../components/Dose';
 
 /* 8 حالات مزاج (إيموجي + وصف) */
 const MOODS = [
@@ -91,9 +92,7 @@ export default function Mood() {
       <XPBar />
 
       <h1 className="section-title">❤️ مودي اليوم</h1>
-      <div className="intro-card">
-        💊 <strong>الجرعة المحفزة:</strong> افهم نفسيتك عشان تعرف كيف تدير يومك صح.
-      </div>
+      <Dose section="mood" />
 
       <div className="card">
         <p style={{ textAlign: 'center', fontWeight: 700, marginBottom: 14 }}>

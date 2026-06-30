@@ -8,8 +8,6 @@ import { useCore, todayStr } from '../core/useCore';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
 
-const OCCASIONS_LIST = ['ذكرى زواج', 'تخرّج', 'عقد قران', 'مولود جديد', 'نجاح', 'عيد فطر', 'عيد أضحى', 'اليوم الوطني 🇸🇦', 'يوم التأسيس', 'أخرى'];
-
 type Tab = 'upcoming' | 'all' | 'circle' | 'add';
 
 /* ====================== مساعدات التاريخ ====================== */
@@ -33,6 +31,21 @@ function daysUntil(date: Date): number {
   return Math.round((date.getTime() - today.getTime()) / 86_400_000);
 }
 
+/* تنسيق تاريخ YYYY-MM-DD → DD/MM/YYYY */
+function fmtDate(d?: string): string {
+  if (!d) return '';
+  const [y, m, day] = d.slice(0, 10).split('-');
+  return `${day}/${m}/${y}`;
+}
+
+/* تنسيق datetime-local (YYYY-MM-DDTHH:mm) → DD/MM الساعة HH:mm */
+function fmtDateTime(s?: string): string {
+  if (!s) return '';
+  const [datePart, timePart] = s.split('T');
+  const [, m, day] = datePart.split('-');
+  return `${day}/${m}${timePart ? ` · ${timePart}` : ''}`;
+}
+
 function formatCountdown(days: number): { label: string; color: string } {
   if (days < 0) return { label: 'انتهت', color: 'var(--text-secondary)' };
   if (days === 0) return { label: 'اليوم! 🎉', color: 'var(--success)' };
@@ -45,8 +58,7 @@ function formatCountdown(days: number): { label: string; color: string } {
 const EMPTY_FORM = {
   personName: '',
   relation: '',
-  occasionName: 'ذكرى زواج',
-  customOccasion: '',
+  occasionName: '',
   date: '',
   isAnnual: true,
   notes: '',
@@ -64,13 +76,25 @@ export default function Occasions() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [hint, setHint] = useState('');
 
-  /* دائرة التواصل (منقولة من صفحة النوم) */
+  /* أهلك وربعك (منقولة من صفحة النوم) */
   const [relName, setRelName] = useState('');
   const [relDelete, setRelDelete] = useState<{ id: string; label: string } | null>(null);
+  const [schedulingId, setSchedulingId] = useState<string | null>(null);
+  const [schedVal, setSchedVal] = useState('');
   const handleAddRel = () => {
     if (relName.trim() === '') { setHint('اكتب اسم الشخص'); return; }
     core.addRelation(relName);
     setRelName('');
+  };
+  const openSchedule = (id: string, current?: string) => {
+    setSchedulingId(schedulingId === id ? null : id);
+    setSchedVal(current ?? '');
+  };
+  const saveSchedule = (id: string) => {
+    core.scheduleRelationCall(id, schedVal);
+    setSchedulingId(null);
+    setSchedVal('');
+    setHint(schedVal ? 'جدّلنا موعد الاتصال ✓' : 'ألغينا الموعد ✓');
   };
 
   /* ترتيب المناسبات بالأقرب */
@@ -87,10 +111,10 @@ export default function Occasions() {
   /* حفظ المناسبة */
   const handleSave = () => {
     const name = form.personName.trim();
-    const occ = form.occasionName === 'أخرى' ? form.customOccasion.trim() : form.occasionName;
+    const occ = form.occasionName.trim();
     if (!name) { setHint('اكتب اسم الشخص'); return; }
     if (!form.date) { setHint('اختر تاريخ المناسبة'); return; }
-    if (!occ) { setHint('اكتب اسم المناسبة'); return; }
+    if (!occ) { setHint('اكتب نوع المناسبة'); return; }
 
     /* تحويل التاريخ: السنوي = MM-DD فقط */
     const dateVal = form.isAnnual
@@ -132,8 +156,7 @@ export default function Occasions() {
     setForm({
       personName: o.personName,
       relation: o.relation,
-      occasionName: OCCASIONS_LIST.includes(o.occasionName) ? o.occasionName : 'أخرى',
-      customOccasion: OCCASIONS_LIST.includes(o.occasionName) ? '' : o.occasionName,
+      occasionName: o.occasionName,
       date: fullDate,
       isAnnual: o.isAnnual,
       notes: o.notes,
@@ -166,7 +189,7 @@ export default function Occasions() {
         {(['upcoming', 'all', 'circle', 'add'] as Tab[]).map((t) => (
           <button key={t} className={tab === t ? 'subtab active' : 'subtab'}
             onClick={() => { setTab(t); if (t !== 'add') { setEditing(null); setForm(EMPTY_FORM); } }}>
-            {t === 'upcoming' ? '📅 القادمة' : t === 'all' ? '🎉 المناسبات' : t === 'circle' ? '🤝 دائرة التواصل' : editing ? '✏️ تعديل' : '➕ إضافة'}
+            {t === 'upcoming' ? '📅 القادمة' : t === 'all' ? '🎉 المناسبات' : t === 'circle' ? '📞 أهلك وربعك' : editing ? '✏️ تعديل' : '➕ إضافة'}
           </button>
         ))}
       </div>
@@ -216,19 +239,19 @@ export default function Occasions() {
       {tab === 'circle' && (
         <>
           <div className="card" style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '1.7rem' }}>🤝</div>
+            <div style={{ fontSize: '1.7rem' }}>📞</div>
             <div style={{ fontWeight: 800, color: 'var(--primary)', marginTop: 6 }}>
-              مين تواصلت معه هالأسبوع؟ ومين ودّك تتصل فيه؟
+              مين تتصل فيه اليوم؟ ومين له فترة ما كلّمته؟
             </div>
             <div style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', marginTop: 4 }}>
-              صِل رحمك واهتم بناسك — وتابع مين كلّمت
+              صِل رحمك واهتم بناسك — اضغط السماعة 📞 أول ما تتصل، وجدول مكالمتك القادمة
             </div>
           </div>
 
           <div className="add-row">
             <input
               className="input-field"
-              placeholder="اسم شخص ودّك تتواصل معه..."
+              placeholder="اسم شخص من أهلك أو ربعك..."
               value={relName}
               maxLength={60}
               onChange={(e) => setRelName(e.target.value)}
@@ -239,25 +262,39 @@ export default function Occasions() {
 
           {relations.length === 0 ? (
             <div className="empty-state">
-              <div className="empty-icon">🤝</div>
-              <div>ما فيه أحد بالقائمة بعد — ضيف اسم شخص ودّك تتواصل معه</div>
+              <div className="empty-icon">📞</div>
+              <div>ما فيه أحد بالقائمة بعد — ضيف اسم شخص من أهلك أو ربعك</div>
             </div>
           ) : (
             relations.map((r) => (
-              <div className="rel-card" key={r.id}>
+              <div className="rel-card" key={r.id} style={{ flexWrap: 'wrap' }}>
                 <div className="rel-avatar">{r.name.charAt(0)}</div>
                 <div className="rel-info">
                   <div className="rel-name">{r.name}</div>
-                  <div className={r.contacted ? 'rel-status done' : 'rel-status'}>
-                    {r.contacted ? '✓ تواصلت معه هالأسبوع' : 'لسا ما تواصلت'}
+                  <div className={r.contactedDate ? 'rel-status done' : 'rel-status'}>
+                    {r.contactedDate ? `📞 آخر اتصال: ${fmtDate(r.contactedDate)}` : 'لسا ما اتصلت'}
                   </div>
+                  {r.scheduledAt && (
+                    <div className="rel-status" style={{ color: 'var(--warning)' }}>
+                      🗓️ موعد الاتصال: {fmtDateTime(r.scheduledAt)}
+                    </div>
+                  )}
                 </div>
                 <button
                   className={r.contacted ? 'rel-check-btn done' : 'rel-check-btn'}
-                  aria-label="تأكيد التواصل"
+                  aria-label="تم الاتصال اليوم"
+                  title="تم الاتصال اليوم"
                   onClick={() => core.toggleRelation(r.id)}
                 >
-                  {r.contacted ? '✓' : ''}
+                  📞
+                </button>
+                <button
+                  className="icon-btn"
+                  aria-label="جدولة موعد اتصال"
+                  title="جدولة موعد اتصال"
+                  onClick={() => openSchedule(r.id, r.scheduledAt)}
+                >
+                  🗓️
                 </button>
                 <button
                   className="icon-btn"
@@ -266,6 +303,22 @@ export default function Occasions() {
                 >
                   🗑️
                 </button>
+
+                {schedulingId === r.id && (
+                  <div style={{ flexBasis: '100%', display: 'flex', gap: 8, marginTop: 10, alignItems: 'center' }}>
+                    <input
+                      type="datetime-local"
+                      className="input-field"
+                      style={{ flex: 1 }}
+                      value={schedVal}
+                      onChange={(e) => setSchedVal(e.target.value)}
+                    />
+                    <button className="btn-primary" onClick={() => saveSchedule(r.id)}>حفظ</button>
+                    {r.scheduledAt && (
+                      <button className="btn-secondary" onClick={() => { setSchedVal(''); core.scheduleRelationCall(r.id, ''); setSchedulingId(null); setHint('ألغينا الموعد ✓'); }}>إلغاء الموعد</button>
+                    )}
+                  </div>
+                )}
               </div>
             ))
           )}
@@ -277,22 +330,14 @@ export default function Occasions() {
         <div className="card">
           <div className="auth-field">
             <label>اسم الشخص *</label>
-            <input className="input-field" placeholder="مثال: لمى أو سعود" value={form.personName}
+            <input className="input-field" placeholder="اسم الشخص" value={form.personName}
               onChange={(e) => setForm((f) => ({ ...f, personName: e.target.value }))} maxLength={60} />
           </div>
 
           <div className="auth-field">
-            <label>المناسبة</label>
-            <div className="chip-row" style={{ flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
-              {OCCASIONS_LIST.map((oc) => (
-                <button key={oc} className={form.occasionName === oc ? 'chip active' : 'chip'}
-                  onClick={() => setForm((f) => ({ ...f, occasionName: oc }))}>{oc}</button>
-              ))}
-            </div>
-            {form.occasionName === 'أخرى' && (
-              <input className="input-field" style={{ marginTop: 8 }} placeholder="اكتب اسم المناسبة"
-                value={form.customOccasion} onChange={(e) => setForm((f) => ({ ...f, customOccasion: e.target.value }))} maxLength={40} />
-            )}
+            <label>نوع المناسبة *</label>
+            <input className="input-field" placeholder="مثال: زواج، تخرّج" value={form.occasionName}
+              onChange={(e) => setForm((f) => ({ ...f, occasionName: e.target.value }))} maxLength={40} />
           </div>
 
           <div className="auth-field">
@@ -342,7 +387,7 @@ export default function Occasions() {
       <ConfirmDialog
         open={relDelete !== null}
         title="تأكيد الحذف"
-        message={`تبي تشيل «${relDelete?.label ?? ''}» من دائرة التواصل؟`}
+        message={`تبي تشيل «${relDelete?.label ?? ''}» من أهلك وربعك؟`}
         confirmLabel="حذف"
         danger
         onConfirm={() => { if (relDelete) core.removeRelation(relDelete.id); setRelDelete(null); }}

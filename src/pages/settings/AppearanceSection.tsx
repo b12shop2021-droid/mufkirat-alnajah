@@ -5,6 +5,16 @@
 
 import { useCore, type AccentName } from '../../core/useCore';
 
+const FONTS: { id: 'tajawal' | 'ibmplex' | 'amiri' | 'cairo' | 'almarai' | 'changa' | 'elmessiri'; label: string; sample: string }[] = [
+  { id: 'tajawal', label: 'تجوال', sample: "'Tajawal', sans-serif" },
+  { id: 'cairo', label: 'القاهرة', sample: "'Cairo', sans-serif" },
+  { id: 'almarai', label: 'المراعي', sample: "'Almarai', sans-serif" },
+  { id: 'changa', label: 'تشانجا', sample: "'Changa', sans-serif" },
+  { id: 'elmessiri', label: 'المسيري', sample: "'El Messiri', serif" },
+  { id: 'ibmplex', label: 'بلكس', sample: "'IBM Plex Sans Arabic', sans-serif" },
+  { id: 'amiri', label: 'أميري', sample: "'Amiri', serif" },
+];
+
 const ACCENTS: { id: AccentName; cls: string }[] = [
   { id: 'saudi', cls: 'sw-saudi' },
   { id: 'gold', cls: 'sw-gold' },
@@ -17,7 +27,7 @@ const ACCENTS: { id: AccentName; cls: string }[] = [
 
 export default function AppearanceSection() {
   const core = useCore();
-  const { dark, accent, autoDark, fontScale, soundOn } = core.state;
+  const { dark, accent, autoDark, fontScale, fontFamily, soundOn } = core.state;
 
   return (
     <>
@@ -75,6 +85,28 @@ export default function AppearanceSection() {
             >
               كبير
             </button>
+            <button
+              className={fontScale === 'xlarge' ? 'btn-primary' : 'btn-ghost'}
+              style={{ flex: 1 }}
+              onClick={() => core.setFontScale('xlarge')}
+            >
+              أكبر
+            </button>
+          </div>
+        </div>
+        <div className="settings-row" style={{ display: 'block' }}>
+          <div className="settings-label" style={{ marginBottom: 8 }}>✍️ نوع الخط</div>
+          <div className="add-row" style={{ marginTop: 0, flexWrap: 'wrap', gap: 8 }}>
+            {FONTS.map((f) => (
+              <button
+                key={f.id}
+                className={fontFamily === f.id ? 'btn-primary' : 'btn-ghost'}
+                style={{ flex: '1 1 28%', fontFamily: f.sample, fontSize: '1.05rem' }}
+                onClick={() => core.setFontFamily(f.id)}
+              >
+                {f.label}
+              </button>
+            ))}
           </div>
         </div>
         <div className="settings-row" style={{ display: 'block' }}>

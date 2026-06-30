@@ -10,6 +10,7 @@ import XPBar from '../components/XPBar';
 import BackButton from '../components/BackButton';
 import { getPrayerTimes, fmtTime, requestCoords, DEFAULT_COORDS } from '../core/prayerTimes';
 import { requestNotifPermission, schedulePrayerNotifications } from '../core/notificationScheduler';
+import Dose from '../components/Dose';
 
 type Tab = 'quran' | 'cal';
 
@@ -109,9 +110,7 @@ export default function QuranCalendar() {
       <XPBar />
 
       <h1 className="section-title">📖 وردي اليومي</h1>
-      <div className="intro-card">
-        💊 <strong>الجرعة المحفزة:</strong> تغذية لروحك وجدول لصلاتك وقرآنك، بركة يومك تبدأ من هنا.
-      </div>
+      <Dose section="quran" />
 
       <div className="subtabs">
         <button

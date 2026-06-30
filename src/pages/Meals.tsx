@@ -10,6 +10,7 @@ import { useCore, todayStr, type MealType, type FavoriteMeal } from '../core/use
 import XPBar from '../components/XPBar';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
+import Dose from '../components/Dose';
 
 const TYPES: MealType[] = ['إفطار', 'غداء', 'عشاء', 'وجبة خفيفة'];
 
@@ -91,9 +92,7 @@ export default function Meals() {
       <XPBar />
 
       <h1 className="section-title">🍽️ أكلي الصح</h1>
-      <div className="intro-card">
-        💊 <strong>الجرعة المحفزة:</strong> وش طبخت اليوم؟ رتب وجباتك وخلك خفيف ونشيط.
-      </div>
+      <Dose section="meals" />
 
       {/* السعرات اليومية */}
       <div className="card">

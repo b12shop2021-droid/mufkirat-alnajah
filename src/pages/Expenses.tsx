@@ -4,10 +4,11 @@
    Pie chart، يوم بدون مصاريف، صندوق الخير كفئة فعلية. الحالة عبر useCore.
    =================================================================== */
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useCore, todayStr, type ExpenseType } from '../core/useCore';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
+import Dose from '../components/Dose';
 
 type Tab = 'overview' | 'budget' | 'list' | 'shopping';
 
@@ -57,57 +58,63 @@ export default function Expenses() {
   const [quickEditIdx, setQuickEditIdx] = useState<number | null>(null);
   const [quickEditVal, setQuickEditVal] = useState('');
 
-  /* بيانات الفئات المجمّعة (أساسية + مخصصة) */
-  const allCats = [
-    ...BASE_CATS,
-    ...customCategories.map((c, i) => ({
-      name: c.name,
-      icon: c.icon,
-      color: CUSTOM_COLORS[i % CUSTOM_COLORS.length],
-    })),
-  ];
+  /* بيانات الفئات المجمّعة (أساسية + مخصصة) — مخزّنة */
+  const allCats = useMemo(
+    () => [
+      ...BASE_CATS,
+      ...customCategories.map((c, i) => ({
+        name: c.name,
+        icon: c.icon,
+        color: CUSTOM_COLORS[i % CUSTOM_COLORS.length],
+      })),
+    ],
+    [customCategories],
+  );
   const catMeta = (name: string) =>
     allCats.find((c) => c.name === name) ?? { name, icon: '📦', color: 'var(--chart-8)' };
 
-  /* إحصائيات */
-  const income = expenses.filter((e) => e.type === 'income').reduce((s, e) => s + e.amount, 0);
-  const expenseTotal = expenses.filter((e) => e.type === 'expense').reduce((s, e) => s + e.amount, 0);
-  const net = income - expenseTotal;
   const today = todayStr();
-  const noExpenseToday = !expenses.some((e) => e.date === today && e.type === 'expense');
-
-  /* مقارنة شهرية */
   const thisMonth = monthOf(today);
-  const prevDate = new Date();
-  prevDate.setMonth(prevDate.getMonth() - 1);
-  const prevMonth = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}`;
-  const sumMonth = (m: string) =>
-    expenses.filter((e) => e.type === 'expense' && monthOf(e.date) === m).reduce((s, e) => s + e.amount, 0);
-  const thisM = sumMonth(thisMonth);
-  const prevM = sumMonth(prevMonth);
-  const diffPct = prevM > 0 ? Math.round(((thisM - prevM) / prevM) * 100) : null;
 
-  /* توزيع الفئات للـ Pie */
-  const catTotals: Record<string, number> = {};
-  expenses.filter((e) => e.type === 'expense').forEach((e) => {
-    catTotals[e.category] = (catTotals[e.category] || 0) + e.amount;
-  });
-  const pieEntries = Object.entries(catTotals).sort((a, b) => b[1] - a[1]);
-  const pieSum = pieEntries.reduce((s, [, v]) => s + v, 0) || 1;
+  /* إحصائيات — تُحسب فقط عند تغيّر المصاريف */
+  const { income, expenseTotal, net, noExpenseToday, diffPct } = useMemo(() => {
+    const income = expenses.filter((e) => e.type === 'income').reduce((s, e) => s + e.amount, 0);
+    const expenseTotal = expenses.filter((e) => e.type === 'expense').reduce((s, e) => s + e.amount, 0);
+    const noExpenseToday = !expenses.some((e) => e.date === today && e.type === 'expense');
+    const prevDate = new Date();
+    prevDate.setMonth(prevDate.getMonth() - 1);
+    const prevMonth = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}`;
+    const sumMonth = (m: string) =>
+      expenses.filter((e) => e.type === 'expense' && monthOf(e.date) === m).reduce((s, e) => s + e.amount, 0);
+    const thisM = sumMonth(thisMonth);
+    const prevM = sumMonth(prevMonth);
+    const diffPct = prevM > 0 ? Math.round(((thisM - prevM) / prevM) * 100) : null;
+    return { income, expenseTotal, net: income - expenseTotal, noExpenseToday, diffPct };
+  }, [expenses, today, thisMonth]);
 
-  /* بناء مسارات Pie */
-  let cum = 0;
-  const r = 55, cx = 60, cy = 60;
-  const piePaths = pieEntries.map(([cat, val]) => {
-    const angle = (val / pieSum) * 360;
-    const s = ((cum - 90) * Math.PI) / 180;
-    const e = ((cum + angle - 90) * Math.PI) / 180;
-    const x1 = cx + r * Math.cos(s), y1 = cy + r * Math.sin(s);
-    const x2 = cx + r * Math.cos(e), y2 = cy + r * Math.sin(e);
-    const large = angle > 180 ? 1 : 0;
-    cum += angle;
-    return { d: `M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${large} 1 ${x2},${y2} Z`, color: catMeta(cat).color, cat };
-  });
+  /* توزيع الفئات + مسارات Pie — مخزّنة */
+  const { catTotals, pieEntries, pieSum, piePaths } = useMemo(() => {
+    const catTotals: Record<string, number> = {};
+    expenses.filter((e) => e.type === 'expense').forEach((e) => {
+      catTotals[e.category] = (catTotals[e.category] || 0) + e.amount;
+    });
+    const pieEntries = Object.entries(catTotals).sort((a, b) => b[1] - a[1]);
+    const pieSum = pieEntries.reduce((s, [, v]) => s + v, 0) || 1;
+    let cum = 0;
+    const r = 55, cx = 60, cy = 60;
+    const colorOf = (name: string) => allCats.find((c) => c.name === name)?.color ?? 'var(--chart-8)';
+    const piePaths = pieEntries.map(([cat, val]) => {
+      const angle = (val / pieSum) * 360;
+      const s = ((cum - 90) * Math.PI) / 180;
+      const e = ((cum + angle - 90) * Math.PI) / 180;
+      const x1 = cx + r * Math.cos(s), y1 = cy + r * Math.sin(s);
+      const x2 = cx + r * Math.cos(e), y2 = cy + r * Math.sin(e);
+      const large = angle > 180 ? 1 : 0;
+      cum += angle;
+      return { d: `M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${large} 1 ${x2},${y2} Z`, color: colorOf(cat), cat };
+    });
+    return { catTotals, pieEntries, pieSum, piePaths };
+  }, [expenses, allCats]);
 
   const handleSaveExpense = () => {
     const amt = Number(form.amount);
@@ -194,9 +201,7 @@ export default function Expenses() {
       <BackButton />
 
       <h1 className="section-title">💰 دراهمي</h1>
-      <div className="intro-card">
-        💊 <strong>الجرعة المحفزة:</strong> ضبط ميزانيتك الحين، عشان تستانس وتدخر للمستقبل بدون ضغط.
-      </div>
+      <Dose section="expenses" />
 
       <div className="subtabs">
         <button className={tab === 'overview' ? 'subtab active' : 'subtab'} onClick={() => setTab('overview')}>

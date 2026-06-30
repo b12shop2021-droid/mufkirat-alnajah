@@ -4,13 +4,19 @@
    كل القيم من useCore المركزي.
    =================================================================== */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useCore } from '../core/useCore';
 import XPBar from '../components/XPBar';
+import { fireConfetti } from '../components/Confetti';
 import { getDailyQuote } from '../data/quotes';
+import { getRandomWelcome } from '../data/welcomeMessages';
+import { DAY_DONE_POPUPS, pickPopup, pickLine, AWAY_LINES, HARVEST_BANNER, personalize, type PopupMsg } from '../data/vibes';
 
 const DAY_NAMES = ['أحد', 'اثن', 'ثلا', 'أرب', 'خمي', 'جمع', 'سبت'];
+
+/* محيط حلقة التقدّم الدائرية (نصف القطر 26) — ثابت لحساب stroke-dashoffset */
+const RING_CIRC = 2 * Math.PI * 26;
 
 const MOTIVATIONS = [
   'كل خطوة صغيرة تقرّبك لحلمك — لا تستهين فيها',
@@ -32,6 +38,8 @@ export default function Home() {
   const today = dateBefore(0);
 
   const greeting = s.profile.nickname || s.profile.name || 'بطل';
+  /* الاسم الشخصي للبوستات المحفزة (الاسم ← اللقب ← «بطل») */
+  const personalName = s.profile.name || s.profile.nickname || 'بطل';
 
   /* التاريخ الهجري (أم القرى) — لمسة سعودية */
   const hijriDate = (() => {
@@ -95,10 +103,12 @@ export default function Home() {
             ? { t: '🙏 اكتب شكر اليوم', to: '/notes' }
             : { t: '🎉 يومك كامل، كفو!', to: '/achievements' };
 
-  /* نظرة الأسبوع */
+  /* نظرة الأسبوع — من الأحد (بداية الأسبوع) للسبت، يُعرض من اليمين لليسار */
+  const todayDow = new Date().getDay(); // الأحد = 0 … السبت = 6
   const week = Array.from({ length: 7 }, (_, i) => {
-    const date = dateBefore(6 - i);
-    return { day: DAY_NAMES[new Date(date + 'T00:00:00').getDay()], v: Math.round((activityOn(date) / 5) * 100) };
+    // i=0 → الأحد، i=6 → السبت
+    const date = dateBefore(todayDow - i);
+    return { day: DAY_NAMES[i], v: Math.round((activityOn(date) / 5) * 100) };
   });
 
   const motiv = MOTIVATIONS[new Date().getDate() % MOTIVATIONS.length];
@@ -109,6 +119,67 @@ export default function Home() {
   const [editingIntent, setEditingIntent] = useState(false);
   const [showIntentArchive, setShowIntentArchive] = useState(false);
   const [nudgeDismissed, setNudgeDismissed] = useState(false);
+
+  /* بطاقة ترحيب عشوائية — تظهر مرة كل جلسة وتنغلق بضغطة */
+  const [welcome] = useState(() => {
+    try {
+      if (sessionStorage.getItem('alhimmah_welcome_seen')) return null;
+    } catch { /* sessionStorage غير متاح */ }
+    return getRandomWelcome();
+  });
+  const [welcomeOpen, setWelcomeOpen] = useState(true);
+  const dismissWelcome = () => {
+    setWelcomeOpen(false);
+    try { sessionStorage.setItem('alhimmah_welcome_seen', '1'); } catch { /* تجاهل */ }
+  };
+
+  /* بطاقة «قفل اليوم» — تظهر مرة واحدة باليوم عند إكمال ١٠٠٪ من الروتين */
+  const dayComplete = routine.length > 0 && doneToday === routine.length;
+  const [dayPopup, setDayPopup] = useState<PopupMsg | null>(null);
+  useEffect(() => {
+    if (!dayComplete) return;
+    const key = `alhimmah_dayclose_${today}`;
+    try {
+      if (localStorage.getItem(key)) return;
+      localStorage.setItem(key, '1');
+    } catch { /* تجاهل */ }
+    setDayPopup(pickPopup(DAY_DONE_POPUPS));
+  }, [dayComplete, today]);
+
+  /* الكونفيتي ينطلق بعد ظهور البطاقة — وقتها مستمع الكونفيتي جاهز أكيد */
+  useEffect(() => {
+    if (dayPopup) fireConfetti();
+  }, [dayPopup]);
+
+  /* بانر السحبة — يظهر لو غاب ٣ أيام أو أكثر (يعتمد آخر فتح للتطبيق) */
+  const [awayMsg, setAwayMsg] = useState<string | null>(null);
+  useEffect(() => {
+    try {
+      const last = localStorage.getItem('alhimmah_last_seen');
+      if (last && last !== today) {
+        const gap = Math.round((Date.parse(today) - Date.parse(last)) / 86_400_000);
+        if (gap >= 3) setAwayMsg(pickLine(AWAY_LINES));
+      }
+      localStorage.setItem('alhimmah_last_seen', today);
+    } catch { /* تجاهل */ }
+  }, [today]);
+
+  /* بانر حصاد الأسبوع — نهاية الأسبوع (الخميس/الجمعة)، مرة كل أسبوع */
+  const weekKey = (() => {
+    const d = new Date();
+    const start = new Date(d.getFullYear(), 0, 1);
+    const week = Math.floor((((d.getTime() - start.getTime()) / 86_400_000) + start.getDay()) / 7);
+    return `${d.getFullYear()}-w${week}`;
+  })();
+  const isWeekend = [4, 5, 6].includes(new Date().getDay()); // الخميس=٤ · الجمعة=٥ · السبت=٦ (نهاية الأسبوع السعودي)
+  const [harvestOpen, setHarvestOpen] = useState(() => {
+    if (!isWeekend) return false;
+    try { return !localStorage.getItem(`alhimmah_harvest_${weekKey}`); } catch { return true; }
+  });
+  const dismissHarvest = () => {
+    setHarvestOpen(false);
+    try { localStorage.setItem(`alhimmah_harvest_${weekKey}`, '1'); } catch { /* تجاهل */ }
+  };
 
   /* تنبيه ذكي سياقي: يختار أهم تذكير حسب حالتك اليوم (الأعلى أولوية) */
   const smartNudge = (() => {
@@ -178,7 +249,7 @@ export default function Home() {
   })();
 
   const tiles = [
-    { icon: '/icons/more.webp', label: 'الهمّة', to: '/more', streak: s.streak.current },
+    { icon: '/icons/more.webp', label: 'الهـمّــة', to: '/more', streak: s.streak.current },
     { icon: '/icons/routine.webp', label: 'روتيني الصح', to: '/routine' },
     { icon: '/icons/goals.webp', label: 'الأهداف', to: '/goals' },
     { icon: '/icons/expenses.webp', label: 'دراهمي', to: '/expenses' },
@@ -207,16 +278,57 @@ export default function Home() {
             {hijriDate && <div className="home-hero-date">🗓️ {hijriDate} هـ</div>}
             <div className="home-hero-title">حقق حلمك وكن ملهماً ✨</div>
           </div>
-          <button className="home-hero-search" aria-label="بحث شامل" onClick={() => navigate('/search')}>🔍</button>
-        </div>
-        <div className="home-progress-wrap">
-          <span className="home-progress-label">{dayPct}%</span>
-          <div className="home-progress-bg">
-            <div className="home-progress-fill" style={{ width: `${dayPct}%` }} />
+          <div className="home-hero-side">
+            <button className="home-hero-search" aria-label="بحث شامل" onClick={() => navigate('/search')}>🔍</button>
+            <div className="home-ring" role="img" aria-label={`إنجاز يومك ${dayPct}٪`}>
+              <svg width="64" height="64" viewBox="0 0 64 64">
+                <circle className="home-ring-track" cx="32" cy="32" r="26" />
+                <circle
+                  className="home-ring-fill"
+                  cx="32"
+                  cy="32"
+                  r="26"
+                  style={{
+                    strokeDasharray: RING_CIRC,
+                    strokeDashoffset: RING_CIRC * (1 - dayPct / 100),
+                  }}
+                />
+              </svg>
+              <span className="home-ring-pct">{dayPct}٪</span>
+            </div>
           </div>
-          <span className="home-progress-label">إنجاز يومك</span>
         </div>
       </div>
+
+      {welcome && welcomeOpen && (
+        <div className="welcome-card">
+          <button className="welcome-close" aria-label="إغلاق" onClick={dismissWelcome}>✕</button>
+          <div className="welcome-title">{personalize(welcome.title, personalName)}</div>
+          <div className="welcome-body">{welcome.body}</div>
+          <button className="btn-primary welcome-cta" onClick={dismissWelcome}>يلا نبدأ 🚀</button>
+        </div>
+      )}
+
+      {awayMsg && (
+        <div className="alert-banner away">
+          <button className="welcome-close" aria-label="إغلاق" onClick={() => setAwayMsg(null)}>✕</button>
+          <div className="alert-banner-text">{personalize(awayMsg, personalName)}</div>
+          <button className="btn-primary welcome-cta" onClick={() => { setAwayMsg(null); navigate('/routine'); }}>
+            رتّب مهامي ←
+          </button>
+        </div>
+      )}
+
+      {harvestOpen && (
+        <div className="alert-banner harvest">
+          <button className="welcome-close" aria-label="إغلاق" onClick={dismissHarvest}>✕</button>
+          <div className="welcome-title">{personalize(HARVEST_BANNER.title, personalName)}</div>
+          <div className="alert-banner-text">{HARVEST_BANNER.body}</div>
+          <button className="btn-primary welcome-cta" onClick={() => { dismissHarvest(); navigate(HARVEST_BANNER.to); }}>
+            {HARVEST_BANNER.cta}
+          </button>
+        </div>
+      )}
 
       {smartNudge && !nudgeDismissed && (
         <div className="smart-nudge">
@@ -377,6 +489,16 @@ export default function Home() {
       <button className="fab" aria-label="خطوة سريعة" onClick={() => navigate(next.to)}>
         +
       </button>
+
+      {dayPopup && (
+        <div className="popup-overlay" onClick={() => setDayPopup(null)}>
+          <div className="popup-card" onClick={(e) => e.stopPropagation()}>
+            <div className="popup-title">{personalize(dayPopup.title, personalName)}</div>
+            <div className="popup-body">{dayPopup.body}</div>
+            <button className="btn-primary welcome-cta" onClick={() => setDayPopup(null)}>تمام 🎉</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

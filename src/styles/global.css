@@ -3,6 +3,45 @@
    كل الألوان معرّفة كمتغيرات في :root — ممنوع لون ثابت داخل المكوّنات
    =================================================================== */
 
+/* خط Tajawal — خط الواجهة الأساسي (عصري واضح، مستضاف محلياً) */
+@font-face {
+  font-family: 'Tajawal';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/tajawal-400-arabic.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Tajawal';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/tajawal-500-arabic.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Tajawal';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/tajawal-700-arabic.woff2') format('woff2');
+}
+
+/* خط IBM Plex Sans Arabic — للعناوين واسم التطبيق فقط (مستضاف محلياً) */
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/ibmplex-600-arabic.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/ibmplex-700-arabic.woff2') format('woff2');
+}
+
 /* خط Amiri — مستضاف محلياً (بدون طلب خارجي حاجب). يُستعمل للآيات والنصوص الرسمية */
 @font-face {
   font-family: 'Amiri';
@@ -36,6 +75,16 @@
   src: url('/fonts/amiri-700-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+
+/* خطوط إضافية ملهمة وواضحة (محمّلة محلياً) */
+@font-face { font-family: 'Cairo'; font-style: normal; font-weight: 400; font-display: swap; src: url('/fonts/cairo-400-arabic.woff2') format('woff2'); }
+@font-face { font-family: 'Cairo'; font-style: normal; font-weight: 700; font-display: swap; src: url('/fonts/cairo-700-arabic.woff2') format('woff2'); }
+@font-face { font-family: 'Almarai'; font-style: normal; font-weight: 400; font-display: swap; src: url('/fonts/almarai-400-arabic.woff2') format('woff2'); }
+@font-face { font-family: 'Almarai'; font-style: normal; font-weight: 700; font-display: swap; src: url('/fonts/almarai-700-arabic.woff2') format('woff2'); }
+@font-face { font-family: 'Changa'; font-style: normal; font-weight: 400; font-display: swap; src: url('/fonts/changa-400-arabic.woff2') format('woff2'); }
+@font-face { font-family: 'Changa'; font-style: normal; font-weight: 700; font-display: swap; src: url('/fonts/changa-700-arabic.woff2') format('woff2'); }
+@font-face { font-family: 'El Messiri'; font-style: normal; font-weight: 400; font-display: swap; src: url('/fonts/elmessiri-400-arabic.woff2') format('woff2'); }
+@font-face { font-family: 'El Messiri'; font-style: normal; font-weight: 700; font-display: swap; src: url('/fonts/elmessiri-700-arabic.woff2') format('woff2'); }
 
 :root {
   /* الهوية البصرية المعتمدة */
@@ -73,7 +122,8 @@
   --grad-calm: linear-gradient(165deg, var(--deep), #0f2433);
 
   /* خطوط */
-  --font-ui: 'Alyamama', 'Segoe UI', 'Tahoma', sans-serif;
+  --font-ui: 'Tajawal', 'Segoe UI', 'Tahoma', sans-serif;
+  --font-display: 'IBM Plex Sans Arabic', 'Tajawal', 'Segoe UI', sans-serif;
   --font-formal: 'Amiri', serif;
 
   /* لوحة ألوان الرسوم البيانية (Pie/Bar) */
@@ -125,6 +175,9 @@
   }
 }
 
+html {
+  font-size: 19px;
+}
 html,
 body {
   background: var(--bg);
@@ -148,6 +201,18 @@ body {
 :root[data-font='large'] #root {
   zoom: 1.12;
 }
+:root[data-font='xlarge'] #root {
+  zoom: 1.26;
+}
+
+/* نوع خط الواجهة (يختاره المستخدم من الإعدادات) */
+:root[data-fontfamily='ibmplex']  { --font-ui: 'IBM Plex Sans Arabic', 'Tajawal', 'Segoe UI', sans-serif; }
+:root[data-fontfamily='amiri']    { --font-ui: 'Amiri', 'Tajawal', 'Segoe UI', serif; }
+:root[data-fontfamily='cairo']    { --font-ui: 'Cairo', 'Tajawal', 'Segoe UI', sans-serif; }
+:root[data-fontfamily='almarai']  { --font-ui: 'Almarai', 'Tajawal', 'Segoe UI', sans-serif; }
+:root[data-fontfamily='changa']   { --font-ui: 'Changa', 'Tajawal', 'Segoe UI', sans-serif; }
+:root[data-fontfamily='elmessiri']{ --font-ui: 'El Messiri', 'Tajawal', 'Segoe UI', serif; }
+/* tajawal = الافتراضي، لا حاجة لتجاوز */
 
 /* الزر العائم السريع */
 .fab {
@@ -197,6 +262,30 @@ select {
   padding: 16px 16px calc(var(--nav-height) + 24px);
 }
 
+/* ===== حركة دخول ناعمة لكل بطاقات/عناصر الصفحة (تتدرّج عند فتح أي صفحة) ===== */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.page > *:not(.fab):not(.popup-overlay) {
+  animation: fade-in-up 0.45s ease both;
+}
+
+.page > *:nth-child(1) { animation-delay: 0s; }
+.page > *:nth-child(2) { animation-delay: 0.04s; }
+.page > *:nth-child(3) { animation-delay: 0.08s; }
+.page > *:nth-child(4) { animation-delay: 0.12s; }
+.page > *:nth-child(5) { animation-delay: 0.16s; }
+.page > *:nth-child(6) { animation-delay: 0.2s; }
+.page > *:nth-child(n + 7) { animation-delay: 0.24s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .page > *:not(.fab):not(.popup-overlay) {
+    animation: none;
+  }
+}
+
 /* ===== رأس الصفحة الموحّد (PageHero) — نظام تصميم واحد لكل الصفحات ===== */
 .page-hero {
   position: relative;
@@ -234,8 +323,9 @@ select {
 }
 
 .page-hero-title {
+  font-family: var(--font-display);
   font-size: 1.15rem;
-  font-weight: 800;
+  font-weight: 700;
   margin-top: 8px;
   line-height: 1.35;
 }
@@ -608,6 +698,49 @@ select {
 
 .task-row:last-child {
   border-bottom: none;
+}
+
+/* ===== سحب مهمة الروتين لإكمالها (Swipe to complete) ===== */
+.swipe-row {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+}
+
+.swipe-bg {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: #fff;
+  padding: 0 18px;
+  opacity: 0;
+}
+
+.swipe-bg.right {
+  justify-content: flex-start;
+  background: var(--success);
+  opacity: 1;
+}
+
+.swipe-bg.left {
+  justify-content: flex-end;
+  background: var(--warning);
+  opacity: 1;
+}
+
+.swipe-bg.left.danger {
+  background: var(--danger);
+}
+
+.swipe-content {
+  position: relative;
+  z-index: 1;
+  background: var(--surface);
+  touch-action: pan-y;
+  cursor: grab;
 }
 
 .prio-dot {
@@ -3777,8 +3910,9 @@ select {
 }
 
 .home-hero-greet {
+  font-family: var(--font-display);
   font-size: 0.92rem;
-  font-weight: 800;
+  font-weight: 700;
   margin-bottom: 6px;
   color: #fff;
 }
@@ -3844,6 +3978,53 @@ select {
   transition: width 0.6s ease;
 }
 
+/* ===== حلقة تقدّم يومك الدائرية (هيرو الرئيسية) ===== */
+.home-hero-side {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.home-ring {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+}
+
+.home-ring svg {
+  transform: rotate(-90deg);
+}
+
+.home-ring-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.25);
+  stroke-width: 6;
+}
+
+.home-ring-fill {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+.home-ring-pct {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #fff;
+}
+
 .greet-strip {
   padding: 13px 18px;
   border-radius: var(--radius-sm);
@@ -3886,6 +4067,109 @@ select {
 }
 
 /* ===== بطاقة التحدّي الأسبوعي ===== */
+/* بطاقة الترحيب العشوائية (الرئيسية) */
+.welcome-card {
+  position: relative;
+  border-radius: var(--radius);
+  padding: 18px 18px 16px;
+  margin: 14px 0 4px;
+  color: #fff;
+  background: var(--grad-primary);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  animation: welcome-in 0.4s ease;
+}
+@keyframes welcome-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.welcome-close {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  line-height: 1;
+}
+.welcome-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin-bottom: 8px;
+}
+.welcome-body {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  opacity: 0.96;
+}
+.welcome-cta {
+  width: 100%;
+  margin-top: 14px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* بانرات داخل التطبيق (السحبة / الحصاد) */
+.alert-banner {
+  position: relative;
+  border-radius: var(--radius);
+  padding: 16px 18px 14px;
+  margin: 12px 0;
+  color: #fff;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  animation: welcome-in 0.4s ease;
+}
+.alert-banner.away { background: var(--grad-sunset); }
+.alert-banner.harvest { background: var(--grad-primary); }
+.alert-banner-text {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  opacity: 0.97;
+}
+
+/* بطاقة منبثقة عند الإنجاز (قفل اليوم) */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 200;
+  animation: welcome-in 0.25s ease;
+}
+.popup-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 22px 20px;
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-card);
+  border-top: 5px solid var(--celebrate);
+}
+.popup-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+.popup-body {
+  font-size: 0.92rem;
+  line-height: 1.75;
+  color: var(--text);
+}
+
 .weekly-card {
   position: relative;
   border-radius: var(--radius);
@@ -4396,7 +4680,7 @@ select {
 
 /* الشعار النصي: «الهمّة حتى القمّة» */
 .auth-slogan {
-  font-family: var(--font-formal);
+  font-family: var(--font-display);
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--primary);
@@ -4405,8 +4689,9 @@ select {
 }
 
 .auth-title {
+  font-family: var(--font-display);
   font-size: 1.4rem;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--deep);
 }
 
@@ -5134,29 +5419,30 @@ select {
 .app-icon.sm { width: 30px; height: 30px; }
 .app-icon.lg { width: 52px; height: 52px; }
 
-/* صف 0 */
-.ic-hub          { background-position: 0%   0%; }
-.ic-analytics    { background-position: 20%  0%; }
-.ic-habits       { background-position: 40%  0%; }
-.ic-goals        { background-position: 60%  0%; }
-.ic-meals        { background-position: 80%  0%; }
-.ic-workouts     { background-position: 100% 0%; }
+/* أيقونات مستقلة موحّدة (ملف webp لكل وحدة، متمركزة) */
+.ic-hub          { background-image: url('/icons/more.webp'); background-position: center; background-size: contain; background-repeat: no-repeat; }
+.ic-analytics    { background-image: url('/icons/analytics.webp'); background-position: center; background-size: contain; background-repeat: no-repeat; }
+.ic-goals        { background-image: url('/icons/goals.webp'); background-position: center; background-size: contain; background-repeat: no-repeat; }
+.ic-meals        { background-image: url('/icons/meals.webp'); background-position: center; background-size: contain; background-repeat: no-repeat; }
+.ic-workouts     { background-image: url('/icons/workouts.webp'); background-position: center; background-size: contain; background-repeat: no-repeat; }
+.ic-expenses     { background-image: url('/icons/expenses.webp'); background-position: center; background-size: contain; background-repeat: no-repeat; }
+.ic-achievements { background-image: url('/icons/achievements.webp'); background-position: center; background-size: contain; background-repeat: no-repeat; }
+.ic-pledges      { background-image: url('/icons/pledges.webp'); background-position: center; background-size: contain; background-repeat: no-repeat; }
 
-/* صف 1 */
-.ic-expenses     { background-position: 0%   50%; }
-.ic-achievements { background-position: 20%  50%; }
-.ic-pledges      { background-position: 40%  50%; }
-.ic-settings     { background-position: 60%  50%; }
+/* لا يزال لها موضع سبرايت (لا يوجد ملف مستقل): habits / sleep / timecapsule */
+.ic-habits       { background-position: 40%  0%; }
+.ic-settings     { background-image: url('/icons/settings.webp'); background-position: center; background-size: contain; background-repeat: no-repeat; }
 .ic-sleep        { background-position: 80%  50%; }
 .ic-timecapsule  { background-position: 100% 50%; }
 
 /* صف 2 */
-.ic-selfdev      { background-position: 0%   100%; }
-.ic-home         { background-position: 20%  100%; }
-.ic-routine      { background-position: 40%  100%; }
-.ic-mood         { background-position: 60%  100%; }
-.ic-notes        { background-position: 80%  100%; }
-.ic-quran        { background-position: 100% 100%; }
+.ic-selfdev      { background-image: url('/icons/selfdev.webp'); background-position: center; background-size: contain; background-repeat: no-repeat; }
+.ic-home         { background-image: url('/icons/home.webp'); background-position: center; background-size: contain; background-repeat: no-repeat; }
+.ic-routine      { background-image: url('/icons/routine.webp'); background-position: center; background-size: contain; background-repeat: no-repeat; }
+.ic-mood         { background-image: url('/icons/occasions.webp'); background-position: center; background-size: contain; background-repeat: no-repeat; }
+.ic-occasions    { background-image: url('/icons/occasions.webp'); background-position: center; background-size: contain; background-repeat: no-repeat; }
+.ic-notes        { background-image: url('/icons/notes.webp'); background-position: center; background-size: contain; background-repeat: no-repeat; }
+.ic-quran        { background-image: url('/icons/quran.webp'); background-position: center; background-size: contain; background-repeat: no-repeat; }
 
 /* مواقيت الصلاة */
 .prayer-grid {

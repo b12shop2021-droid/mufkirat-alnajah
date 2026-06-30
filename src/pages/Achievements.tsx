@@ -6,6 +6,7 @@
 import { lazy, Suspense, useState } from 'react';
 import BackButton from '../components/BackButton';
 import XPBar from '../components/XPBar';
+import Dose from '../components/Dose';
 
 const Streak = lazy(() => import('./Streak'));
 const JourneyGallery = lazy(() => import('./JourneyGallery'));
@@ -29,9 +30,7 @@ export default function Achievements() {
       <BackButton to="/" />
       <XPBar />
       <h1 className="section-title">🏆 منصة التتويج</h1>
-      <div className="intro-card">
-        💊 <strong>الجرعة المحفزة:</strong> وثّق بطولاتك وإنجازاتك، لأنك تعبت وتستاهل تحتفل بها!
-      </div>
+      <Dose section="achievements" />
       <div className="subtabs">
         <button className={tab === 'streak' ? 'subtab active' : 'subtab'} onClick={() => setTab('streak')}>
           🔥 السلسلة والألقاب

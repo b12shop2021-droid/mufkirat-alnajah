@@ -1,5 +1,5 @@
 /* Service Worker: تخزين مؤقت + إشعارات مجدولة محلياً */
-const CACHE = 'mufkirat-v2';
+const CACHE = 'mufkirat-v3';
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.add('/')));
@@ -18,6 +18,28 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
+
+  // صفحات التنقّل (HTML): الشبكة أولاً — حتى تنزل النسخة الجديدة دائماً،
+  // والكاش بديل احتياطي فقط عند انقطاع الإنترنت.
+  const isNav = req.mode === 'navigate' ||
+    (req.headers.get('accept') || '').includes('text/html');
+  if (isNav) {
+    e.respondWith(
+      fetch(req)
+        .then((res) => {
+          if (res && res.status === 200) {
+            const copy = res.clone();
+            caches.open(CACHE).then((c) => c.put('/', copy));
+          }
+          return res;
+        })
+        .catch(() => caches.match(req).then((c) => c || caches.match('/'))),
+    );
+    return;
+  }
+
+  // باقي الموارد (JS/CSS/صور): stale-while-revalidate —
+  // يخدم من الكاش بسرعة ويحدّثه بالخلفية للمرة الجاية.
   e.respondWith(
     caches.match(req).then((cached) => {
       const fetched = fetch(req)

@@ -6,6 +6,7 @@
 
 import { lazy, Suspense, useState } from 'react';
 import BackButton from '../components/BackButton';
+import Dose from '../components/Dose';
 
 const CaptainWorkout = lazy(() => import('./CaptainWorkout'));
 const CustomWorkout = lazy(() => import('./CustomWorkout'));
@@ -27,9 +28,7 @@ export default function Workouts() {
     <div className="page">
       <BackButton to="/" />
       <h1 className="section-title">🏋️ قم لـ جيم</h1>
-      <div className="intro-card">
-        💊 <strong>الجرعة المحفزة:</strong> شد حيلك مع المدرب سعود، الصحة هيبة والنشاط طاقة!
-      </div>
+      <Dose section="workouts" />
       <div className="subtabs">
         <button className={tab === 'captain' ? 'subtab active' : 'subtab'} onClick={() => setTab('captain')}>
           🏋️ المدرب سعود

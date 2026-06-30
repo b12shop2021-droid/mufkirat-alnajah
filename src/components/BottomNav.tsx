@@ -10,11 +10,11 @@ interface NavEntry {
 }
 
 const NAV_ITEMS: NavEntry[] = [
-  { path: '/',          label: 'الرئيسية',  iconClass: 'ic-home'      },
-  { path: '/goals',     label: 'الأهداف',   iconClass: 'ic-goals', img: '/icons/goals.webp' },
-  { path: '/quran',  label: 'القرآن',     iconClass: 'ic-quran' },
-  { path: '/notes',  label: 'الملاحظات', iconClass: 'ic-notes'  },
-  { path: '/more',      label: 'المزيد',    iconClass: 'ic-hub'       },
+  { path: '/',          label: 'رحلتك للنجاح', iconClass: 'ic-home'  },
+  { path: '/notes',     label: 'فضفضة',        iconClass: 'ic-notes' },
+  { path: '/quran',     label: 'نور حياتي',    iconClass: 'ic-quran' },
+  { path: '/occasions', label: 'الغالين',      iconClass: 'ic-occasions' },
+  { path: '/more',      label: 'المزيد',       iconClass: 'ic-hub'   },
 ];
 
 export default function BottomNav() {

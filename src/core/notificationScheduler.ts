@@ -25,12 +25,12 @@ function msUntil(hhmm: string): number {
 }
 
 const NOTIF_LABELS: Record<string, { title: string; body: string }> = {
-  morning: { title: '☀️ صباح الخير!', body: 'وقت روتين الصباح — ابدأ يومك بقوة 💪' },
-  evening: { title: '🌙 مساء النور', body: 'لا تنسى روتينك المسائي قبل النوم' },
-  gratitude: { title: '🙏 لحظة شكر', body: 'سجّل ٣ أشياء تشكر الله عليها اليوم' },
-  streak: { title: '🔥 سلسلتك في خطر!', body: 'ما سجّلت نشاطاً اليوم — خلّ السلسلة ما تنكسر' },
-  meal: { title: '🍽️ وقت الوجبة', body: 'لا تنسى تسجّل وجبتك الرئيسية' },
-  water: { title: '💧 اشرب ماء', body: 'جسمك يحتاج ترطيب — اشرب كوب ماء الآن' },
+  morning: { title: 'صباح الهيبة يا مبدع! ⚡', body: 'أشرقت الشمس ويومك ناديك — قُم سمّ بالله وابدأ بقوة 🚀' },
+  evening: { title: 'يعطيك العافية يا بطل ☕️', body: 'قفّل ملفات اليوم، اشرب مويتك، واذكر ربك ونم وأنت مرتاح 😴' },
+  gratitude: { title: 'لحظة شكر 🙏', body: 'سجّل ٣ نعم تشكر الله عليها اليوم — ترفع مزاجك فعلاً ✨' },
+  streak: { title: 'سلسلتك في خطر! 🔥', body: 'ما سجّلت نشاط اليوم — أنجز أي مهمة وثبّت سلسلتك قبل ما تنكسر' },
+  meal: { title: 'وقت الوجبة 🍽️', body: 'سجّل أكلك وخلك واعي — أكلك الصح طاقتك الصح 🥦' },
+  water: { title: 'اشرب مويتك 💧', body: 'جسمك يطلب ترطيب — كاسة ماء الحين تفرق في طاقتك' },
 };
 
 export async function scheduleNotifications(opts: ScheduleOptions): Promise<void> {

@@ -16,9 +16,20 @@ export function initPwa(): void {
     deferred = e as BeforeInstallPromptEvent;
   });
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').catch(() => {});
-    });
+    if (import.meta.env.PROD) {
+      // الإنتاج فقط: سجّل الـSW
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      });
+    } else {
+      // التطوير: ألغِ أي SW قديم وامسح الكاش حتى لا يخدم وحدات Vite قديمة (شاشة بيضاء)
+      navigator.serviceWorker.getRegistrations().then((regs) => {
+        regs.forEach((r) => r.unregister());
+      }).catch(() => {});
+      if ('caches' in window) {
+        caches.keys().then((keys) => keys.forEach((k) => caches.delete(k))).catch(() => {});
+      }
+    }
   }
 }
 

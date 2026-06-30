@@ -167,6 +167,7 @@ export interface Relation {
   name: string;
   contacted: boolean;
   contactedDate?: string; // YYYY-MM-DD آخر يوم تواصلت فيه (لقياس آخر 7 أيام)
+  scheduledAt?: string;   // datetime-local (YYYY-MM-DDTHH:mm) موعد مجدول للاتصال القادم
 }
 
 export interface WeeklyReview {
@@ -194,7 +195,8 @@ export interface CoreState {
   accent: AccentName; // اسم الثيم (لا اللون المباشر)
   dark: boolean;
   autoDark: boolean; // وضع ليلي تلقائي حسب الوقت
-  fontScale: 'normal' | 'large'; // حجم الخط
+  fontScale: 'normal' | 'large' | 'xlarge'; // حجم الخط
+  fontFamily: 'tajawal' | 'ibmplex' | 'amiri' | 'cairo' | 'almarai' | 'changa' | 'elmessiri'; // نوع خط الواجهة
   soundOn: boolean; // أصوات النجاح (مطفأة افتراضياً)
   countedMemorizedJuz: number[]; // أجزاء حُسبت +50 لمنع التكرار
   countedReadJuz: number[]; // أجزاء حُسبت +20 لمنع التكرار
@@ -324,7 +326,7 @@ export const LEVELS = [
   'طاير 🐣',
   'صاعد 🚀',
   'نمر 🐅',
-  'وحش 🔥',
+  'مبدع 🔥',
   'محترف 🎯',
   'أسطورة 👑',
   'قمة الهمّة 🏔️',
@@ -386,6 +388,7 @@ const DEFAULT_STATE: CoreState = {
   dark: false,
   autoDark: false,
   fontScale: 'normal',
+  fontFamily: 'tajawal',
   soundOn: false,
   countedMemorizedJuz: [],
   countedReadJuz: [],
@@ -460,6 +463,7 @@ const loadState = (): CoreState => {
       streak: { ...DEFAULT_STATE.streak, ...parsed.streak },
       autoDark: parsed.autoDark ?? false,
       fontScale: parsed.fontScale ?? 'normal',
+      fontFamily: parsed.fontFamily ?? 'tajawal',
       soundOn: parsed.soundOn ?? false,
       countedMemorizedJuz: parsed.countedMemorizedJuz ?? [],
       countedReadJuz: parsed.countedReadJuz ?? [],
@@ -529,7 +533,8 @@ interface CoreContextValue {
   toggleDark: () => void;
   toggleAutoDark: () => void;
   toggleSound: () => void;
-  setFontScale: (scale: 'normal' | 'large') => void;
+  setFontScale: (scale: 'normal' | 'large' | 'xlarge') => void;
+  setFontFamily: (family: 'tajawal' | 'ibmplex' | 'amiri' | 'cairo' | 'almarai' | 'changa' | 'elmessiri') => void;
   markMemorizedJuz: (juz: number) => boolean; // true إذا احتُسبت لأول مرة
   // ===== الروتين =====
   addRoutineTask: (section: RoutineSection, text: string) => void;
@@ -581,6 +586,7 @@ interface CoreContextValue {
   logSleep: (date: string, hours: number) => void; // استيراد مباشر بالتاريخ والساعات
   addRelation: (name: string) => void;
   toggleRelation: (id: string) => void;
+  scheduleRelationCall: (id: string, when: string) => void; // جدولة موعد اتصال ('' يلغي)
   removeRelation: (id: string) => void;
   // ===== مراجعة الأسبوع =====
   addWeeklyReview: (success: string, challenge: string, next: string) => void; // +20
@@ -681,7 +687,8 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     const effectiveDark = state.autoDark ? hour >= 19 || hour < 6 : state.dark;
     root.setAttribute('data-dark', String(effectiveDark));
     root.setAttribute('data-font', state.fontScale);
-  }, [state.accent, state.dark, state.autoDark, state.fontScale]);
+    root.setAttribute('data-fontfamily', state.fontFamily);
+  }, [state.accent, state.dark, state.autoDark, state.fontScale, state.fontFamily]);
 
   /* مزامنة تفعيل أصوات النجاح مع الحالة (عند الإقلاع وأي تغيير) */
   useEffect(() => {
@@ -810,8 +817,13 @@ export function CoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   /* ضبط حجم الخط */
-  const setFontScale = useCallback((scale: 'normal' | 'large') => {
+  const setFontScale = useCallback((scale: 'normal' | 'large' | 'xlarge') => {
     setState((s) => ({ ...s, fontScale: scale }));
+  }, []);
+
+  /* ضبط نوع خط الواجهة */
+  const setFontFamily = useCallback((family: 'tajawal' | 'ibmplex' | 'amiri' | 'cairo' | 'almarai' | 'changa' | 'elmessiri') => {
+    setState((s) => ({ ...s, fontFamily: family }));
   }, []);
 
   /* احتساب حفظ جزء قرآن مرة واحدة فقط (+50 لا تتكرر) */
@@ -1506,13 +1518,24 @@ export function CoreProvider({ children }: { children: ReactNode }) {
         relations: s.relations.map((r) => {
           if (r.id !== id) return r;
           nowContacted = !r.contacted;
-          return { ...r, contacted: nowContacted, contactedDate: nowContacted ? todayStr() : undefined };
+          // عند تأكيد الاتصال: سجّل تاريخ اليوم وامسح الموعد المجدول (تمّ)
+          return { ...r, contacted: nowContacted, contactedDate: nowContacted ? todayStr() : undefined, scheduledAt: nowContacted ? undefined : r.scheduledAt };
         }),
       }));
       if (nowContacted) addXP(5);
     },
     [addXP],
   );
+
+  /* جدولة موعد اتصال قادم (datetime-local) — تمرير '' يلغي الموعد */
+  const scheduleRelationCall = useCallback((id: string, when: string) => {
+    setState((s) => ({
+      ...s,
+      relations: s.relations.map((r) =>
+        r.id === id ? { ...r, scheduledAt: when || undefined } : r,
+      ),
+    }));
+  }, []);
 
   /* حذف شخص (يمرّ عبر ConfirmDialog) */
   const removeRelation = useCallback((id: string) => {
@@ -2117,6 +2140,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       toggleAutoDark,
       toggleSound,
       setFontScale,
+      setFontFamily,
       markMemorizedJuz,
       addRoutineTask,
       editRoutineText,
@@ -2157,6 +2181,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       logSleep,
       addRelation,
       toggleRelation,
+      scheduleRelationCall,
       removeRelation,
       addWeeklyReview,
       removeWeeklyReview,
@@ -2223,6 +2248,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       toggleAutoDark,
       toggleSound,
       setFontScale,
+      setFontFamily,
       markMemorizedJuz,
       addRoutineTask,
       editRoutineText,
@@ -2263,6 +2289,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       logSleep,
       addRelation,
       toggleRelation,
+      scheduleRelationCall,
       removeRelation,
       addWeeklyReview,
       removeWeeklyReview,

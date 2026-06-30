@@ -16,11 +16,14 @@ export default function Badges() {
   const { state } = useCore();
   const s = state;
 
+  /* صافي الرصيد (دخل − مصروف) — لوسام «الهامور المالي» */
+  const netBalance = s.expenses.reduce((n, e) => n + (e.type === 'income' ? e.amount : -e.amount), 0);
+
   const badges: BadgeDef[] = [
     { emoji: '🌱', title: 'أول خطوة', desc: 'سوّيت أول مهمة بروتينك', earned: [...s.routine.morning, ...s.routine.evening].some((t) => (t.history?.length ?? 0) > 0) },
     { emoji: '🎯', title: 'محقّق الأهداف', desc: 'كمّلت أول هدف لك', earned: s.goals.some((g) => g.completed) },
     { emoji: '🔥', title: 'أسبوع متواصل', desc: 'سلسلة ٧ أيام بلا توقّف', earned: s.streak.longest >= 7 },
-    { emoji: '🏔️', title: 'شهر كامل', desc: 'سلسلة ٣٠ يوم — وحش!', earned: s.streak.longest >= 30 },
+    { emoji: '🏔️', title: 'شهر كامل', desc: 'سلسلة ٣٠ يوم — مبدع!', earned: s.streak.longest >= 30 },
     { emoji: '⭐', title: 'أول ١٠٠ نقطة', desc: 'جمعت ١٠٠ نقطة', earned: s.xp >= 100 },
     { emoji: '👑', title: 'أسطورة النقاط', desc: 'جمعت ٥٠٠ نقطة', earned: s.xp >= 500 },
     { emoji: '🛡️', title: 'صاحب عهد', desc: 'سوّيت أول عهد لك', earned: s.pledges.length > 0 },
@@ -29,6 +32,10 @@ export default function Badges() {
     { emoji: '💰', title: 'ضابط المصروف', desc: 'سجّلت ١٠ مصاريف', earned: s.expenses.length >= 10 },
     { emoji: '😴', title: 'راصد النوم', desc: 'سجّلت نومك ٧ مرات', earned: s.sleepLog.length >= 7 },
     { emoji: '✍️', title: 'صاحب نِيّة', desc: '٧ نِيّات يومية', earned: s.intentionLog.length >= 7 },
+    { emoji: '🏅', title: 'المسيطر', desc: 'سلسلة أسبوعين بلا انقطاع — ملك الالتزام!', earned: s.streak.longest >= 14 },
+    { emoji: '⚡', title: 'الشرارة', desc: '٥ تمارين مسجّلة — لياقتك تولّع!', earned: s.workoutLogs.length >= 5 },
+    { emoji: '🐟', title: 'الهامور المالي', desc: 'ضبطت دراهمك ووفّرت — واعي ومسيطر مادياً', earned: s.expenses.length >= 10 && netBalance > 0 },
+    { emoji: '🆙', title: 'النسخة المحدثة', desc: 'قفلت مراجعة أسبوعك — تتطور نسخة ورا نسخة', earned: s.weeklyReviews.length > 0 },
   ];
 
   const earnedCount = badges.filter((b) => b.earned).length;

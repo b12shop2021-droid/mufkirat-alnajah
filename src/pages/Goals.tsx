@@ -9,6 +9,7 @@ import { useCore, todayStr, type Goal } from '../core/useCore';
 import XPBar from '../components/XPBar';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
+import SwipeRow from '../components/SwipeRow';
 
 interface PendingDelete {
   goalId: string;
@@ -184,38 +185,44 @@ export default function Goals() {
           {goal.steps.map((step) => {
             const stepEditing = editKey === `step|${goal.id}|${step.id}`;
             return (
-              <div className="subtask-row" key={step.id}>
-                <button
-                  className={step.done ? 'sub-check done' : 'sub-check'}
-                  aria-label="تبديل إنجاز الخطوة"
-                  onClick={() => core.toggleGoalStep(goal.id, step.id)}
-                >
-                  {step.done ? '✓' : ''}
-                </button>
-                {stepEditing ? (
-                  <input
-                    className="input-field" value={draft} autoFocus maxLength={200}
-                    onChange={(e) => setDraft(e.target.value)}
-                    onBlur={commitEdit}
-                    onKeyDown={(e) => e.key === 'Enter' && commitEdit()}
-                  />
-                ) : (
-                  <span
-                    className={step.done ? 'task-text done' : 'task-text'}
-                    onClick={() => startEdit(`step|${goal.id}|${step.id}`, step.text)}
+              <SwipeRow
+                key={step.id}
+                done={step.done}
+                onComplete={() => core.toggleGoalStep(goal.id, step.id)}
+              >
+                <div className="subtask-row">
+                  <button
+                    className={step.done ? 'sub-check done' : 'sub-check'}
+                    aria-label="تبديل إنجاز الخطوة"
+                    onClick={() => core.toggleGoalStep(goal.id, step.id)}
                   >
-                    {step.text}
-                  </span>
-                )}
-                <button className="icon-btn reorder" aria-label="فوق" onClick={() => core.moveGoalStep(goal.id, step.id, -1)}>▲</button>
-                <button className="icon-btn reorder" aria-label="تحت" onClick={() => core.moveGoalStep(goal.id, step.id, 1)}>▼</button>
-                <button
-                  className="icon-btn" aria-label="حذف الخطوة"
-                  onClick={() => setPendingDelete({ goalId: goal.id, stepId: step.id, label: step.text })}
-                >
-                  🗑️
-                </button>
-              </div>
+                    {step.done ? '✓' : ''}
+                  </button>
+                  {stepEditing ? (
+                    <input
+                      className="input-field" value={draft} autoFocus maxLength={200}
+                      onChange={(e) => setDraft(e.target.value)}
+                      onBlur={commitEdit}
+                      onKeyDown={(e) => e.key === 'Enter' && commitEdit()}
+                    />
+                  ) : (
+                    <span
+                      className={step.done ? 'task-text done' : 'task-text'}
+                      onClick={() => startEdit(`step|${goal.id}|${step.id}`, step.text)}
+                    >
+                      {step.text}
+                    </span>
+                  )}
+                  <button className="icon-btn reorder" aria-label="فوق" onClick={() => core.moveGoalStep(goal.id, step.id, -1)}>▲</button>
+                  <button className="icon-btn reorder" aria-label="تحت" onClick={() => core.moveGoalStep(goal.id, step.id, 1)}>▼</button>
+                  <button
+                    className="icon-btn" aria-label="حذف الخطوة"
+                    onClick={() => setPendingDelete({ goalId: goal.id, stepId: step.id, label: step.text })}
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </SwipeRow>
             );
           })}
 
