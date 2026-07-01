@@ -13,6 +13,7 @@ const MAX_IMAGE_BYTES = 1_500_000;
 export default function Guidelines({ embedded = false }: { embedded?: boolean }) {
   const core = useCore();
   const [hint, setHint] = useState<string | null>(null);
+  const v = (m: string, f: string) => (core.state.profile.gender === 'female' ? f : m);
 
   /* رفع صورة الإرشادات مع التحقق من النوع والحجم */
   const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -159,7 +160,7 @@ export default function Guidelines({ embedded = false }: { embedded?: boolean })
             <li><strong>رفع الأرجل المعلقة:</strong> 3 جولات × 10-15 عدة.</li>
             <li><strong>الدراجة الهوائية (Bicycle Crunches):</strong> 3 جولات × 15-20 عدة لكل جانب.</li>
           </ul>
-          <div className="example-box">💡 نصيحة: ضِف هالتمارين بنهاية أيام Legs A و Legs B.</div>
+          <div className="example-box">💡 نصيحة: {v('ضِف', 'ضيفي')} هالتمارين بنهاية أيام Legs A و Legs B.</div>
         </div>
       </div>
 
@@ -224,7 +225,7 @@ export default function Guidelines({ embedded = false }: { embedded?: boolean })
 
       <div className="card" style={{ textAlign: 'center' }}>
         <div className="formal-text" style={{ color: 'var(--primary)', fontSize: '1rem', fontWeight: 700, lineHeight: 1.8 }}>
-          بالتوفيق في تمرينك يا بطل! حافظ على التكنيك الصحيح والاستمرارية. رحلتك للنجاح تبدأ من هنا 💪
+          بالتوفيق في تمرينك يا {v('بطل', 'بطلة')}! {v('حافظ', 'حافظي')} على التكنيك الصحيح والاستمرارية. رحلتك للنجاح تبدأ من هنا 💪
         </div>
       </div>
 

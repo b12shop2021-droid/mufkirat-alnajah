@@ -92,6 +92,8 @@ export default function CaptainWorkout({ embedded = false }: { embedded?: boolea
     }
   };
 
+  const fem = core.state.profile.gender === 'female';
+  const v = (m: string, f: string) => (fem ? f : m);
   const doneCount = day.exercises.filter((e) =>
     core.state.completedExercises.includes(exKey(e.id)),
   ).length;
@@ -234,12 +236,12 @@ export default function CaptainWorkout({ embedded = false }: { embedded?: boolea
       {dayComplete && (
         <div className="workout-complete-card">
           <div className="wc-icon">🏆</div>
-          <div className="wc-title">أحسنت! أكملت {day.label}</div>
+          <div className="wc-title">{v('أحسنت', 'أحسنتِ')}! أكملت {day.label}</div>
           <div className="wc-sub">{day.exercises.length} تمارين، استمرارية رائعة في رحلتك</div>
           <div className="wc-xp">⚡ +{day.exercises.length * 15 + 10} XP لهذا اليوم</div>
           {day.id === 'legs_b' && (
             <div className="wc-xp" style={{ marginTop: 8 }}>
-              👑 أسبوع كامل من النظام! يا بطل حقيقي
+              👑 أسبوع كامل من النظام! يا {v('بطل حقيقي', 'بطلة حقيقية')}
             </div>
           )}
         </div>

@@ -24,6 +24,7 @@ export default function Meals() {
   const core = useCore();
   const s = core.state;
   const today = todayStr();
+  const v = (m: string, f: string) => (s.profile.gender === 'female' ? f : m);
 
   const [form, setForm] = useState({
     type: 'إفطار' as MealType,
@@ -83,7 +84,7 @@ export default function Meals() {
       calories: f.calories ? String(f.calories) : '',
       notes: '',
     });
-    setHint('✏️ عُبّئت من المفضلة — عدّلها ثم أضِف');
+    setHint(`✏️ عُبّئت من المفضلة — ${v('عدّلها', 'عدّليها')} ثم ${v('أضِف', 'أضيفي')}`);
   };
 
   return (

@@ -25,6 +25,7 @@ export default function CustomWorkout({ embedded = false }: { embedded?: boolean
   const core = useCore();
   const days = core.state.customWorkout;
   const nick = core.state.profile.nickname || core.state.profile.name || 'بطل';
+  const v = (m: string, f: string) => (core.state.profile.gender === 'female' ? f : m);
 
   const [openDay, setOpenDay] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(null);
@@ -73,7 +74,7 @@ export default function CustomWorkout({ embedded = false }: { embedded?: boolean
   /* حفظ البرنامج: تحقق ثم احتفال (البيانات محفوظة تلقائياً أصلاً) */
   const handleSave = () => {
     if (days.length === 0) {
-      setHint({ kind: 'warn', text: '⚠️ ضِف يوم تمرين واحد أول' });
+      setHint({ kind: 'warn', text: `⚠️ ${v('ضِف', 'ضيفي')} يوم تمرين واحد أول` });
       return;
     }
     const hasEmpty = days.some((d) =>

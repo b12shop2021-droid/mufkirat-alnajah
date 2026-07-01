@@ -1111,13 +1111,16 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     [updateSection],
   );
 
-  /* تبديل "تم اليوم" لمهمة فرعية + احتساب +3 مرة واحدة عند الإنجاز */
+  /* تبديل "تم اليوم" لمهمة فرعية + احتساب +3 عند الإنجاز.
+     إلغاء التحديد يخصم نفس الـ3 (وريالاتها) بنفس مضاعف الكسب — يمنع فرمنة XP بتحديد/إلغاء متكرر
+     (نفس منطق toggleRoutineDone/toggleGoalStep/toggleExerciseDone). */
   const toggleSubDone = useCallback(
     (section: RoutineSection, taskId: string, subId: string) => {
       const today = todayStr();
       let earned = false;
-      updateSection(section, (list) =>
-        list.map((task) => {
+      let undone = false;
+      setState((s) => {
+        const list = s.routine[section].map((task) => {
           if (task.id !== taskId) return task;
           return {
             ...task,
@@ -1125,14 +1128,20 @@ export function CoreProvider({ children }: { children: ReactNode }) {
               if (sub.id !== subId) return sub;
               const wasDone = sub.doneDate === today;
               if (!wasDone) earned = true;
+              else undone = true;
               return { ...sub, doneDate: wasDone ? '' : today };
             }),
           };
-        }),
-      );
+        });
+        const mult = computeRialMult(s.streak.current, s.vipRials, 1);
+        const xp = undone ? Math.max(0, s.xp - 3) : s.xp;
+        const rials = undone ? Math.max(0, s.rials - Math.round(3 * mult)) : s.rials;
+        return { ...s, xp, rials, routine: { ...s.routine, [section]: list } };
+      });
       if (earned) addXP(3);
+      if (undone) xpRef.current = Math.max(0, xpRef.current - 3);
     },
-    [updateSection, addXP],
+    [addXP],
   );
 
   /* حذف مهمة فرعية (يمرّ عبر ConfirmDialog في الواجهة) */
@@ -1468,19 +1477,24 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     [addXP],
   );
 
-  /* إضافة لحظة فخر للأرشيف + احتساب +5 */
+  /* إضافة لحظة فخر للأرشيف — +5 لأول لحظة باليوم فقط (تمنع فرمنة XP بإضافة لحظات متكررة) */
   const addPride = useCallback(
     (text: string) => {
       const t = clean(text);
       if (!t) return;
-      setState((s) => ({
-        ...s,
-        prideArchive: [
-          { id: crypto.randomUUID(), text: t, date: todayStr() },
-          ...s.prideArchive,
-        ],
-      }));
-      addXP(5);
+      const today = todayStr();
+      let firstToday = false;
+      setState((s) => {
+        firstToday = !s.prideArchive.some((p) => p.date === today);
+        return {
+          ...s,
+          prideArchive: [
+            { id: crypto.randomUUID(), text: t, date: today },
+            ...s.prideArchive,
+          ],
+        };
+      });
+      if (firstToday) addXP(5);
     },
     [addXP],
   );
@@ -1493,16 +1507,21 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
-  /* إضافة ملاحظة سريعة + احتساب +5 */
+  /* إضافة ملاحظة سريعة — +5 لأول ملاحظة باليوم فقط (تمنع فرمنة XP بإضافة ملاحظات متكررة) */
   const addNote = useCallback(
     (text: string) => {
       const t = clean(text);
       if (!t) return;
-      setState((s) => ({
-        ...s,
-        notes: [{ id: crypto.randomUUID(), text: t, date: todayStr() }, ...s.notes],
-      }));
-      addXP(5);
+      const today = todayStr();
+      let firstToday = false;
+      setState((s) => {
+        firstToday = !s.notes.some((n) => n.date === today);
+        return {
+          ...s,
+          notes: [{ id: crypto.randomUUID(), text: t, date: today }, ...s.notes],
+        };
+      });
+      if (firstToday) addXP(5);
     },
     [addXP],
   );
@@ -1588,13 +1607,15 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     [addXP],
   );
 
-  /* تسجيل دقائق تلاوة اليوم (تجميع) + احتساب +10 */
+  /* تسجيل دقائق تلاوة اليوم (تجميع) — +10 لأول تسجيل باليوم فقط (تمنع فرمنة XP بحفظ متكرر) */
   const addQuranMinutes = useCallback(
     (minutes: number) => {
       const min = clampNum(Math.round(minutes), 1, 1440);
       const today = todayStr();
+      let firstToday = false;
       setState((s) => {
         const existing = s.quranMinutes.find((q) => q.date === today);
+        firstToday = !existing;
         const others = s.quranMinutes.filter((q) => q.date !== today);
         const total = (existing?.minutes ?? 0) + min;
         return {
@@ -1602,12 +1623,13 @@ export function CoreProvider({ children }: { children: ReactNode }) {
           quranMinutes: [...others, { date: today, minutes: total }],
         };
       });
-      addXP(10);
+      if (firstToday) addXP(10);
     },
     [addXP],
   );
 
-  /* حفظ نوم الليلة: حساب الساعات مع معالجة عبور منتصف الليل + احتساب +5 */
+  /* حفظ نوم الليلة: حساب الساعات مع معالجة عبور منتصف الليل — +5 لأول حفظ باليوم فقط
+     (تعديل نفس اليوم لاحقاً يُحدَّث بدون XP إضافي، يمنع فرمنة الحفظ المتكرر) */
   const saveSleep = useCallback(
     (sleepTime: string, wakeTime: string): number => {
       const [sh, sm] = sleepTime.split(':').map(Number);
@@ -1618,11 +1640,13 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       if (wakeMin <= sleepMin) wakeMin += 24 * 60; // عبور منتصف الليل
       const hours = Math.round(((wakeMin - sleepMin) / 60) * 10) / 10;
       const today = todayStr();
+      let firstToday = false;
       setState((s) => {
+        firstToday = !s.sleepLog.some((e) => e.date === today);
         const others = s.sleepLog.filter((e) => e.date !== today);
         return { ...s, sleepLog: [...others, { date: today, hours }] };
       });
-      addXP(5);
+      if (firstToday) addXP(5);
       return hours;
     },
     [addXP],
@@ -1666,20 +1690,27 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  /* تبديل حالة التواصل + احتساب +5 عند تأكيد التواصل */
+  /* تبديل حالة التواصل + احتساب +5 عند تأكيد التواصل.
+     إلغاء التأكيد يخصم نفس الـ5 (وريالاتها) — يمنع فرمنة XP بتبديل نفس الشخص تواصل/إلغاء متكرراً. */
   const toggleRelation = useCallback(
     (id: string) => {
       let nowContacted = false;
-      setState((s) => ({
-        ...s,
-        relations: s.relations.map((r) => {
+      let unconfirmed = false;
+      setState((s) => {
+        const relations = s.relations.map((r) => {
           if (r.id !== id) return r;
           nowContacted = !r.contacted;
+          unconfirmed = !nowContacted;
           // عند تأكيد الاتصال: سجّل تاريخ اليوم وامسح الموعد المجدول (تمّ)
           return { ...r, contacted: nowContacted, contactedDate: nowContacted ? todayStr() : undefined, scheduledAt: nowContacted ? undefined : r.scheduledAt };
-        }),
-      }));
+        });
+        const mult = computeRialMult(s.streak.current, s.vipRials, 1);
+        const xp = unconfirmed ? Math.max(0, s.xp - 5) : s.xp;
+        const rials = unconfirmed ? Math.max(0, s.rials - Math.round(5 * mult)) : s.rials;
+        return { ...s, relations, xp, rials };
+      });
       if (nowContacted) addXP(5);
+      if (unconfirmed) xpRef.current = Math.max(0, xpRef.current - 5);
     },
     [addXP],
   );
@@ -1699,27 +1730,32 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     setState((s) => ({ ...s, relations: s.relations.filter((r) => r.id !== id) }));
   }, []);
 
-  /* إضافة مراجعة أسبوعية للأرشيف + احتساب +20 */
+  /* إضافة مراجعة أسبوعية للأرشيف — +20 لأول مراجعة باليوم فقط (تمنع فرمنة XP بإرسال متكرر) */
   const addWeeklyReview = useCallback(
     (success: string, challenge: string, next: string) => {
       const s1 = clean(success);
       const s2 = clean(challenge);
       const s3 = clean(next);
       if (!s1 && !s2 && !s3) return;
-      setState((s) => ({
-        ...s,
-        weeklyReviews: [
-          {
-            id: crypto.randomUUID(),
-            date: todayStr(),
-            success: s1,
-            challenge: s2,
-            next: s3,
-          },
-          ...s.weeklyReviews,
-        ],
-      }));
-      addXP(20);
+      const today = todayStr();
+      let firstToday = false;
+      setState((s) => {
+        firstToday = !s.weeklyReviews.some((r) => r.date === today);
+        return {
+          ...s,
+          weeklyReviews: [
+            {
+              id: crypto.randomUUID(),
+              date: today,
+              success: s1,
+              challenge: s2,
+              next: s3,
+            },
+            ...s.weeklyReviews,
+          ],
+        };
+      });
+      if (firstToday) addXP(20);
     },
     [addXP],
   );
@@ -2013,18 +2049,29 @@ export function CoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   /* تبديل إكمال تمرين + احتساب +15 مرة عند الإكمال */
+  /* تبديل إنجاز تمرين — إلغاء التحديد يخصم نفس الـ15 XP (وريالاتها) بنفس مضاعف الكسب
+     لمنع فرمنة XP بتحديد/إلغاء متكرر لنفس التمرين (نفس منطق toggleRoutineDone/toggleGoalStep). */
   const toggleExerciseDone = useCallback(
     (key: string) => {
       let earned = false;
+      let undone = false;
       setState((s) => {
         const done = s.completedExercises.includes(key);
         if (done) {
-          return { ...s, completedExercises: s.completedExercises.filter((k) => k !== key) };
+          undone = true;
+          const mult = computeRialMult(s.streak.current, s.vipRials, 1);
+          return {
+            ...s,
+            completedExercises: s.completedExercises.filter((k) => k !== key),
+            xp: Math.max(0, s.xp - 15),
+            rials: Math.max(0, s.rials - Math.round(15 * mult)),
+          };
         }
         earned = true;
         return { ...s, completedExercises: [...s.completedExercises, key] };
       });
       if (earned) addXP(15);
+      if (undone) xpRef.current = Math.max(0, xpRef.current - 15);
     },
     [addXP],
   );
