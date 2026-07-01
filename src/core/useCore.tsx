@@ -375,6 +375,16 @@ export function getDailyDoubleId(dateStr: string, taskIds: string[]): string | n
   return taskIds[hash % taskIds.length];
 }
 
+/* مضاعف ريالات مركّب — مشترك بين كسب الريالات (addXP) والتراجع عن مهمة (toggleRoutineDone)
+   حتى يبقى الخصم عند الإلغاء مطابقاً تماماً للمكسب عند الإنجاز:
+   سلسلة ٧+ أيام ×١.٥ · سلسلة ١٤+ يوم ×٢ · الأحد "القوي" ×١.٣ كحد أدنى · VIP دائم +١٠٪ · مضاعف إضافي لمرة وحدة */
+function computeRialMult(streakDays: number, vipRials: boolean, extraRialMult: number): number {
+  let mult = streakDays >= 14 ? 2 : streakDays >= 7 ? 1.5 : 1;
+  if (new Date().getDay() === 0) mult = Math.max(mult, 1.3);
+  if (vipRials) mult *= 1.1;
+  return mult * extraRialMult;
+}
+
 /* تاريخ الأمس بصيغة YYYY-MM-DD آمن للمنطقة الزمنية */
 const yesterdayStr = (): string => {
   const y = new Date();
@@ -770,13 +780,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     const before = xpRef.current;
     const after = before + safe;
     xpRef.current = after;
-    /* مضاعف ريالات مركّب (لا يؤثر على XP/المستوى):
-       سلسلة ٧+ أيام ×١.٥ · سلسلة ١٤+ يوم ×٢ · الأحد "القوي" ×١.٣ كحد أدنى · VIP دائم +١٠٪ · مهمة الدبل ×٢ */
-    const streakDays = state.streak.current;
-    let rialMult = streakDays >= 14 ? 2 : streakDays >= 7 ? 1.5 : 1;
-    if (new Date().getDay() === 0) rialMult = Math.max(rialMult, 1.3); // الأحد القوي
-    if (state.vipRials) rialMult *= 1.1;
-    rialMult *= extraRialMult;
+    const rialMult = computeRialMult(state.streak.current, state.vipRials, extraRialMult);
     const bonusRials = Math.round(safe * rialMult);
     const lvlOf = (xp: number) => Math.min(Math.floor(xp / 100), LEVELS.length - 1);
     if (lvlOf(after) > lvlOf(before)) {
@@ -1022,9 +1026,12 @@ export function CoreProvider({ children }: { children: ReactNode }) {
         const allDone =
           nextList.length > 0 && nextList.every((t) => t.doneDate === today);
         if (earned && allDone) fireConfetti();
-        // إلغاء التحديد يخصم النقاط ليبقى الرصيد متسقاً (لا تُكسب نقاط لمهمة غير منجزة)
+        // إلغاء التحديد يخصم النقاط والريالات (بنفس مضاعف الكسب) ليبقى الرصيد متسقاً — لا تُبقى مكافأة لمهمة غير منجزة
         const xp = undone ? Math.max(0, s.xp - 5) : s.xp;
-        return { ...s, xp, routine: { ...s.routine, [section]: nextList } };
+        const rials = undone
+          ? Math.max(0, s.rials - Math.round(5 * computeRialMult(s.streak.current, s.vipRials, isDailyDouble ? 2 : 1)))
+          : s.rials;
+        return { ...s, xp, rials, routine: { ...s.routine, [section]: nextList } };
       });
       if (earned) {
         navigator.vibrate?.(12); // نبضة خفيفة تعطي إحساس الإنجاز
