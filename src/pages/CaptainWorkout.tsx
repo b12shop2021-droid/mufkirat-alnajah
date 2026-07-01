@@ -12,7 +12,6 @@ import BackButton from '../components/BackButton';
 import { fireConfetti } from '../components/Confetti';
 
 const REST_SECONDS = 75;
-const MAX_IMG = 1_500_000;
 
 interface SetEntry {
   weight: string;
@@ -93,21 +92,6 @@ export default function CaptainWorkout({ embedded = false }: { embedded?: boolea
     }
   };
 
-  /* رفع صورة اليوم (يُفضّل 1080×1920) */
-  const handleDayImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.target.value = '';
-    if (!file) return;
-    if (!file.type.startsWith('image/')) { setHint('⚠️ لازم تكون صورة'); return; }
-    if (file.size > MAX_IMG) { setHint('⚠️ الصورة كبيرة (الحد 1.5 ميجا)'); return; }
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') core.setWorkoutDayImage(day.id, reader.result);
-    };
-    reader.readAsDataURL(file);
-  };
-  const dayImage = core.state.workoutDayImages[day.id];
-
   const doneCount = day.exercises.filter((e) =>
     core.state.completedExercises.includes(exKey(e.id)),
   ).length;
@@ -129,18 +113,6 @@ export default function CaptainWorkout({ embedded = false }: { embedded?: boolea
           decoding="async"
         />
       )}
-
-      <label className="day-photo">
-        {dayImage ? (
-          <img src={dayImage} alt="صورة اليوم" loading="lazy" decoding="async" />
-        ) : (
-          <div className="day-photo-empty">
-            <div style={{ fontSize: '1.8rem' }}>📸</div>
-            <div>ضِف صورة لهذا اليوم (1080×1920)</div>
-          </div>
-        )}
-        <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleDayImage} />
-      </label>
 
       <div className="day-header">
         <div className="day-title-row">

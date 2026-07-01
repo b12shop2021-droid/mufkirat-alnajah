@@ -229,7 +229,6 @@ export interface CoreState {
   customCategories: CustomCategory[];
   budgets: Record<string, number>; // اسم الفئة → السقف الشهري
   workoutPRs: Record<string, number>; // مفتاح التمرين → أعلى وزن
-  workoutDayImages: Record<string, string>; // معرّف اليوم → صورة (1080×1920)
   completedExercises: string[]; // مفاتيح التمارين المكتملة
   workoutLogs: WorkoutLog[];
   meals: MealEntry[];
@@ -439,7 +438,6 @@ const DEFAULT_STATE: CoreState = {
     'صندوق الخير': 0,
   },
   workoutPRs: {},
-  workoutDayImages: {},
   completedExercises: [],
   workoutLogs: [],
   meals: [],
@@ -504,7 +502,6 @@ const loadState = (): CoreState => {
       customCategories: parsed.customCategories ?? [],
       budgets: parsed.budgets ?? DEFAULT_STATE.budgets,
       workoutPRs: parsed.workoutPRs ?? {},
-      workoutDayImages: parsed.workoutDayImages ?? {},
       completedExercises: parsed.completedExercises ?? [],
       workoutLogs: parsed.workoutLogs ?? [],
       meals: parsed.meals ?? [],
@@ -639,7 +636,6 @@ interface CoreContextValue {
   setBudget: (category: string, amount: number) => void;
   // ===== جدول المدرب سعود =====
   toggleExerciseDone: (key: string) => void; // +15 عند الإكمال
-  setWorkoutDayImage: (dayId: string, image: string) => void;
   recordPR: (key: string, weight: number) => boolean; // true إذا رقم شخصي جديد
   logWorkoutDay: (dayId: string, durationSec: number, doneIds: string[]) => void; // +10 إضافية
   // ===== الوجبات =====
@@ -1904,11 +1900,6 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     [addXP],
   );
 
-  /* حفظ صورة اليوم (1080×1920) */
-  const setWorkoutDayImage = useCallback((dayId: string, image: string) => {
-    setState((s) => ({ ...s, workoutDayImages: { ...s.workoutDayImages, [dayId]: image } }));
-  }, []);
-
   /* تسجيل رقم شخصي إذا تجاوز الأعلى السابق */
   const recordPR = useCallback((key: string, weight: number): boolean => {
     const w = clampNum(weight, 0, 100000);
@@ -2269,7 +2260,6 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       removeQuickShopItem,
       setBudget,
       toggleExerciseDone,
-      setWorkoutDayImage,
       recordPR,
       logWorkoutDay,
       addMeal,
@@ -2381,7 +2371,6 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       removeQuickShopItem,
       setBudget,
       toggleExerciseDone,
-      setWorkoutDayImage,
       recordPR,
       logWorkoutDay,
       addMeal,
