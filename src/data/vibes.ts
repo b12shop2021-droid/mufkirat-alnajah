@@ -150,3 +150,6 @@ export const HARVEST_BANNER = {
 export function personalize(text: string, name: string): string {
   return text.replace(/\{name\}/g, name);
 }
+
+/* ---------- ٤) تلميح ميزة السحب (يظهر مرة واحدة لكل مستخدم) ---------- */
+export const SWIPE_HINT = '👉 سحب يمين = خلصتها! سحب يسار = مسحها من الوجود 🗑️';

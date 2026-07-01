@@ -7,6 +7,7 @@
 import { useState } from 'react';
 import Dose from '../components/Dose';
 import SwipeRow from '../components/SwipeRow';
+import SwipeHint from '../components/SwipeHint';
 import {
   useCore,
   todayStr,
@@ -188,19 +189,6 @@ export default function Routine() {
               {isOpen ? '▲' : '▾'}
               {task.subtasks.length > 0 ? ` ${task.subtasks.length}` : ''}
             </button>
-            <button
-              className="icon-btn"
-              aria-label="حذف المهمة"
-              onClick={() =>
-                setPendingDelete({
-                  section: active,
-                  taskId: task.id,
-                  label: task.text,
-                })
-              }
-            >
-              🗑️
-            </button>
           </div>
         </SwipeRow>
 
@@ -214,6 +202,14 @@ export default function Routine() {
                   key={sub.id}
                   done={subDone}
                   onComplete={() => core.toggleSubDone(active, task.id, sub.id)}
+                  onDelete={() =>
+                    setPendingDelete({
+                      section: active,
+                      taskId: task.id,
+                      subId: sub.id,
+                      label: sub.text,
+                    })
+                  }
                 >
                   <div className="subtask-row">
                     <button
@@ -243,20 +239,6 @@ export default function Routine() {
                         {sub.text}
                       </span>
                     )}
-                    <button
-                      className="icon-btn"
-                      aria-label="حذف الفرعية"
-                      onClick={() =>
-                        setPendingDelete({
-                          section: active,
-                          taskId: task.id,
-                          subId: sub.id,
-                          label: sub.text,
-                        })
-                      }
-                    >
-                      🗑️
-                    </button>
                   </div>
                 </SwipeRow>
               );
@@ -318,6 +300,7 @@ export default function Routine() {
       </div>
 
       <div className={allDone ? 'card pulse' : 'card'}>
+        <SwipeHint />
         <div className="section-progress">
           {tasks.length === 0
             ? 'ما فيه مهام — ضيف أول مهمة 👇'

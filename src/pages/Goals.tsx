@@ -10,6 +10,7 @@ import XPBar from '../components/XPBar';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
 import SwipeRow from '../components/SwipeRow';
+import SwipeHint from '../components/SwipeHint';
 
 interface PendingDelete {
   goalId: string;
@@ -189,6 +190,7 @@ export default function Goals() {
                 key={step.id}
                 done={step.done}
                 onComplete={() => core.toggleGoalStep(goal.id, step.id)}
+                onDelete={() => setPendingDelete({ goalId: goal.id, stepId: step.id, label: step.text })}
               >
                 <div className="subtask-row">
                   <button
@@ -215,12 +217,6 @@ export default function Goals() {
                   )}
                   <button className="icon-btn reorder" aria-label="فوق" onClick={() => core.moveGoalStep(goal.id, step.id, -1)}>▲</button>
                   <button className="icon-btn reorder" aria-label="تحت" onClick={() => core.moveGoalStep(goal.id, step.id, 1)}>▼</button>
-                  <button
-                    className="icon-btn" aria-label="حذف الخطوة"
-                    onClick={() => setPendingDelete({ goalId: goal.id, stepId: step.id, label: step.text })}
-                  >
-                    🗑️
-                  </button>
                 </div>
               </SwipeRow>
             );
@@ -259,6 +255,8 @@ export default function Goals() {
           </p>
         </div>
       )}
+
+      {goals.length > 0 && <SwipeHint />}
 
       {goals.map(renderGoal)}
 

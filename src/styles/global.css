@@ -743,6 +743,32 @@ select {
   cursor: grab;
 }
 
+.swipe-hint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  border-radius: var(--radius-sm);
+  background: var(--primary-light);
+  color: var(--deep);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.6;
+  cursor: pointer;
+}
+
+.swipe-hint-close {
+  background: none;
+  border: none;
+  color: var(--deep);
+  font-weight: 800;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
 .prio-dot {
   width: 16px;
   height: 16px;
