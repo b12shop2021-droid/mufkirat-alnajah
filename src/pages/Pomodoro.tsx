@@ -49,6 +49,7 @@ function fmt(sec: number): string {
 
 export default function Pomodoro({ embedded = false }: { embedded?: boolean }) {
   const core = useCore();
+  const v = (m: string, f: string) => (core.state.profile.gender === 'female' ? f : m);
   const tasks = [
     ...core.state.routine.morning,
     ...core.state.routine.evening,
@@ -208,7 +209,7 @@ export default function Pomodoro({ embedded = false }: { embedded?: boolean }) {
           style={{ background: COLORS[mode] }}
           onClick={() => setRunning((r) => !r)}
         >
-          {running ? '⏸ إيقاف مؤقت' : remaining === DURATIONS[mode] ? '▶ يلا بسم الله' : '▶ استمر'}
+          {running ? '⏸ إيقاف مؤقت' : remaining === DURATIONS[mode] ? '▶ يلا بسم الله' : `▶ ${v('استمر', 'استمري')}`}
         </button>
         <button className="pomo-btn-reset" onClick={() => { stop(); setRemaining(DURATIONS[mode]); setJustDone(false); }}>
           ↺ إعادة

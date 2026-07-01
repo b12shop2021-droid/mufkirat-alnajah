@@ -14,6 +14,7 @@ export default function Identity({ embedded = false }: { embedded?: boolean }) {
   const core = useCore();
   const { identityStatement, constitution } = core.state;
   const nick = core.state.profile.nickname || core.state.profile.name || 'بطل';
+  const v = (m: string, f: string) => (core.state.profile.gender === 'female' ? f : m);
 
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(identityStatement);
@@ -133,7 +134,7 @@ export default function Identity({ embedded = false }: { embedded?: boolean }) {
         <div className="add-row">
           <input
             className="input-field"
-            placeholder="ضِف قاعدة (مثال: أصلّي صلاتي بوقتها)"
+            placeholder={`${v('ضِف', 'ضيفي')} قاعدة (مثال: أصلّي صلاتي بوقتها)`}
             value={rule}
             maxLength={200}
             onChange={(e) => setRule(e.target.value)}
