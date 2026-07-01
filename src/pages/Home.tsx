@@ -13,7 +13,7 @@ import RelaxTipButton from '../components/RelaxTipButton';
 import { fireConfetti } from '../components/Confetti';
 import { getDailyQuote } from '../data/quotes';
 import { getRandomWelcome } from '../data/welcomeMessages';
-import { DAY_DONE_POPUPS, STREAK_MILESTONE_POPUPS, pickPopup, pickLine, AWAY_LINES, HARVEST_BANNER, SUNDAY_BANNER, NAG_LINES, personalize, type PopupMsg } from '../data/vibes';
+import { DAY_DONE_POPUPS, STREAK_MILESTONE_POPUPS, pickPopup, pickLine, AWAY_LINES, getHarvestBanner, SUNDAY_BANNER, NAG_LINES, AFTERNOON_DONE_MSG, AFTERNOON_LATE_MSG, personalize, type PopupMsg } from '../data/vibes';
 
 const DAY_NAMES = ['أحد', 'اثن', 'ثلا', 'أرب', 'خمي', 'جمع', 'سبت'];
 
@@ -207,6 +207,16 @@ export default function Home() {
     } catch { /* تجاهل */ }
   }, [today]);
 
+  /* عدد المهام المنجزة آخر ٧ أيام (من history كل مهمة روتين) — لمحتوى بانر الحصاد */
+  const weeklyTaskCount = routine.reduce((sum, t) => {
+    const hist = t.history ?? [];
+    const inLastWeek = hist.filter((d) => {
+      const diff = (Date.now() - new Date(d + 'T00:00:00').getTime()) / 86_400_000;
+      return diff >= 0 && diff < 7;
+    }).length;
+    return sum + inLastWeek;
+  }, 0);
+
   /* بانر حصاد الأسبوع — نهاية الأسبوع (الخميس/الجمعة)، مرة كل أسبوع */
   const weekKey = (() => {
     const d = new Date();
@@ -233,6 +243,17 @@ export default function Home() {
   const dismissSunday = () => {
     setSundayOpen(false);
     try { localStorage.setItem(`alhimmah_sunday_${weekKey}`, '1'); } catch { /* تجاهل */ }
+  };
+
+  /* تفقّد الساعة 5 العصر — إنجاز أو تأخير، مرة واحدة باليوم */
+  const isAfternoonCheck = new Date().getHours() >= 17;
+  const [afternoonDismissed, setAfternoonDismissed] = useState(() => {
+    try { return !!localStorage.getItem(`alhimmah_afternoon_${today}`); } catch { return false; }
+  });
+  const afternoonOpen = isAfternoonCheck && !afternoonDismissed;
+  const dismissAfternoon = () => {
+    setAfternoonDismissed(true);
+    try { localStorage.setItem(`alhimmah_afternoon_${today}`, '1'); } catch { /* تجاهل */ }
   };
 
   /* الجلد الدبلوماسي — فتح الرئيسية ٥ مرات فأكثر بدون إنجاز أي مهمة اليوم، مرة واحدة باليوم */
@@ -403,16 +424,20 @@ export default function Home() {
         </div>
       )}
 
-      {harvestOpen && (
-        <div className="alert-banner harvest">
-          <button className="welcome-close" aria-label="إغلاق" onClick={dismissHarvest}>✕</button>
-          <div className="welcome-title">{personalize(HARVEST_BANNER.title, personalName)}</div>
-          <div className="alert-banner-text">{HARVEST_BANNER.body}</div>
-          <button className="btn-primary welcome-cta" onClick={() => { dismissHarvest(); navigate(HARVEST_BANNER.to); }}>
-            {HARVEST_BANNER.cta}
-          </button>
-        </div>
-      )}
+      {harvestOpen && (() => {
+        const banner = getHarvestBanner(weeklyTaskCount);
+        const fill = (t: string) => personalize(t, personalName).replace(/\{count\}/g, String(weeklyTaskCount));
+        return (
+          <div className="alert-banner harvest">
+            <button className="welcome-close" aria-label="إغلاق" onClick={dismissHarvest}>✕</button>
+            <div className="welcome-title">{fill(banner.title)}</div>
+            <div className="alert-banner-text">{fill(banner.body)}</div>
+            <button className="btn-primary welcome-cta" onClick={() => { dismissHarvest(); navigate(banner.to); }}>
+              {banner.cta}
+            </button>
+          </div>
+        );
+      })()}
 
       {sundayOpen && (
         <div className="alert-banner harvest">
@@ -422,6 +447,20 @@ export default function Home() {
           <button className="btn-primary welcome-cta" onClick={() => { dismissSunday(); navigate(SUNDAY_BANNER.to); }}>
             {SUNDAY_BANNER.cta}
           </button>
+        </div>
+      )}
+
+      {afternoonOpen && (
+        <div className={doneToday > 0 ? 'alert-banner harvest' : 'alert-banner away'}>
+          <button className="welcome-close" aria-label="إغلاق" onClick={dismissAfternoon}>✕</button>
+          <div className="alert-banner-text">
+            {personalize(doneToday > 0 ? AFTERNOON_DONE_MSG : AFTERNOON_LATE_MSG, personalName)}
+          </div>
+          {doneToday === 0 && (
+            <button className="btn-primary welcome-cta" onClick={() => { dismissAfternoon(); navigate(next.to); }}>
+              يلا نخلص ←
+            </button>
+          )}
         </div>
       )}
 

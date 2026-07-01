@@ -241,6 +241,7 @@ export interface CoreState {
   intentionLog: { date: string; text: string }[]; // أرشيف النِيّات السابقة (لكل يوم)
   ventNote: { text: string; expiresAt: number } | null; // تفريغ طاقة سلبية — تُمحى تلقائياً بعد ساعة، بدون أرشيف
   homeTileOrder: string[]; // ترتيب بلاطات الرئيسية اليدوي (مصفوفة روابط to)؛ فاضي = الترتيب الافتراضي
+  rials: number; // ريالات الهمّة — عملة تُصرف بسوق الهمّة، تتراكم مع كل XP لكن تُخصم عند الشراء (لا تؤثر على المستوى)
 }
 
 /* حالة التحدّي الأسبوعي — الفهرس يُشتق من معرّف الأسبوع، ونخزّن الإتمام فقط */
@@ -450,6 +451,7 @@ const DEFAULT_STATE: CoreState = {
   intentionLog: [],
   ventNote: null,
   homeTileOrder: [],
+  rials: 0,
 };
 
 /* قراءة الحالة المحفوظة من localStorage مع دمج آمن مع الافتراضي */
@@ -515,6 +517,7 @@ const loadState = (): CoreState => {
       ventNote:
         parsed.ventNote && parsed.ventNote.expiresAt > Date.now() ? parsed.ventNote : null,
       homeTileOrder: parsed.homeTileOrder ?? [],
+      rials: parsed.rials ?? 0,
     };
   } catch {
     return DEFAULT_STATE;
@@ -536,6 +539,7 @@ interface CoreContextValue {
   setVentNote: (text: string) => void;
   clearVentNote: () => void;
   setHomeTileOrder: (order: string[]) => void;
+  spendRials: (amount: number) => boolean;
   addXP: (amount: number) => void;
   updateProfile: (patch: Partial<Profile>) => void;
   markStreakToday: () => void;
@@ -743,7 +747,18 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     } else {
       fireXP(safe);
     }
-    setState((s) => ({ ...s, xp: s.xp + safe }));
+    setState((s) => ({ ...s, xp: s.xp + safe, rials: s.rials + safe }));
+  }, []);
+
+  /* صرف ريالات الهمّة بسوق الهمّة — يفشل لو الرصيد أقل من المطلوب (لا يؤثر على XP/المستوى) */
+  const spendRials = useCallback((amount: number): boolean => {
+    let ok = false;
+    setState((s) => {
+      if (s.rials < amount) return s;
+      ok = true;
+      return { ...s, rials: s.rials - amount };
+    });
+    return ok;
   }, []);
 
   /* تحديث الملف الشخصي مع تنظيف النصوص وحصر الأرقام */
@@ -2178,6 +2193,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       setVentNote,
       clearVentNote,
       setHomeTileOrder,
+      spendRials,
       addXP,
       updateProfile,
       markStreakToday,
@@ -2289,6 +2305,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       setVentNote,
       clearVentNote,
       setHomeTileOrder,
+      spendRials,
       addXP,
       updateProfile,
       markStreakToday,

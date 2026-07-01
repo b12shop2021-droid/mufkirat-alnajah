@@ -34,6 +34,7 @@ const TABS: { id: Tab; label: string; links: Link[] }[] = [
       { iconClass: 'ic-timecapsule', label: 'وعد الحر دين',               to: '/pledges'  },
       { iconClass: 'ic-habits',      label: 'مؤقت البومودورو',            to: '/pomodoro' },
       { iconClass: 'ic-expenses',    label: 'دراهمي',                     to: '/expenses' },
+      { iconClass: 'ic-expenses',    label: '🛍️ سوق الهمّة',              to: '/rewards' },
     ],
   },
   {

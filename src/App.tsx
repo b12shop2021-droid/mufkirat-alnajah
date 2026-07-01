@@ -38,6 +38,7 @@ const Pomodoro = lazy(() => import('./pages/Pomodoro'));
 const Occasions = lazy(() => import('./pages/Occasions'));
 const Templates = lazy(() => import('./pages/Templates'));
 const Search = lazy(() => import('./pages/Search'));
+const RewardShop = lazy(() => import('./pages/RewardShop'));
 
 /* مؤشر تحميل بسيط بين الصفحات */
 function Loader() {
@@ -131,6 +132,7 @@ export default function App() {
         <Route path="/pomodoro">{() => <Pomodoro />}</Route>
         <Route path="/occasions">{() => <Occasions />}</Route>
         <Route path="/templates" component={Templates} />
+        <Route path="/rewards" component={RewardShop} />
         <Route path="/search" component={Search} />
         <Route component={NotFound} />
       </Switch>
