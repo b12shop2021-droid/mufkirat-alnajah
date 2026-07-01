@@ -8,7 +8,7 @@ import { useCore, todayStr } from '../core/useCore';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
 
-type Tab = 'upcoming' | 'all' | 'circle' | 'add';
+type Tab = 'all' | 'circle' | 'add';
 type AddType = 'occasion' | 'appointment';
 
 /* ====================== مساعدات التاريخ ====================== */
@@ -70,10 +70,11 @@ export default function Occasions() {
   const core = useCore();
   const { occasions, relations } = core.state;
 
-  const [tab, setTab] = useState<Tab>('upcoming');
+  const [tab, setTab] = useState<Tab>('all');
   const [addType, setAddType] = useState<AddType>('occasion');
   const [apptName, setApptName] = useState('');
   const [apptWhen, setApptWhen] = useState('');
+  const [apptNote, setApptNote] = useState('');
   const [form, setForm] = useState(EMPTY_FORM);
   const [editing, setEditing] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -109,18 +110,16 @@ export default function Occasions() {
       .sort((a, b) => a.days - b.days);
   }, [occasions]);
 
-  const upcoming = sorted.filter((o) => o.days >= 0 && o.days <= 60);
   const thisMonth = sorted.filter((o) => o.days >= 0 && o.days <= 30);
 
-  /* المواعيد المجدولة (من أهلك وربعك) — تُدمج مع المناسبات بتبويب القادمة */
+  /* المواعيد المجدولة (من أهلك وربعك) — تُدمج مع المناسبات بتبويب المناسبات */
   const appointments = useMemo(() => {
     return relations
       .filter((r) => r.scheduledAt)
       .map((r) => {
         const when = new Date(r.scheduledAt!);
-        return { id: r.id, personName: r.name, when, raw: r.scheduledAt!, days: daysUntil(when) };
+        return { id: r.id, personName: r.name, when, raw: r.scheduledAt!, note: r.note, days: daysUntil(when) };
       })
-      .filter((a) => a.days >= 0 && a.days <= 60)
       .sort((a, b) => a.when.getTime() - b.when.getTime());
   }, [relations]);
 
@@ -129,11 +128,12 @@ export default function Occasions() {
     const name = apptName.trim();
     if (!name) { setHint('اكتب اسم الشخص'); return; }
     if (!apptWhen) { setHint('اختر وقت الموعد'); return; }
-    core.addAppointment(name, apptWhen);
+    core.addAppointment(name, apptWhen, apptNote);
     setApptName('');
     setApptWhen('');
+    setApptNote('');
     setHint('جدّلنا موعدك ✓');
-    setTab('upcoming');
+    setTab('all');
   };
 
   /* حفظ المناسبة */
@@ -174,7 +174,7 @@ export default function Occasions() {
     }
     setForm(EMPTY_FORM);
     setEditing(null);
-    setTab('upcoming');
+    setTab('all');
   };
 
   const startEdit = (id: string) => {
@@ -214,26 +214,26 @@ export default function Occasions() {
       {hint && <div className="hint-msg ok" style={{ marginBottom: 8 }}>{hint}</div>}
 
       <div className="subtabs">
-        {(['upcoming', 'all', 'circle', 'add'] as Tab[]).map((t) => (
+        {(['all', 'circle', 'add'] as Tab[]).map((t) => (
           <button key={t} className={tab === t ? 'subtab active' : 'subtab'}
             onClick={() => { setTab(t); if (t !== 'add') { setEditing(null); setForm(EMPTY_FORM); } }}>
-            {t === 'upcoming' ? '📅 القادمة' : t === 'all' ? '🎉 المناسبات' : t === 'circle' ? '📞 أهلك وربعك' : editing ? '✏️ تعديل' : '➕ إضافة'}
+            {t === 'all' ? '🎉 المناسبات' : t === 'circle' ? '📞 أهلك وربعك' : editing ? '✏️ تعديل' : '➕ إضافة'}
           </button>
         ))}
       </div>
 
-      {/* ===== تبويب القادمة (مناسبات + مواعيد مدمجة) ===== */}
-      {tab === 'upcoming' && (
+      {/* ===== تبويب المناسبات (مناسبات + مواعيد مدمجة) ===== */}
+      {tab === 'all' && (
         <>
-          {upcoming.length === 0 && appointments.length === 0 ? (
+          {sorted.length === 0 && appointments.length === 0 ? (
             <div className="empty-state">
               <div className="empty-icon">🎁</div>
-              <div>ما في مناسبات أو مواعيد في الـ 60 يوم القادمة</div>
+              <div>ما أضفت أي مناسبة أو موعد بعد</div>
               <button className="btn-primary" style={{ marginTop: 12 }} onClick={() => setTab('add')}>ضِف مناسبة أو موعد</button>
             </div>
           ) : (
             [
-              ...upcoming.map((o) => ({ kind: 'occasion' as const, days: o.days, o })),
+              ...sorted.map((o) => ({ kind: 'occasion' as const, days: o.days, o })),
               ...appointments.map((a) => ({ kind: 'appointment' as const, days: a.days, a })),
             ]
               .sort((x, y) => x.days - y.days)
@@ -248,6 +248,9 @@ export default function Occasions() {
                       <div>
                         <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>🗓️ موعد — {item.a.personName}</div>
                         <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{fmtDateTime(item.a.raw)}</div>
+                        {item.a.note && (
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 2 }}>📝 {item.a.note}</div>
+                        )}
                       </div>
                       <div style={{ textAlign: 'left', minWidth: 80 }}>
                         <div style={{ fontWeight: 800, fontSize: '0.88rem', color: formatCountdown(item.a.days).color }}>
@@ -262,30 +265,6 @@ export default function Occasions() {
                   </div>
                 ),
               )
-          )}
-          {sorted.filter((o) => o.days > 60).length > 0 && (
-            <button className="settings-row" style={{ width: '100%', textAlign: 'right', marginTop: 8 }} onClick={() => setTab('all')}>
-              <div className="settings-icon">📋</div>
-              <div className="settings-text"><div className="settings-label">عرض كل المناسبات</div></div>
-              <div style={{ color: 'var(--text-secondary)' }}>›</div>
-            </button>
-          )}
-        </>
-      )}
-
-      {/* ===== تبويب الكل ===== */}
-      {tab === 'all' && (
-        <>
-          {sorted.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-icon">👥</div>
-              <div>ما أضفت أي مناسبة بعد</div>
-              <button className="btn-primary" style={{ marginTop: 12 }} onClick={() => setTab('add')}>ضِف أول وحدة</button>
-            </div>
-          ) : (
-            sorted.map((o) => <OccasionCard key={o.id} o={o} expanded={expandedId === o.id}
-              onExpand={() => setExpandedId(expandedId === o.id ? null : o.id)}
-              onEdit={() => startEdit(o.id)} onDelete={() => setDeleteId(o.id)} />)
           )}
         </>
       )}
@@ -333,6 +312,9 @@ export default function Occasions() {
                     <div className="rel-status" style={{ color: 'var(--warning)' }}>
                       🗓️ موعد الاتصال: {fmtDateTime(r.scheduledAt)}
                     </div>
+                  )}
+                  {r.note && (
+                    <div className="rel-status">📝 {r.note}</div>
                   )}
                 </div>
                 <button
@@ -450,6 +432,12 @@ export default function Occasions() {
                 <label>وقت الموعد *</label>
                 <input type="datetime-local" className="input-field" value={apptWhen}
                   onChange={(e) => setApptWhen(e.target.value)} />
+              </div>
+
+              <div className="auth-field">
+                <label>ملاحظة</label>
+                <textarea className="input-field" rows={2} placeholder="حدد موعدك..."
+                  value={apptNote} onChange={(e) => setApptNote(e.target.value)} maxLength={200} />
               </div>
 
               <button className="btn-primary" style={{ width: '100%', marginTop: 8 }} onClick={handleSaveAppointment}>

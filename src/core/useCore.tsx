@@ -169,6 +169,7 @@ export interface Relation {
   contacted: boolean;
   contactedDate?: string; // YYYY-MM-DD آخر يوم تواصلت فيه (لقياس آخر 7 أيام)
   scheduledAt?: string;   // datetime-local (YYYY-MM-DDTHH:mm) موعد مجدول للاتصال القادم
+  note?: string;          // ملاحظة على الموعد المجدول (مثال: وش الموضوع)
 }
 
 export interface WeeklyReview {
@@ -594,7 +595,7 @@ interface CoreContextValue {
   saveSleep: (sleepTime: string, wakeTime: string) => number; // يعيد عدد الساعات
   logSleep: (date: string, hours: number) => void; // استيراد مباشر بالتاريخ والساعات
   addRelation: (name: string) => void;
-  addAppointment: (name: string, when: string) => void;
+  addAppointment: (name: string, when: string, note?: string) => void;
   toggleRelation: (id: string) => void;
   scheduleRelationCall: (id: string, when: string) => void; // جدولة موعد اتصال ('' يلغي)
   removeRelation: (id: string) => void;
@@ -1519,20 +1520,21 @@ export function CoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   /* إضافة موعد مباشرة: شخص جديد (أو موجود بنفس الاسم) + جدولة موعد اتصال عليه بضغطة واحدة */
-  const addAppointment = useCallback((name: string, when: string) => {
+  const addAppointment = useCallback((name: string, when: string, note?: string) => {
     const t = clean(name);
     if (!t || !when) return;
+    const n = note ? clean(note) : undefined;
     setState((s) => {
       const existing = s.relations.find((r) => r.name === t);
       if (existing) {
         return {
           ...s,
-          relations: s.relations.map((r) => (r.id === existing.id ? { ...r, scheduledAt: when } : r)),
+          relations: s.relations.map((r) => (r.id === existing.id ? { ...r, scheduledAt: when, note: n } : r)),
         };
       }
       return {
         ...s,
-        relations: [...s.relations, { id: crypto.randomUUID(), name: t, contacted: false, scheduledAt: when }],
+        relations: [...s.relations, { id: crypto.randomUUID(), name: t, contacted: false, scheduledAt: when, note: n }],
       };
     });
   }, []);
