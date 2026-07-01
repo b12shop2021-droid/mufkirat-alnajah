@@ -9,10 +9,11 @@ import { useLocation } from 'wouter';
 import { useCore } from '../core/useCore';
 import XPBar from '../components/XPBar';
 import RescueTimer from '../components/RescueTimer';
+import RelaxTipButton from '../components/RelaxTipButton';
 import { fireConfetti } from '../components/Confetti';
 import { getDailyQuote } from '../data/quotes';
 import { getRandomWelcome } from '../data/welcomeMessages';
-import { DAY_DONE_POPUPS, STREAK_MILESTONE_POPUPS, pickPopup, pickLine, AWAY_LINES, HARVEST_BANNER, personalize, type PopupMsg } from '../data/vibes';
+import { DAY_DONE_POPUPS, STREAK_MILESTONE_POPUPS, pickPopup, pickLine, AWAY_LINES, HARVEST_BANNER, SUNDAY_BANNER, NAG_LINES, personalize, type PopupMsg } from '../data/vibes';
 
 const DAY_NAMES = ['أحد', 'اثن', 'ثلا', 'أرب', 'خمي', 'جمع', 'سبت'];
 
@@ -79,6 +80,18 @@ export default function Home() {
   const routine = [...s.routine.morning, ...s.routine.evening];
   const doneToday = routine.filter((t) => t.doneDate === today).length;
   const dayPct = routine.length ? Math.round((doneToday / routine.length) * 100) : 0;
+
+  /* عدّاد فتحات الرئيسية اليوم — يزيد مرة واحدة فقط عند فتح الصفحة (lazy init) */
+  const [opensToday] = useState(() => {
+    try {
+      const key = `alhimmah_opens_${today}`;
+      const n = Number(localStorage.getItem(key) ?? '0') + 1;
+      localStorage.setItem(key, String(n));
+      return n;
+    } catch {
+      return 0;
+    }
+  });
 
   /* نشاط يوم معيّن */
   const activityOn = (date: string) =>
@@ -209,6 +222,28 @@ export default function Home() {
   const dismissHarvest = () => {
     setHarvestOpen(false);
     try { localStorage.setItem(`alhimmah_harvest_${weekKey}`, '1'); } catch { /* تجاهل */ }
+  };
+
+  /* بانر صدمة بداية الأسبوع — صباح الأحد، مرة كل أسبوع */
+  const isSunday = new Date().getDay() === 0;
+  const [sundayOpen, setSundayOpen] = useState(() => {
+    if (!isSunday) return false;
+    try { return !localStorage.getItem(`alhimmah_sunday_${weekKey}`); } catch { return true; }
+  });
+  const dismissSunday = () => {
+    setSundayOpen(false);
+    try { localStorage.setItem(`alhimmah_sunday_${weekKey}`, '1'); } catch { /* تجاهل */ }
+  };
+
+  /* الجلد الدبلوماسي — فتح الرئيسية ٥ مرات فأكثر بدون إنجاز أي مهمة اليوم، مرة واحدة باليوم */
+  const [nagDismissed, setNagDismissed] = useState(() => {
+    try { return !!localStorage.getItem(`alhimmah_nag_${today}`); } catch { return false; }
+  });
+  const nagOpen = opensToday >= 5 && doneToday === 0 && !nagDismissed;
+  const [nagMsg] = useState(() => pickLine(NAG_LINES));
+  const dismissNag = () => {
+    setNagDismissed(true);
+    try { localStorage.setItem(`alhimmah_nag_${today}`, '1'); } catch { /* تجاهل */ }
   };
 
   /* تنبيه ذكي سياقي: يختار أهم تذكير حسب حالتك اليوم (الأعلى أولوية) */
@@ -375,6 +410,27 @@ export default function Home() {
           <div className="alert-banner-text">{HARVEST_BANNER.body}</div>
           <button className="btn-primary welcome-cta" onClick={() => { dismissHarvest(); navigate(HARVEST_BANNER.to); }}>
             {HARVEST_BANNER.cta}
+          </button>
+        </div>
+      )}
+
+      {sundayOpen && (
+        <div className="alert-banner harvest">
+          <button className="welcome-close" aria-label="إغلاق" onClick={dismissSunday}>✕</button>
+          <div className="welcome-title">{personalize(SUNDAY_BANNER.title, personalName)}</div>
+          <div className="alert-banner-text">{SUNDAY_BANNER.body}</div>
+          <button className="btn-primary welcome-cta" onClick={() => { dismissSunday(); navigate(SUNDAY_BANNER.to); }}>
+            {SUNDAY_BANNER.cta}
+          </button>
+        </div>
+      )}
+
+      {nagOpen && (
+        <div className="alert-banner away">
+          <button className="welcome-close" aria-label="إغلاق" onClick={dismissNag}>✕</button>
+          <div className="alert-banner-text">{personalize(nagMsg, personalName)}</div>
+          <button className="btn-primary welcome-cta" onClick={() => { dismissNag(); navigate(next.to); }}>
+            يلا نخلص وحدة ←
           </button>
         </div>
       )}
@@ -551,6 +607,8 @@ export default function Home() {
           ))}
         </div>
       </div>
+
+      <RelaxTipButton />
 
       <button className="fab" aria-label="خطوة سريعة" onClick={() => navigate(next.to)}>
         +

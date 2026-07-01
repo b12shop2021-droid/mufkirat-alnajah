@@ -22,7 +22,7 @@ export default function AccountSection() {
         <button className="settings-row" style={{ width: '100%', textAlign: 'right' }} onClick={core.logout}>
           <div className="settings-icon">🚪</div>
           <div className="settings-text">
-            <div className="settings-label" style={{ color: 'var(--danger)' }}>تسجيل الخروج</div>
+            <div className="settings-label" style={{ color: 'var(--danger)' }}>تسجيل خروج (أشوفك على خير، لا تطول)</div>
           </div>
         </button>
       </div>

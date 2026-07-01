@@ -35,7 +35,7 @@ export default function NotificationsSection({ setHint }: { setHint: (m: string)
         >
           <div className="settings-icon">🔔</div>
           <div className="settings-text">
-            <div className="settings-label">إشعارات التحفيز اليومية</div>
+            <div className="settings-label">تبغانا نزنّ فوق رأسك بالمهام؟</div>
             <div className="settings-sub">تذكيرات لطيفة لتسجيل يومك</div>
           </div>
           <div style={{ color: 'var(--text-secondary)' }}>{showNotif ? '▲' : '▾'}</div>

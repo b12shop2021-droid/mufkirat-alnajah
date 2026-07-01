@@ -30,6 +30,17 @@ const COLORS: Record<Mode, string> = {
   long: 'var(--deep)',
 };
 
+/* عبارات تشجيعية أثناء عمل المؤقت — حسب الوضع والوقت المنقضي/المتبقي */
+function coachMessage(mode: Mode, remaining: number): string {
+  if (mode !== 'work') {
+    return 'أطلق فزعة! خذ لك 5 دقايق تمدد فيها، اشرب موية، بس تكفى لا تطول في السوشيال ميديا وتضيع 🙏';
+  }
+  const elapsed = DURATIONS.work - remaining;
+  if (remaining <= 120) return 'اللمسات الأخيرة.. هانت، لا تفك التركيز الحين وتخرب اللوحة! 🎨';
+  if (elapsed < 300) return 'بداية فنانة.. خلك صامل، الجوال الحين اعتبره طافي. 🔒';
+  return 'نص الطريق قفلناه.. كفو، مخك الحين شغال بأعلى كفاءة. 🧠';
+}
+
 function fmt(sec: number): string {
   const m = Math.floor(sec / 60).toString().padStart(2, '0');
   const s = (sec % 60).toString().padStart(2, '0');
@@ -179,6 +190,10 @@ export default function Pomodoro({ embedded = false }: { embedded?: boolean }) {
         <div className="pomo-time">{fmt(remaining)}</div>
         <div className="pomo-label">{LABELS[mode]}</div>
       </div>
+
+      {running && (
+        <div className="pomo-coach">{coachMessage(mode, remaining)}</div>
+      )}
 
       {justDone && mode !== 'work' && (
         <div className="pomo-done-msg">

@@ -266,6 +266,19 @@ body {
   background: linear-gradient(135deg, var(--deep), var(--deep-2));
 }
 
+/* زر جرعة روقان — صغير وخفيف، غير بارز */
+.relax-tip-btn {
+  display: block;
+  margin: 4px auto 0;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  opacity: 0.75;
+  padding: 6px;
+}
+
 button {
   font-family: inherit;
   cursor: pointer;
@@ -5495,6 +5508,17 @@ select {
   background: var(--surface);
   border-radius: var(--radius-sm);
   border: 1px solid var(--primary);
+}
+
+.pomo-coach {
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--deep);
+  margin: 4px 0 14px;
+  padding: 10px 14px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
 }
 
 .pomo-stats {

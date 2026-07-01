@@ -109,7 +109,7 @@ export default function ProfileSection({ setHint }: { setHint: (m: string) => vo
           >
             <div className="settings-icon">🪪</div>
             <div className="settings-text">
-              <div className="settings-label">بطاقتي الشخصية</div>
+              <div className="settings-label">تبي تغير الهوية؟</div>
               <div className="settings-sub">الاسم، اللقب، الجنس، العمر، المهنة، الطول والوزن</div>
             </div>
             <div style={{ color: 'var(--text-secondary)' }}>‹</div>

@@ -36,7 +36,7 @@ export default function AppearanceSection() {
         <div className="settings-row">
           <div className="settings-icon">{dark ? '🌙' : '☀️'}</div>
           <div className="settings-text">
-            <div className="settings-label">الوضع الليلي</div>
+            <div className="settings-label">وضع الهدوء (عشان عيونك في الليل)</div>
             <div className="settings-sub">
               {autoDark ? 'يتحكم به الوضع التلقائي' : 'يريّح عينك بالليل'}
             </div>
