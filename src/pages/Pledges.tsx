@@ -16,13 +16,13 @@ type Tab = 'pledges' | 'capsule';
 const MILESTONES = [3, 7, 14, 30, 90];
 
 /* رسالة مختلفة لكل معلم تناسب صعوبته */
-const MILESTONE_MSG: Record<number, string> = {
+const milestoneMsg = (m: number, fem: boolean): string => ({
   3: '🌱 بداية قوية! 3 أيام — أصعب خطوة وقد تجاوزتها',
   7: '🌟 أسبوع كامل! إرادتك تكبر يوماً بعد يوم',
-  14: '🏆 أهنيك يا بطل! أسبوعين كاملين — أنت تستطيع الاستمرار',
+  14: `🏆 أهنيك يا ${fem ? 'بطلة' : 'بطل'}! أسبوعين كاملين — أنت تستطيع الاستمرار`,
   30: '🎉 شهر كامل! تحوّلت العادة، أنت شخص جديد الآن',
   90: '👑 90 يوماً! إنجاز استثنائي — أنت قدوة لمن حولك',
-};
+}[m] ?? '');
 
 const daysSince = (dateStr: string): number => {
   const start = new Date(dateStr + 'T00:00:00').getTime();
@@ -91,7 +91,7 @@ export default function Pledges() {
             {next ? `· المعلم القادم: ${next} يوم` : '· أنجزت كل المعالم! 👑'}
           </div>
         </div>
-        {lastPassed && <div className="milestone-msg">{MILESTONE_MSG[lastPassed]}</div>}
+        {lastPassed && <div className="milestone-msg">{milestoneMsg(lastPassed, profile.gender === 'female')}</div>}
         <div className="pledge-milestones">
           {MILESTONES.map((m) => (
             <div className={days >= m ? 'ms-dot passed' : 'ms-dot'} key={m}>

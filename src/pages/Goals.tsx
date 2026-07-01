@@ -38,6 +38,7 @@ const countdownText = (n: number): string => {
 
 export default function Goals() {
   const core = useCore();
+  const v = (m: string, f: string) => (core.state.profile.gender === 'female' ? f : m);
   /* ترتيب: غير المكتمل أولاً، ثم الأقرب موعداً (بلا موعد في الآخر) */
   const goals = [...core.state.goals].sort((a, b) => {
     if (a.completed !== b.completed) return a.completed ? 1 : -1;
@@ -229,7 +230,7 @@ export default function Goals() {
                 onChange={(e) => setNewStep(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleAddStep(goal.id)}
               />
-              <button className="btn-primary" onClick={() => handleAddStep(goal.id)}>زِد</button>
+              <button className="btn-primary" onClick={() => handleAddStep(goal.id)}>{v('زِد', 'زيدي')}</button>
             </div>
           ) : (
             <button className="add-sub-btn" onClick={() => { setNewStepFor(goal.id); setNewStep(''); }}>
@@ -247,11 +248,14 @@ export default function Goals() {
       <XPBar />
 
       <h1 className="section-title">🎯 أهدافي</h1>
+      <div className="intro-card">
+        💊 <strong>الجرعة المحفزة:</strong> {v('كسّر', 'كسّري')} هدفك لخطوات صغيرة.. كل خطوة تخلّصها تقربك للحلم وتكسبك نقاط، وأول خطوة دايماً أصعبهم!
+      </div>
 
       {goals.length === 0 && (
         <div className="card">
           <p style={{ color: 'var(--text-secondary)' }}>
-            ما عندك أهداف لين الحين — ضيف أول هدف وخلنا نبدأ 👇
+            ما عندك أهداف لين الحين — {v('ضيف', 'ضيفي')} أول هدف وخلنا نبدأ 👇
           </p>
         </div>
       )}
@@ -292,7 +296,7 @@ export default function Goals() {
           onChange={(e) => setNewDeadline(e.target.value)}
         />
         <button className="btn-primary" style={{ width: '100%' }} onClick={handleAddGoal}>
-          ضيف الهدف 🚀
+          {v('ضيف', 'ضيفي')} الهدف 🚀
         </button>
       </div>
 

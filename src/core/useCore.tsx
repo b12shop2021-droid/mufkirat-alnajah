@@ -1251,35 +1251,51 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     [updateGoals],
   );
 
-  /* تبديل إنجاز خطوة + احتساب +3 عند الإنجاز + إكمال الهدف تلقائياً (+25 واحتفال) */
+  /* تبديل إنجاز خطوة + احتساب +3 عند الإنجاز + إكمال الهدف تلقائياً (+25 واحتفال).
+     إلغاء التحديد يخصم النقاط والريالات بنفس مضاعف الكسب (مطابق لمنطق toggleRoutineDone)
+     ويعيد فتح الهدف لو كان مكتملاً — يمنع بقاء بادج "✅ تم" على هدف ناقص، ويمنع فرمنة XP بتحديد/إلغاء متكرر. */
   const toggleGoalStep = useCallback(
     (goalId: string, stepId: string) => {
       let earnedStep = false;
+      let undoneStep = false;
       let goalJustCompleted = false;
-      updateGoals((list) =>
-        list.map((g) => {
+      let goalJustUncompleted = false;
+      setState((s) => {
+        const goals = s.goals.map((g) => {
           if (g.id !== goalId) return g;
           const steps = g.steps.map((st) => {
             if (st.id !== stepId) return st;
             if (!st.done) earnedStep = true;
+            else undoneStep = true;
             return { ...st, done: !st.done };
           });
           const allDone = steps.length > 0 && steps.every((st) => st.done);
           let completed = g.completed;
           if (allDone && !g.completed) {
-            completed = true; // يُقفل عند الاكتمال لمنع تكرار +25
+            completed = true;
             goalJustCompleted = true;
+          } else if (!allDone && g.completed) {
+            completed = false;
+            goalJustUncompleted = true;
           }
           return { ...g, steps, completed };
-        }),
-      );
+        });
+        const mult = computeRialMult(s.streak.current, s.vipRials, 1);
+        let xp = s.xp;
+        let rials = s.rials;
+        if (undoneStep) { xp = Math.max(0, xp - 3); rials = Math.max(0, rials - Math.round(3 * mult)); }
+        if (goalJustUncompleted) { xp = Math.max(0, xp - 25); rials = Math.max(0, rials - Math.round(25 * mult)); }
+        return { ...s, goals, xp, rials };
+      });
       if (earnedStep) addXP(3);
       if (goalJustCompleted) {
         addXP(25);
         fireConfetti();
       }
+      if (undoneStep) xpRef.current = Math.max(0, xpRef.current - 3);
+      if (goalJustUncompleted) xpRef.current = Math.max(0, xpRef.current - 25);
     },
-    [updateGoals, addXP],
+    [addXP],
   );
 
   /* حذف خطوة من هدف */
