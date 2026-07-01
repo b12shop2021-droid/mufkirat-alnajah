@@ -24,14 +24,38 @@ function msUntil(hhmm: string): number {
   return diff > 0 ? diff : -1; // سالب = مضى وقته اليوم
 }
 
+/* رسائل الصباح الباكر (تصحصح النايم) — تُختار وحدة عشوائياً كل مرة */
+const MORNING_LINES: { title: string; body: string }[] = [
+  { title: '⏰ قم شف مستقبلك!', body: 'صباح الخير.. قم شف مستقبلك ينتظرك، ترى السرير ما راح يكتب لك سيرة ذاتية!' },
+  { title: '🛏️ الفراش حبيبك؟', body: "أدري الفراش يمر بـ 'حالة حب' معك الحين، بس همّتك تقول: المجد للمستيقظين." },
+  { title: '🚀 صباح النشاط!', body: 'اترك الجوال الحين وخلنا نخلص أول مهمة.. الوعد شاشة الإنجاز.' },
+];
+
+/* رسائل التكاسل/التأخر (سلسلتك في خطر) — تُختار وحدة عشوائياً كل مرة */
+const STREAK_DANGER_LINES: { title: string; body: string }[] = [
+  { title: '😴 الوضع فيه ركود', body: 'عسى ما شر؟ لا يغرك هدوء الغرفة، وراك لستة مهام تنتظرك!' },
+  { title: '📉 الهمّة واصلة الأرض؟', body: 'ألووو.. الهمّة واصلة الأرض ليه؟ نبي نرفع المؤشر، ضغطة زر وحدة وتعدل الوضع.' },
+  { title: '🤕 التسويف صداع', body: "التسويف ما وراه إلا الصداع.. اخلص منها الحين وعش بقية يومك 'مرتاح البال'." },
+  { title: '👀 التطبيق مستغرب منك', body: 'ترى التطبيق يطالع فيك ومستغرب.. وين حماس أمس؟ قم نفض الكسل وورنا همّتك بالمهام.' },
+];
+
+function pickRandom<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
 const NOTIF_LABELS: Record<string, { title: string; body: string }> = {
-  morning: { title: 'كفو عليك يا ملهم! ⚡', body: 'أشرقت الشمس ويومك ناداك — قُم سمّ بالله وابدأ بقوة 🚀' },
   evening: { title: 'يعطيك العافية يا بطل ☕️', body: 'قفّل ملفات اليوم، اشرب مويتك، واذكر ربك ونم وأنت مرتاح 😴' },
   gratitude: { title: 'لحظة شكر 🙏', body: 'سجّل ٣ نعم تشكر الله عليها اليوم — ترفع مزاجك فعلاً ✨' },
-  streak: { title: 'سلسلتك في خطر! 🔥', body: 'ما سجّلت نشاط اليوم — أنجز أي مهمة وثبّت سلسلتك قبل ما تنكسر' },
   meal: { title: 'وقت الوجبة 🍽️', body: 'سجّل أكلك وخلك واعي — أكلك الصح طاقتك الصح 🥦' },
   water: { title: 'اشرب مويتك 💧', body: 'جسمك يطلب ترطيب — كاسة ماء الحين تفرق في طاقتك' },
 };
+
+/* رسالة إشعار حسب النوع — الصباح والسلسلة عشوائيان، الباقي ثابت */
+function notifFor(id: string): { title: string; body: string } | undefined {
+  if (id === 'morning') return pickRandom(MORNING_LINES);
+  if (id === 'streak') return pickRandom(STREAK_DANGER_LINES);
+  return NOTIF_LABELS[id];
+}
 
 export async function scheduleNotifications(opts: ScheduleOptions): Promise<void> {
   if (!opts.masterEnabled) return;
@@ -46,7 +70,7 @@ export async function scheduleNotifications(opts: ScheduleOptions): Promise<void
     const delayMs = msUntil(item.time);
     if (delayMs < 0) continue; // مضى وقته
 
-    const meta = NOTIF_LABELS[item.id];
+    const meta = notifFor(item.id);
     if (!meta) continue;
 
     navigator.serviceWorker.controller.postMessage({

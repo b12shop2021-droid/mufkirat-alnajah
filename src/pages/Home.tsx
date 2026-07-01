@@ -11,7 +11,7 @@ import XPBar from '../components/XPBar';
 import { fireConfetti } from '../components/Confetti';
 import { getDailyQuote } from '../data/quotes';
 import { getRandomWelcome } from '../data/welcomeMessages';
-import { DAY_DONE_POPUPS, pickPopup, pickLine, AWAY_LINES, HARVEST_BANNER, personalize, type PopupMsg } from '../data/vibes';
+import { DAY_DONE_POPUPS, STREAK_MILESTONE_POPUPS, pickPopup, pickLine, AWAY_LINES, HARVEST_BANNER, personalize, type PopupMsg } from '../data/vibes';
 
 const DAY_NAMES = ['أحد', 'اثن', 'ثلا', 'أرب', 'خمي', 'جمع', 'سبت'];
 
@@ -161,6 +161,24 @@ export default function Home() {
   useEffect(() => {
     if (dayPopup) fireConfetti();
   }, [dayPopup]);
+
+  /* بطاقة «محطة السلسلة» — تظهر مرة واحدة عند كل محطة (كل 5 أيام متتالية) */
+  const [streakPopup, setStreakPopup] = useState<PopupMsg | null>(null);
+  useEffect(() => {
+    const n = s.streak.current;
+    if (n === 0 || n % 5 !== 0) return;
+    const key = `alhimmah_streak_popup_${n}`;
+    try {
+      if (localStorage.getItem(key)) return;
+      localStorage.setItem(key, '1');
+    } catch { /* تجاهل */ }
+    const msg = pickPopup(STREAK_MILESTONE_POPUPS);
+    setStreakPopup({ ...msg, body: msg.body.replace(/\{n\}/g, String(n)) });
+  }, [s.streak.current]);
+
+  useEffect(() => {
+    if (streakPopup) fireConfetti();
+  }, [streakPopup]);
 
   /* بانر السحبة — يظهر لو غاب ٣ أيام أو أكثر (يعتمد آخر فتح للتطبيق) */
   const [awayMsg, setAwayMsg] = useState<string | null>(null);
@@ -543,6 +561,16 @@ export default function Home() {
             <div className="popup-title">{personalize(dayPopup.title, personalName)}</div>
             <div className="popup-body">{dayPopup.body}</div>
             <button className="btn-primary welcome-cta" onClick={() => setDayPopup(null)}>تمام 🎉</button>
+          </div>
+        </div>
+      )}
+
+      {streakPopup && (
+        <div className="popup-overlay" onClick={() => setStreakPopup(null)}>
+          <div className="popup-card" onClick={(e) => e.stopPropagation()}>
+            <div className="popup-title">{personalize(streakPopup.title, personalName)}</div>
+            <div className="popup-body">{personalize(streakPopup.body, personalName)}</div>
+            <button className="btn-primary welcome-cta" onClick={() => setStreakPopup(null)}>كفو 🔥</button>
           </div>
         </div>
       )}
