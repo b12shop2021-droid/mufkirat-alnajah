@@ -26,11 +26,12 @@ const REWARDS: Reward[] = [
 export default function RewardShop() {
   const core = useCore();
   const [hint, setHint] = useState<string | null>(null);
+  const v = (m: string, f: string) => (core.state.profile.gender === 'female' ? f : m);
 
   const handleBuy = (r: Reward) => {
     const ok = core.spendRials(r.cost);
     if (!ok) {
-      setHint('⚠️ ريالاتك ما تكفي — كمّل مهام واكسب أكثر');
+      setHint(`⚠️ ريالاتك ما تكفي — ${v('كمّل', 'كمّلي')} مهام واكسب أكثر`);
       return;
     }
     fireConfetti();
@@ -41,7 +42,7 @@ export default function RewardShop() {
     const ok = core.buyVipRials();
     setHint(ok
       ? '💎 مبروك! صرت VIP رسمي — من الحين كل ريال تكسبه +١٠٪ للأبد'
-      : '⚠️ ريالاتك ما تكفي لبطاقة الـVIP بعد — كمّل شوي وارجع لها');
+      : `⚠️ ريالاتك ما تكفي لبطاقة الـVIP بعد — ${v('كمّل', 'كمّلي')} شوي و${v('ارجع', 'ارجعي')} لها`);
   };
 
   return (

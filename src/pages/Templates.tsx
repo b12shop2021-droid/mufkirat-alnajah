@@ -19,6 +19,7 @@ export default function Templates() {
   const [tab, setTab] = useState<Tab>('goal');
   const [applied, setApplied] = useState<string | null>(null);
   const [hint, setHint] = useState<string | null>(null);
+  const v = (m: string, f: string) => (core.state.profile.gender === 'female' ? f : m);
 
   /* عرض اليوم — قالب واحد ثابت طول اليوم بنص السعر */
   const dealId = useMemo(() => getDailyDealId(todayStr()), []);
@@ -28,7 +29,7 @@ export default function Templates() {
 
   const unlock = (t: AnyTemplate) => {
     const ok = core.unlockTemplate(t.id, costFor(t.id));
-    setHint(ok ? `🔓 فتحنا لك "${t.title}" — بالتوفيق!` : '⚠️ ريالاتك ما تكفي — كمّل مهام واكسب ريالات همّة أكثر');
+    setHint(ok ? `🔓 فتحنا لك "${t.title}" — بالتوفيق!` : `⚠️ ريالاتك ما تكفي — ${v('كمّل', 'كمّلي')} مهام واكسب ريالات همّة أكثر`);
   };
 
   const apply = (t: AnyTemplate) => {
@@ -89,7 +90,7 @@ export default function Templates() {
                 </ul>
                 <button className={applied === t.id ? 'btn-primary done' : 'btn-primary'} style={{ width: '100%' }}
                   disabled={applied === t.id} onClick={() => apply(t)}>
-                  {applied === t.id ? '✅ انضاف لأهدافك — كفو!' : 'خذ هذا القالب'}
+                  {applied === t.id ? '✅ انضاف لأهدافك — كفو!' : `${v('خذ', 'خذي')} هذا القالب`}
                 </button>
               </>
             ) : (
@@ -119,7 +120,7 @@ export default function Templates() {
                 </ul>
                 <button className={applied === t.id ? 'btn-primary done' : 'btn-primary'} style={{ width: '100%' }}
                   disabled={applied === t.id} onClick={() => apply(t)}>
-                  {applied === t.id ? '✅ انضاف لروتينك — يا بطل!' : 'خذ هذا الروتين'}
+                  {applied === t.id ? `✅ انضاف لروتينك — يا ${v('بطل', 'بطلة')}!` : `${v('خذ', 'خذي')} هذا الروتين`}
                 </button>
               </>
             ) : (
@@ -149,7 +150,7 @@ export default function Templates() {
                 </ul>
                 <button className={applied === t.id ? 'btn-primary done' : 'btn-primary'} style={{ width: '100%' }}
                   disabled={applied === t.id} onClick={() => apply(t)}>
-                  {applied === t.id ? '✅ بدأ التحدّي — وريهم وش فيك!' : 'وريهم وش فيك — ابدأ التحدّي وانت قدها 🔥'}
+                  {applied === t.id ? '✅ بدأ التحدّي — وريهم وش فيك!' : `وريهم وش فيك — ${v('ابدأ', 'ابدئي')} التحدّي وانت قدها 🔥`}
                 </button>
               </>
             ) : (
@@ -178,7 +179,7 @@ export default function Templates() {
                 </ul>
                 <button className={applied === t.id ? 'btn-primary done' : 'btn-primary'} style={{ width: '100%' }}
                   disabled={applied === t.id} onClick={() => apply(t)}>
-                  {applied === t.id ? '✅ صارت من عاداتك — يا بطل!' : 'ضيف هذي العادة'}
+                  {applied === t.id ? `✅ صارت من عاداتك — يا ${v('بطل', 'بطلة')}!` : `${v('ضيف', 'ضيفي')} هذي العادة`}
                 </button>
               </>
             ) : (
@@ -207,7 +208,7 @@ export default function Templates() {
                 </ul>
                 <button className={applied === t.id ? 'btn-primary done' : 'btn-primary'} style={{ width: '100%' }}
                   disabled={applied === t.id} onClick={() => apply(t)}>
-                  {applied === t.id ? '✅ ضبطنا ميزانيتك — تمام!' : 'طبّق هذه الميزانية'}
+                  {applied === t.id ? '✅ ضبطنا ميزانيتك — تمام!' : `${v('طبّق', 'طبّقي')} هذه الميزانية`}
                 </button>
               </>
             ) : (

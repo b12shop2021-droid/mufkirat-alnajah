@@ -4,7 +4,7 @@
    =================================================================== */
 
 import { useState, useMemo } from 'react';
-import { useCore, todayStr } from '../core/useCore';
+import { useCore, todayStr, type OccasionEntry } from '../core/useCore';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
 
@@ -99,7 +99,7 @@ export default function Occasions() {
     core.scheduleRelationCall(id, schedVal);
     setSchedulingId(null);
     setSchedVal('');
-    setHint(schedVal ? 'جدّلنا موعد الاتصال ✓' : 'ألغينا الموعد ✓');
+    setHint(schedVal ? 'جدولنا موعد الاتصال ✓' : 'ألغينا الموعد ✓');
   };
 
   /* ترتيب المناسبات بالأقرب */
@@ -132,7 +132,7 @@ export default function Occasions() {
     setApptName('');
     setApptWhen('');
     setApptNote('');
-    setHint('جدّلنا موعدك ✓');
+    setHint('جدولنا موعدك ✓');
     setTab('all');
   };
 
@@ -436,7 +436,7 @@ export default function Occasions() {
 
               <div className="auth-field">
                 <label>ملاحظة</label>
-                <textarea className="input-field" rows={2} placeholder="حدد موعدك..."
+                <textarea className="input-field" rows={2} placeholder="أي تفاصيل عن الموعد..."
                   value={apptNote} onChange={(e) => setApptNote(e.target.value)} maxLength={200} />
               </div>
 
@@ -471,18 +471,17 @@ export default function Occasions() {
 
 /* ===== بطاقة المناسبة ===== */
 function OccasionCard({ o, expanded, onExpand, onEdit, onDelete }: {
-  o: ReturnType<typeof useMemo> extends never ? never : { id: string; personName: string; relation: string; occasionName: string; isAnnual: boolean; notes: string; giftIdeas: string; days: number };
+  o: OccasionEntry & { days: number };
   expanded: boolean; onExpand: () => void; onEdit: () => void; onDelete: () => void;
 }) {
-  const cd = formatCountdown((o as { days: number }).days);
-  const item = o as { id: string; personName: string; relation: string; occasionName: string; isAnnual: boolean; notes: string; giftIdeas: string; days: number };
+  const cd = formatCountdown(o.days);
 
   return (
     <div className="card" style={{ marginBottom: 10 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} onClick={onExpand}>
         <div>
-          <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>{item.occasionName} — {item.personName}</div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{[item.relation, item.isAnnual ? 'يتكرر سنوياً' : ''].filter(Boolean).join(' · ')}</div>
+          <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>{o.occasionName} — {o.personName}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{[o.relation, o.isAnnual ? 'يتكرر سنوياً' : ''].filter(Boolean).join(' · ')}</div>
         </div>
         <div style={{ textAlign: 'left', minWidth: 80 }}>
           <div style={{ fontWeight: 800, fontSize: '0.88rem', color: cd.color }}>{cd.label}</div>
@@ -491,16 +490,16 @@ function OccasionCard({ o, expanded, onExpand, onEdit, onDelete }: {
 
       {expanded && (
         <div style={{ marginTop: 10, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
-          {item.giftIdeas && (
+          {o.giftIdeas && (
             <div style={{ marginBottom: 6 }}>
               <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>🎁 أفكار الهدايا: </span>
-              <span style={{ fontSize: '0.82rem' }}>{item.giftIdeas}</span>
+              <span style={{ fontSize: '0.82rem' }}>{o.giftIdeas}</span>
             </div>
           )}
-          {item.notes && (
+          {o.notes && (
             <div style={{ marginBottom: 8 }}>
               <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>📝 ملاحظات: </span>
-              <span style={{ fontSize: '0.82rem' }}>{item.notes}</span>
+              <span style={{ fontSize: '0.82rem' }}>{o.notes}</span>
             </div>
           )}
           <div style={{ display: 'flex', gap: 8 }}>

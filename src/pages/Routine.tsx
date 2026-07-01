@@ -313,7 +313,7 @@ export default function Routine() {
         <SwipeHint />
         <div className="section-progress">
           {tasks.length === 0
-            ? 'الستة تشتكي من الفضاااوة! شكل يومك رايق، بس حط لك كم شغلة تسويها عشان ما تأنبك ضميرك بالليل 👇'
+            ? 'روتينك يشتكي من الفضاااوة! شكل يومك رايق، بس حط لك كم شغلة تسويها عشان ما تأنبك ضميرك بالليل 👇'
             : `خلّصت ${doneCount} من ${tasks.length}`}
           {allDone ? ' — كمّلت القسم، كفو! ✨' : ''}
         </div>

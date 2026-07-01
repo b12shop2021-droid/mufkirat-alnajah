@@ -15,6 +15,7 @@ interface BadgeDef {
 export default function Badges() {
   const { state } = useCore();
   const s = state;
+  const v = (m: string, f: string) => (s.profile.gender === 'female' ? f : m);
 
   /* صافي الرصيد (دخل − مصروف) — لوسام «الهامور المالي» */
   const netBalance = s.expenses.reduce((n, e) => n + (e.type === 'income' ? e.amount : -e.amount), 0);
@@ -48,7 +49,7 @@ export default function Badges() {
           {earnedCount} / {badges.length}
         </div>
         <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-          {earnedCount === badges.length ? 'كملت كل الأوسمة — أسطورة! 👑' : 'كمّل عشان تفتح الباقي 💪'}
+          {earnedCount === badges.length ? 'كملت كل الأوسمة — أسطورة! 👑' : `${v('كمّل', 'كمّلي')} عشان تفتح الباقي 💪`}
         </div>
       </div>
 

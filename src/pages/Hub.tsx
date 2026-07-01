@@ -31,11 +31,11 @@ const TABS: { id: Tab; label: string; links: Link[] }[] = [
     links: [
       { iconClass: 'ic-workouts',    label: 'قم لـ جيم',                  to: '/workouts' },
       { iconClass: 'ic-occasions',   label: 'العلاقات والمناسبات',        to: '/occasions'  },
-      { iconClass: 'ic-timecapsule', label: 'وعد الحر دين',               to: '/pledges'  },
+      { iconClass: 'ic-pledges',     label: 'وعد الحر دين',               to: '/pledges'  },
       { iconClass: 'ic-habits',      label: 'مؤقت البومودورو',            to: '/pomodoro' },
       { iconClass: 'ic-expenses',    label: 'دراهمي',                     to: '/expenses' },
-      { iconClass: 'ic-expenses',    label: '🏦 مصرف الـهـمّــة',          to: '/rewards' },
-      { iconClass: 'ic-goals',       label: '🛍️ متجر الـهـمّــة',         to: '/templates' },
+      { iconClass: 'ic-timecapsule', label: '🏦 مصرف الـهـمّــة',          to: '/rewards' },
+      { iconClass: 'ic-sleep',       label: '🛍️ متجر الـهـمّــة',         to: '/templates' },
     ],
   },
   {

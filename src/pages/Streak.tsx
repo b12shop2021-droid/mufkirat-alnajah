@@ -3,6 +3,7 @@
    صفحة عرض تقرأ كل قيمها من useCore المركزي (لا حالة مستقلة).
    =================================================================== */
 
+import { useMemo } from 'react';
 import { useCore, LEVELS } from '../core/useCore';
 import XPBar from '../components/XPBar';
 import BackButton from '../components/BackButton';
@@ -35,7 +36,9 @@ const ARABIC_MONTHS = ['يناير','فبراير','مارس','أبريل','ما
 export default function Streak({ embedded = false }: { embedded?: boolean }) {
   const core = useCore();
   const level = core.level;
-  const { streak, moodLog, gratitudeLog, quranMinutes, notes, goals } = core.state;
+  const { streak, moodLog, gratitudeLog, quranMinutes, notes, goals, profile } = core.state;
+  const fem = profile.gender === 'female';
+  const v = (m: string, f: string) => (fem ? f : m);
 
   /* مفتاح الشهر الحالي لمعرفة حالة بطاقة الحماية */
   const thisMonth = `${new Date().getFullYear()}-${String(
@@ -60,8 +63,8 @@ export default function Streak({ embedded = false }: { embedded?: boolean }) {
     return count;
   };
 
-  /* بناء خلايا الخريطة الحرارية (365 يوم) مرتّبة في أعمدة أسبوعية */
-  const heatmapData = (() => {
+  /* بناء خلايا الخريطة الحرارية (365 يوم) مرتّبة في أعمدة أسبوعية — محسوبة مرة واحدة فقط عند تغيّر البيانات الفعلية */
+  const heatmapData = useMemo(() => {
     const today = new Date();
     /* ابدأ من أول الأسبوع (الأحد) قبل 364 يوماً */
     const start = new Date(today);
@@ -87,7 +90,7 @@ export default function Streak({ embedded = false }: { embedded?: boolean }) {
       cur.setDate(cur.getDate() + 1);
     }
     return weeks;
-  })();
+  }, [moodLog, gratitudeLog, quranMinutes, notes]);
 
   /* تسميات الأشهر: لكل عمود نحسب الشهر الأول فيه */
   const monthLabels = heatmapData.map((week) => {
@@ -111,9 +114,9 @@ export default function Streak({ embedded = false }: { embedded?: boolean }) {
     streak.current === 0
       ? 'يلا نبدأ من جديد، أنا معك! 🌱'
       : streak.current < 7
-        ? `${streak.current} أيام وما وقفت — كفو، كمّل! 💪`
+        ? `${streak.current} أيام وما وقفت — كفو، ${v('كمّل', 'كمّلي')}! 💪`
         : streak.current < 30
-          ? 'ماشي عدّال يا بطل، خلّك ثابت 🔥'
+          ? `ماشي عدّال يا ${v('بطل', 'بطلة')}، خلّك ثابت 🔥`
           : 'إنجاز خرافي! أنت قدوة لغيرك 👑';
   const nextStage = COMPANION_STAGES[stageIdx + 1];
   const companionPct = nextStage

@@ -47,7 +47,7 @@ export default function JourneyGallery({ embedded = false }: { embedded?: boolea
   const currentStreak = s.streak.current;
   const firstUnreached = STATIONS.findIndex((st) => longest < st.days);
   const reachedCount = STATIONS.filter((st) => longest >= st.days).length;
-  const fillPct = Math.min(100, (reachedCount / (STATIONS.length - 1)) * 100);
+  const fillPct = Math.min(100, (reachedCount / STATIONS.length) * 100);
 
   /* الإنجازات — تُحسب من بيانات حقيقية */
   const achievements = [
@@ -132,7 +132,7 @@ export default function JourneyGallery({ embedded = false }: { embedded?: boolea
             </div>
           </div>
           <div className="wrap-highlight">
-            🏆 مستواك الحالي: {core.levelName} — كمّل رحلتك!
+            🏆 مستواك الحالي: {core.levelName} — {s.profile.gender === 'female' ? 'كمّلي' : 'كمّل'} رحلتك!
           </div>
           <button
             className="btn-ghost"
