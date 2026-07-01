@@ -194,6 +194,25 @@ export default function Home() {
     if (streakPopup) fireConfetti();
   }, [streakPopup]);
 
+  /* هدية تسجيل الدخول اليومية — أول فتح للتطبيق كل يوم يمنح ريالات مجانية بمصرف الهمّة */
+  const [loginBonus, setLoginBonus] = useState(0);
+  useEffect(() => {
+    const granted = core.claimDailyLoginBonus();
+    if (granted > 0) setLoginBonus(granted);
+  }, []);
+
+  /* عجلة حظ الأسبوع — تُفتح بعد إنجاز التحدّي الأسبوعي، جائزة ريالات عشوائية مرة كل أسبوع */
+  const [wheelSpinning, setWheelSpinning] = useState(false);
+  const [wheelResult, setWheelResult] = useState<number | null>(null);
+  const handleSpinWheel = () => {
+    setWheelSpinning(true);
+    window.setTimeout(() => {
+      const reward = core.spinLuckWheel();
+      setWheelSpinning(false);
+      if (reward > 0) setWheelResult(reward);
+    }, 900);
+  };
+
   /* بانر السحبة — يظهر لو غاب ٣ أيام أو أكثر (يعتمد آخر فتح للتطبيق) */
   const [awayMsg, setAwayMsg] = useState<string | null>(null);
   useEffect(() => {
@@ -254,6 +273,17 @@ export default function Home() {
   const dismissAfternoon = () => {
     setAfternoonDismissed(true);
     try { localStorage.setItem(`alhimmah_afternoon_${today}`, '1'); } catch { /* تجاهل */ }
+  };
+
+  /* «رصيدك يستنى» — تذكير لطيف لو تجمّع رصيد كبير (١٠٠+ ريال) ما تصرفه، مرة واحدة باليوم */
+  const RICH_BALANCE_THRESHOLD = 100;
+  const [richDismissed, setRichDismissed] = useState(() => {
+    try { return !!localStorage.getItem(`alhimmah_rich_${today}`); } catch { return false; }
+  });
+  const richOpen = s.rials >= RICH_BALANCE_THRESHOLD && !richDismissed;
+  const dismissRich = () => {
+    setRichDismissed(true);
+    try { localStorage.setItem(`alhimmah_rich_${today}`, '1'); } catch { /* تجاهل */ }
   };
 
   /* الجلد الدبلوماسي — فتح الرئيسية ٥ مرات فأكثر بدون إنجاز أي مهمة اليوم، مرة واحدة باليوم */
@@ -411,6 +441,32 @@ export default function Home() {
           <div className="welcome-title">{personalize(welcome.title, personalName)}</div>
           <div className="welcome-body">{welcome.body}</div>
           <button className="btn-primary welcome-cta" onClick={dismissWelcome}>يلا نبدأ 🚀</button>
+        </div>
+      )}
+
+      {loginBonus > 0 && (
+        <div className="alert-banner harvest">
+          <button className="welcome-close" aria-label="إغلاق" onClick={() => setLoginBonus(0)}>✕</button>
+          <div className="welcome-title">🎁 هديتك اليومية وصلت!</div>
+          <div className="alert-banner-text">
+            فتحت التطبيق اليوم؟ خذ {loginBonus} ريال همّة هدية بس لأنك رجعت. افتح كل يوم واكسب أكثر من مصرف الهمّة!
+          </div>
+          <button className="btn-primary welcome-cta" onClick={() => { setLoginBonus(0); navigate('/rewards'); }}>
+            تفضل مصرف الهمّة ←
+          </button>
+        </div>
+      )}
+
+      {richOpen && (
+        <div className="alert-banner harvest">
+          <button className="welcome-close" aria-label="إغلاق" onClick={dismissRich}>✕</button>
+          <div className="welcome-title">💰 رصيدك يستنّاك!</div>
+          <div className="alert-banner-text">
+            عندك {s.rials} ريال همّة نايمة بلا فايدة — تفضل اصرفها بمصرف الهمّة على مكافأة تستاهلها، أو افتح قالب من متجر الهمّة!
+          </div>
+          <button className="btn-primary welcome-cta" onClick={() => { dismissRich(); navigate('/rewards'); }}>
+            تفضل مصرف الهمّة ←
+          </button>
         </div>
       )}
 
@@ -577,6 +633,28 @@ export default function Home() {
           </button>
         )}
       </div>
+
+      {core.weekly.done && s.luckWheelWeek !== core.weekly.weekKey && (
+        <div className="card" style={{ textAlign: 'center' }}>
+          <div style={{ fontWeight: 800, marginBottom: 6 }}>🎡 عجلة حظ الأسبوع فتحت لك!</div>
+          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: 10 }}>
+            خلّصت التحدّي — تفضل دورها واكسب ريالات همّة عشوائية (١٠ لين ٥٠)
+          </div>
+          <button className="btn-primary" style={{ width: '100%' }} disabled={wheelSpinning} onClick={handleSpinWheel}>
+            {wheelSpinning ? '🎡 تدور... تدور...' : '🎡 دور العجلة'}
+          </button>
+        </div>
+      )}
+
+      {wheelResult !== null && (
+        <div className="popup-overlay" onClick={() => setWheelResult(null)}>
+          <div className="popup-card" onClick={(e) => e.stopPropagation()}>
+            <div className="popup-title">🎉 طلعت لك {wheelResult} ريال همّة!</div>
+            <div className="popup-body">كفو عليك يا بطل! خذها وصرفها بمصرف الهمّة أو متجر الهمّة.</div>
+            <button className="btn-primary welcome-cta" onClick={() => setWheelResult(null)}>تمام 🔥</button>
+          </div>
+        </div>
+      )}
 
       {/* بطاقة تحفيزية دوّارة — تتغيّر كل ساعة بين همسة الفجر، عبارة تحفيزية، واقتباس اليوم */}
       {(() => {

@@ -34,7 +34,8 @@ const TABS: { id: Tab; label: string; links: Link[] }[] = [
       { iconClass: 'ic-timecapsule', label: 'وعد الحر دين',               to: '/pledges'  },
       { iconClass: 'ic-habits',      label: 'مؤقت البومودورو',            to: '/pomodoro' },
       { iconClass: 'ic-expenses',    label: 'دراهمي',                     to: '/expenses' },
-      { iconClass: 'ic-expenses',    label: '🛍️ سوق الهمّة',              to: '/rewards' },
+      { iconClass: 'ic-expenses',    label: '🏦 مصرف الـهـمّــة',          to: '/rewards' },
+      { iconClass: 'ic-goals',       label: '🛍️ متجر الـهـمّــة',         to: '/templates' },
     ],
   },
   {
@@ -43,7 +44,6 @@ const TABS: { id: Tab; label: string; links: Link[] }[] = [
     links: [
       { iconClass: 'ic-selfdev',  label: 'نسختي الأفضل', to: '/self-dev' },
       { iconClass: 'ic-goals',    label: 'الأهداف',                       to: '/goals'    },
-      { iconClass: 'ic-goals',    label: '🎁 قوالب جاهزة',                 to: '/templates' },
     ],
   },
   {

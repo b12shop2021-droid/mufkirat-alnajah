@@ -18,14 +18,15 @@ const CHEERS = [
 interface XPDetail {
   amount: number;
   levelName?: string;
+  rialMult?: number; // مضاعف ريالات السلسلة النشط (>1) — لعرض بادج "🔥 ×1.5 ريال"
 }
 
 /* إطلاق رسالة النقاط من أي مكان (مع اهتزاز خفيف إن دعمه الجهاز) */
-export function fireXP(amount: number, levelName?: string): void {
+export function fireXP(amount: number, levelName?: string, rialMult?: number): void {
   if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
     navigator.vibrate?.(15);
   }
-  window.dispatchEvent(new CustomEvent<XPDetail>(EVENT_NAME, { detail: { amount, levelName } }));
+  window.dispatchEvent(new CustomEvent<XPDetail>(EVENT_NAME, { detail: { amount, levelName, rialMult } }));
 }
 
 interface Toast {
@@ -33,6 +34,7 @@ interface Toast {
   amount: number;
   cheer: string;
   levelName?: string;
+  rialMult?: number;
 }
 
 export default function XPToast() {
@@ -47,6 +49,7 @@ export default function XPToast() {
         amount: detail.amount,
         cheer: CHEERS[Math.floor(Math.random() * CHEERS.length)],
         levelName: detail.levelName,
+        rialMult: detail.rialMult,
       });
       window.setTimeout(() => setToast(null), detail.levelName ? 3200 : 2000);
     };
@@ -71,6 +74,9 @@ export default function XPToast() {
           <>
             <span className="xp-toast-amount">+{toast.amount}</span>
             <span className="xp-toast-cheer">{toast.cheer}</span>
+            {toast.rialMult && toast.rialMult > 1 && (
+              <span className="xp-toast-cheer">🔥 ×{toast.rialMult} ريال</span>
+            )}
           </>
         )}
       </div>

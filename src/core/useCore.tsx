@@ -241,7 +241,11 @@ export interface CoreState {
   intentionLog: { date: string; text: string }[]; // أرشيف النِيّات السابقة (لكل يوم)
   ventNote: { text: string; expiresAt: number } | null; // تفريغ طاقة سلبية — تُمحى تلقائياً بعد ساعة، بدون أرشيف
   homeTileOrder: string[]; // ترتيب بلاطات الرئيسية اليدوي (مصفوفة روابط to)؛ فاضي = الترتيب الافتراضي
-  rials: number; // ريالات الهمّة — عملة تُصرف بسوق الهمّة، تتراكم مع كل XP لكن تُخصم عند الشراء (لا تؤثر على المستوى)
+  rials: number; // ريالات الهمّة — عملة تُصرف بمصرف الهمّة، تتراكم مع كل XP لكن تُخصم عند الشراء (لا تؤثر على المستوى)
+  unlockedTemplates: string[]; // معرّفات القوالب الجاهزة المفتوحة (كل فتح يخصم ريالات الهمّة)
+  lastLoginBonusDate: string; // آخر يوم استُلمت فيه هدية تسجيل الدخول اليومية (YYYY-MM-DD)
+  vipRials: boolean; // بطاقة VIP دائمة — تُشترى مرة بمصرف الهمّة، تعطي +١٠٪ ريالات على كل كسب
+  luckWheelWeek: string; // آخر أسبوع (weekKey) استُلمت فيه جائزة عجلة الحظ الأسبوعية
 }
 
 /* حالة التحدّي الأسبوعي — الفهرس يُشتق من معرّف الأسبوع، ونخزّن الإتمام فقط */
@@ -357,6 +361,20 @@ export const todayStr = (): string => {
   ).padStart(2, '0')}`;
 };
 
+/* ثوابت اقتصاد ريالات الهمّة */
+export const DAILY_LOGIN_BONUS = 10; // ريالات هدية أول فتح للتطبيق كل يوم
+export const VIP_RIALS_COST = 500; // تكلفة بطاقة VIP الدائمة (+١٠٪ ريالات على كل كسب) بمصرف الهمّة
+export const LUCK_WHEEL_MIN = 10; // أقل جائزة عجلة الحظ الأسبوعية
+export const LUCK_WHEEL_MAX = 50; // أعلى جائزة عجلة الحظ الأسبوعية
+
+/* معرّف "مهمة اليوم المضاعفة" — مهمة واحدة عشوائية (ثابتة طول اليوم) من قائمة مهام الروتين تضاعف ريالاتها عند الإنجاز */
+export function getDailyDoubleId(dateStr: string, taskIds: string[]): string | null {
+  if (taskIds.length === 0) return null;
+  let hash = 0;
+  for (let i = 0; i < dateStr.length; i++) hash = (hash * 31 + dateStr.charCodeAt(i)) >>> 0;
+  return taskIds[hash % taskIds.length];
+}
+
 /* تاريخ الأمس بصيغة YYYY-MM-DD آمن للمنطقة الزمنية */
 const yesterdayStr = (): string => {
   const y = new Date();
@@ -452,6 +470,10 @@ const DEFAULT_STATE: CoreState = {
   ventNote: null,
   homeTileOrder: [],
   rials: 0,
+  unlockedTemplates: [],
+  lastLoginBonusDate: '',
+  vipRials: false,
+  luckWheelWeek: '',
 };
 
 /* قراءة الحالة المحفوظة من localStorage مع دمج آمن مع الافتراضي */
@@ -518,6 +540,10 @@ const loadState = (): CoreState => {
         parsed.ventNote && parsed.ventNote.expiresAt > Date.now() ? parsed.ventNote : null,
       homeTileOrder: parsed.homeTileOrder ?? [],
       rials: parsed.rials ?? 0,
+      unlockedTemplates: parsed.unlockedTemplates ?? [],
+      lastLoginBonusDate: parsed.lastLoginBonusDate ?? '',
+      vipRials: parsed.vipRials ?? false,
+      luckWheelWeek: parsed.luckWheelWeek ?? '',
     };
   } catch {
     return DEFAULT_STATE;
@@ -540,6 +566,10 @@ interface CoreContextValue {
   clearVentNote: () => void;
   setHomeTileOrder: (order: string[]) => void;
   spendRials: (amount: number) => boolean;
+  unlockTemplate: (id: string, cost: number) => boolean; // يخصم ريالات ويفتح قالباً — false لو الرصيد ما يكفي
+  claimDailyLoginBonus: () => number; // يمنح ريالات هدية أول فتح كل يوم — يعيد المبلغ الممنوح (٠ لو استُلمت اليوم)
+  buyVipRials: () => boolean; // يشتري بطاقة VIP الدائمة (+١٠٪ ريالات) — false لو الرصيد ما يكفي
+  spinLuckWheel: () => number; // يفتح جائزة عجلة الحظ الأسبوعية — يعيد المبلغ الممنوح (٠ لو استُلمت هالأسبوع)
   addXP: (amount: number) => void;
   updateProfile: (patch: Partial<Profile>) => void;
   markStreakToday: () => void;
@@ -732,25 +762,34 @@ export function CoreProvider({ children }: { children: ReactNode }) {
   }, [state.xp]);
 
   /* إضافة نقاط — موحّدة كـ useCallback (المرجع الوحيد لكل الصفحات)
-     ترسل رسالة تحفيز منبثقة تلقائياً، واحتفالاً خاصاً عند صعود المستوى */
-  const addXP = useCallback((amount: number) => {
+     ترسل رسالة تحفيز منبثقة تلقائياً، واحتفالاً خاصاً عند صعود المستوى.
+     extraRialMult: مضاعف إضافي لمرة وحدة (مثل مهمة اليوم المضاعفة ×٢) — لا يؤثر على XP */
+  const addXP = useCallback((amount: number, extraRialMult: number = 1) => {
     const safe = clampNum(Math.round(amount), 0, 10000);
     if (safe === 0) return;
     const before = xpRef.current;
     const after = before + safe;
     xpRef.current = after;
+    /* مضاعف ريالات مركّب (لا يؤثر على XP/المستوى):
+       سلسلة ٧+ أيام ×١.٥ · سلسلة ١٤+ يوم ×٢ · الأحد "القوي" ×١.٣ كحد أدنى · VIP دائم +١٠٪ · مهمة الدبل ×٢ */
+    const streakDays = state.streak.current;
+    let rialMult = streakDays >= 14 ? 2 : streakDays >= 7 ? 1.5 : 1;
+    if (new Date().getDay() === 0) rialMult = Math.max(rialMult, 1.3); // الأحد القوي
+    if (state.vipRials) rialMult *= 1.1;
+    rialMult *= extraRialMult;
+    const bonusRials = Math.round(safe * rialMult);
     const lvlOf = (xp: number) => Math.min(Math.floor(xp / 100), LEVELS.length - 1);
     if (lvlOf(after) > lvlOf(before)) {
       fireConfetti();
       playLevelUp();
       fireXP(safe, LEVELS[lvlOf(after)]);
     } else {
-      fireXP(safe);
+      fireXP(safe, undefined, rialMult > 1 ? Math.round(rialMult * 10) / 10 : undefined);
     }
-    setState((s) => ({ ...s, xp: s.xp + safe, rials: s.rials + safe }));
-  }, []);
+    setState((s) => ({ ...s, xp: s.xp + safe, rials: s.rials + bonusRials }));
+  }, [state.streak.current, state.vipRials]);
 
-  /* صرف ريالات الهمّة بسوق الهمّة — يفشل لو الرصيد أقل من المطلوب (لا يؤثر على XP/المستوى) */
+  /* صرف ريالات الهمّة بمصرف الهمّة — يفشل لو الرصيد أقل من المطلوب (لا يؤثر على XP/المستوى) */
   const spendRials = useCallback((amount: number): boolean => {
     let ok = false;
     setState((s) => {
@@ -760,6 +799,54 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     });
     return ok;
   }, []);
+
+  /* فتح قالب جاهز — يخصم ريالات الهمّة، وكل خصم يفتح قالباً واحداً */
+  const unlockTemplate = useCallback((id: string, cost: number): boolean => {
+    let ok = false;
+    setState((s) => {
+      if (s.unlockedTemplates.includes(id)) { ok = true; return s; }
+      if (s.rials < cost) return s;
+      ok = true;
+      return { ...s, rials: s.rials - cost, unlockedTemplates: [...s.unlockedTemplates, id] };
+    });
+    if (ok) fireConfetti();
+    return ok;
+  }, []);
+
+  /* هدية تسجيل الدخول اليومية — أول فتح للتطبيق كل يوم يمنح ريالات مجانية (لا تؤثر على XP) */
+  const claimDailyLoginBonus = useCallback((): number => {
+    const today = todayStr();
+    let granted = 0;
+    setState((s) => {
+      if (s.lastLoginBonusDate === today) return s;
+      granted = DAILY_LOGIN_BONUS;
+      return { ...s, rials: s.rials + DAILY_LOGIN_BONUS, lastLoginBonusDate: today };
+    });
+    return granted;
+  }, []);
+
+  /* بطاقة VIP الدائمة — تُشترى مرة واحدة بمصرف الهمّة، تعطي +١٠٪ ريالات على كل كسب للأبد */
+  const buyVipRials = useCallback((): boolean => {
+    let ok = false;
+    setState((s) => {
+      if (s.vipRials) { ok = true; return s; }
+      if (s.rials < VIP_RIALS_COST) return s;
+      ok = true;
+      return { ...s, rials: s.rials - VIP_RIALS_COST, vipRials: true };
+    });
+    if (ok) fireConfetti();
+    return ok;
+  }, []);
+
+  /* عجلة حظ أسبوعية — تُفتح بعد إنجاز التحدّي الأسبوعي، جائزة عشوائية مرة كل أسبوع */
+  const spinLuckWheel = useCallback((): number => {
+    const weekKey = isoWeekKey();
+    if (state.luckWheelWeek === weekKey) return 0;
+    const reward = LUCK_WHEEL_MIN + Math.floor(Math.random() * (LUCK_WHEEL_MAX - LUCK_WHEEL_MIN + 1));
+    setState((s) => ({ ...s, rials: s.rials + reward, luckWheelWeek: weekKey }));
+    fireConfetti();
+    return reward;
+  }, [state.luckWheelWeek]);
 
   /* تحديث الملف الشخصي مع تنظيف النصوص وحصر الأرقام */
   const updateProfile = useCallback((patch: Partial<Profile>) => {
@@ -917,6 +1004,8 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       const today = todayStr();
       let earned = false;
       let undone = false;
+      const allTaskIds = [...state.routine.morning, ...state.routine.evening].map((t) => t.id);
+      const isDailyDouble = id === getDailyDoubleId(today, allTaskIds);
       setState((s) => {
         const list = s.routine[section];
         const nextList = list.map((task) => {
@@ -940,13 +1029,13 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       if (earned) {
         navigator.vibrate?.(12); // نبضة خفيفة تعطي إحساس الإنجاز
         playSuccess();
-        addXP(5);
+        addXP(5, isDailyDouble ? 2 : 1);
         markStreakToday();
       } else if (undone) {
         xpRef.current = Math.max(0, xpRef.current - 5); // مزامنة المرجع مع الخصم
       }
     },
-    [addXP, markStreakToday],
+    [addXP, markStreakToday, state.routine],
   );
 
   /* حذف مهمة روتين نهائياً (يمرّ عبر ConfirmDialog في الواجهة) */
@@ -2072,7 +2161,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  /* تطبيق قالب جاهز (هدف/روتين/تحدّي/ميزانية) دفعة واحدة آمنة */
+  /* تطبيق قالب جاهز (هدف/روتين/تحدّي/عادة/ميزانية) دفعة واحدة آمنة */
   const applyTemplate = useCallback((t: AnyTemplate) => {
     const mkTask = (text: string): RoutineTask => ({
       id: crypto.randomUUID(), text, priority: 'med', doneDate: '', history: [], subtasks: [],
@@ -2113,6 +2202,12 @@ export function CoreProvider({ children }: { children: ReactNode }) {
             id: crypto.randomUUID(), title: t.goalTitle, steps: [],
             completed: false, createdDate: todayStr(), category: 'تحدّي', deadline: deadlineAfter(t.days),
           }],
+        };
+      }
+      if (t.kind === 'habit') {
+        return {
+          ...s,
+          routine: { ...s.routine, [t.section]: [...s.routine[t.section], mkTask(t.task)] },
         };
       }
       // budget
@@ -2194,6 +2289,10 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       clearVentNote,
       setHomeTileOrder,
       spendRials,
+      unlockTemplate,
+      claimDailyLoginBonus,
+      buyVipRials,
+      spinLuckWheel,
       addXP,
       updateProfile,
       markStreakToday,
@@ -2306,6 +2405,10 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       clearVentNote,
       setHomeTileOrder,
       spendRials,
+      unlockTemplate,
+      claimDailyLoginBonus,
+      buyVipRials,
+      spinLuckWheel,
       addXP,
       updateProfile,
       markStreakToday,

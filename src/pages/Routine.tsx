@@ -11,6 +11,7 @@ import SwipeHint from '../components/SwipeHint';
 import {
   useCore,
   todayStr,
+  getDailyDoubleId,
   type RoutineSection,
   type RoutineTask,
   type Priority,
@@ -75,6 +76,10 @@ export default function Routine() {
   const tasks = core.state.routine[active];
   const doneCount = tasks.filter((t) => isToday(t.doneDate)).length;
   const allDone = tasks.length > 0 && doneCount === tasks.length;
+
+  /* مهمة اليوم المضاعفة — واحدة عشوائية ثابتة طول اليوم، ريالاتها ×٢ عند الإنجاز */
+  const allTaskIds = [...core.state.routine.morning, ...core.state.routine.evening].map((t) => t.id);
+  const dailyDoubleId = getDailyDoubleId(todayStr(), allTaskIds);
 
   /* بدء تعديل نص (مهمة أو فرعية) */
   const startEdit = (key: string, current: string) => {
@@ -173,6 +178,11 @@ export default function Routine() {
             {streak >= 2 && (
               <span className="habit-streak" title={`${streak} يوم متتالي على هالعادة`}>
                 🔥 {streak}
+              </span>
+            )}
+            {task.id === dailyDoubleId && (
+              <span className="habit-streak" title="مهمة اليوم المضاعفة — ريالاتها ×٢ لو خلّصتها">
+                ⚡×2
               </span>
             )}
             <button className="icon-btn reorder" aria-label="فوق" onClick={() => core.moveRoutineTask(active, task.id, -1)}>
