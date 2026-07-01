@@ -619,7 +619,7 @@ export default function Expenses() {
       <ConfirmDialog
         open={deleteId !== null}
         title="تأكيد الحذف"
-        message="متأكد تبي تحذف هالحركة؟"
+        message="متأكد تبي تحذفها؟ ترى الهروب مو حل.. بس إذا تبي، بنمشيها لك هالمرة."
         confirmLabel="حذف"
         danger
         onConfirm={() => {

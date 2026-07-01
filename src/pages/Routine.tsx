@@ -303,7 +303,7 @@ export default function Routine() {
         <SwipeHint />
         <div className="section-progress">
           {tasks.length === 0
-            ? 'ما فيه مهام — ضيف أول مهمة 👇'
+            ? 'الستة تشتكي من الفضاااوة! شكل يومك رايق، بس حط لك كم شغلة تسويها عشان ما تأنبك ضميرك بالليل 👇'
             : `خلّصت ${doneCount} من ${tasks.length}`}
           {allDone ? ' — كمّلت القسم، كفو! ✨' : ''}
         </div>
@@ -330,6 +330,11 @@ export default function Routine() {
         <>
           <h2 className="section-title" style={{ marginTop: 18 }}>😴 نومك الليلة</h2>
           <SleepRelations embedded />
+          <div className="intro-card" style={{ marginTop: 12 }}>
+            {allDone
+              ? 'يعطيك العافية.. سويت اللي عليك واليوم قفل ملفه بسلام. نم الحين وبكرة يوم جديد وهمة أقوى. 🌙'
+              : 'حتى لو ما شطبت على كل شيء، يكفي أنك حاولت. المخ يبي له راحة، والوعد بكرة. 💙'}
+          </div>
         </>
       )}
 

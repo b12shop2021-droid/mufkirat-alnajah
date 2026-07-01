@@ -55,7 +55,7 @@ export default function Search() {
 
       {query.length >= 2 && (
         <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '12px 2px' }}>
-          {results.length === 0 ? 'ما لقيت شي — جرّب كلمة ثانية' : `${results.length} نتيجة`}
+          {results.length === 0 ? 'بحثنا يمين ويسار وما لقينا شيء.. متأكد من الكلمة ولا الهمة اليوم مضيعة؟' : `${results.length} نتيجة`}
         </div>
       )}
 

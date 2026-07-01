@@ -180,7 +180,7 @@ ${encouragement}
       </div>
 
       <button className={`wrapped-share-btn ${copied ? 'copied' : ''}`} onClick={handleShare}>
-        {copied ? '✅ نسخناها!' : '📤 شارك قصتك'}
+        {copied ? '✅ نسخناها!' : '📄 أكشخ بإنجازك'}
       </button>
       <button className="wrapped-share-btn" style={{ marginTop: 8, background: 'var(--deep)' }} onClick={handleSaveImage} disabled={saving}>
         {saving ? '⏳ نجهّز الصورة...' : '🖼️ احفظها كصورة'}

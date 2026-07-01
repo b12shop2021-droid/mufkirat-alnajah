@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useCore } from '../core/useCore';
 import XPBar from '../components/XPBar';
+import RescueTimer from '../components/RescueTimer';
 import { fireConfetti } from '../components/Confetti';
 import { getDailyQuote } from '../data/quotes';
 import { getRandomWelcome } from '../data/welcomeMessages';
@@ -554,6 +555,7 @@ export default function Home() {
       <button className="fab" aria-label="خطوة سريعة" onClick={() => navigate(next.to)}>
         +
       </button>
+      <RescueTimer />
 
       {dayPopup && (
         <div className="popup-overlay" onClick={() => setDayPopup(null)}>

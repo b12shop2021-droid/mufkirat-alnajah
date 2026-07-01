@@ -451,7 +451,7 @@ export default function Occasions() {
       <ConfirmDialog
         open={!!deleteId}
         title="تأكيد الحذف"
-        message="تحذف هذي المناسبة؟"
+        message="متأكد تبي تحذفها؟ ترى الهروب مو حل.. بس إذا تبي، بنمشيها لك هالمرة."
         onConfirm={() => { if (deleteId) core.removeOccasion(deleteId); setDeleteId(null); }}
         onCancel={() => setDeleteId(null)}
       />

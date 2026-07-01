@@ -193,7 +193,7 @@ export default function Pomodoro({ embedded = false }: { embedded?: boolean }) {
           style={{ background: COLORS[mode] }}
           onClick={() => setRunning((r) => !r)}
         >
-          {running ? '⏸ إيقاف مؤقت' : remaining === DURATIONS[mode] ? '▶ ابدأ' : '▶ استمر'}
+          {running ? '⏸ إيقاف مؤقت' : remaining === DURATIONS[mode] ? '▶ يلا بسم الله' : '▶ استمر'}
         </button>
         <button className="pomo-btn-reset" onClick={() => { stop(); setRemaining(DURATIONS[mode]); setJustDone(false); }}>
           ↺ إعادة
