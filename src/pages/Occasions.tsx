@@ -9,6 +9,7 @@ import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
 
 type Tab = 'upcoming' | 'all' | 'circle' | 'add';
+type AddType = 'occasion' | 'appointment';
 
 /* ====================== مساعدات التاريخ ====================== */
 
@@ -70,6 +71,9 @@ export default function Occasions() {
   const { occasions, relations } = core.state;
 
   const [tab, setTab] = useState<Tab>('upcoming');
+  const [addType, setAddType] = useState<AddType>('occasion');
+  const [apptName, setApptName] = useState('');
+  const [apptWhen, setApptWhen] = useState('');
   const [form, setForm] = useState(EMPTY_FORM);
   const [editing, setEditing] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -107,6 +111,30 @@ export default function Occasions() {
 
   const upcoming = sorted.filter((o) => o.days >= 0 && o.days <= 60);
   const thisMonth = sorted.filter((o) => o.days >= 0 && o.days <= 30);
+
+  /* المواعيد المجدولة (من أهلك وربعك) — تُدمج مع المناسبات بتبويب القادمة */
+  const appointments = useMemo(() => {
+    return relations
+      .filter((r) => r.scheduledAt)
+      .map((r) => {
+        const when = new Date(r.scheduledAt!);
+        return { id: r.id, personName: r.name, when, raw: r.scheduledAt!, days: daysUntil(when) };
+      })
+      .filter((a) => a.days >= 0 && a.days <= 60)
+      .sort((a, b) => a.when.getTime() - b.when.getTime());
+  }, [relations]);
+
+  /* حفظ موعد جديد (بدون تاريخ مناسبة — مباشرة كمكالمة مجدولة على الشخص) */
+  const handleSaveAppointment = () => {
+    const name = apptName.trim();
+    if (!name) { setHint('اكتب اسم الشخص'); return; }
+    if (!apptWhen) { setHint('اختر وقت الموعد'); return; }
+    core.addAppointment(name, apptWhen);
+    setApptName('');
+    setApptWhen('');
+    setHint('جدّلنا موعدك ✓');
+    setTab('upcoming');
+  };
 
   /* حفظ المناسبة */
   const handleSave = () => {
@@ -194,19 +222,46 @@ export default function Occasions() {
         ))}
       </div>
 
-      {/* ===== تبويب القادمة ===== */}
+      {/* ===== تبويب القادمة (مناسبات + مواعيد مدمجة) ===== */}
       {tab === 'upcoming' && (
         <>
-          {upcoming.length === 0 ? (
+          {upcoming.length === 0 && appointments.length === 0 ? (
             <div className="empty-state">
               <div className="empty-icon">🎁</div>
-              <div>ما في مناسبات في الـ 60 يوم القادمة</div>
-              <button className="btn-primary" style={{ marginTop: 12 }} onClick={() => setTab('add')}>ضِف مناسبة</button>
+              <div>ما في مناسبات أو مواعيد في الـ 60 يوم القادمة</div>
+              <button className="btn-primary" style={{ marginTop: 12 }} onClick={() => setTab('add')}>ضِف مناسبة أو موعد</button>
             </div>
           ) : (
-            upcoming.map((o) => <OccasionCard key={o.id} o={o} expanded={expandedId === o.id}
-              onExpand={() => setExpandedId(expandedId === o.id ? null : o.id)}
-              onEdit={() => startEdit(o.id)} onDelete={() => setDeleteId(o.id)} />)
+            [
+              ...upcoming.map((o) => ({ kind: 'occasion' as const, days: o.days, o })),
+              ...appointments.map((a) => ({ kind: 'appointment' as const, days: a.days, a })),
+            ]
+              .sort((x, y) => x.days - y.days)
+              .map((item) =>
+                item.kind === 'occasion' ? (
+                  <OccasionCard key={item.o.id} o={item.o} expanded={expandedId === item.o.id}
+                    onExpand={() => setExpandedId(expandedId === item.o.id ? null : item.o.id)}
+                    onEdit={() => startEdit(item.o.id)} onDelete={() => setDeleteId(item.o.id)} />
+                ) : (
+                  <div className="card" key={item.a.id} style={{ marginBottom: 10 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>🗓️ موعد — {item.a.personName}</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{fmtDateTime(item.a.raw)}</div>
+                      </div>
+                      <div style={{ textAlign: 'left', minWidth: 80 }}>
+                        <div style={{ fontWeight: 800, fontSize: '0.88rem', color: formatCountdown(item.a.days).color }}>
+                          {formatCountdown(item.a.days).label}
+                        </div>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                      <button className="btn-secondary" style={{ flex: 1, fontSize: '0.78rem' }} onClick={() => { core.toggleRelation(item.a.id); setHint('📞 تم تسجيل الاتصال'); }}>📞 تم الاتصال</button>
+                      <button className="btn-secondary" style={{ flex: 1, fontSize: '0.78rem' }} onClick={() => setTab('circle')}>✏️ تعديل الموعد</button>
+                    </div>
+                  </div>
+                ),
+              )
           )}
           {sorted.filter((o) => o.days > 60).length > 0 && (
             <button className="settings-row" style={{ width: '100%', textAlign: 'right', marginTop: 8 }} onClick={() => setTab('all')}>
@@ -328,50 +383,79 @@ export default function Occasions() {
       {/* ===== تبويب الإضافة/التعديل ===== */}
       {tab === 'add' && (
         <div className="card">
-          <div className="auth-field">
-            <label>اسم الشخص *</label>
-            <input className="input-field" placeholder="اسم الشخص" value={form.personName}
-              onChange={(e) => setForm((f) => ({ ...f, personName: e.target.value }))} maxLength={60} />
-          </div>
+          {!editing && (
+            <div className="cat-chips" style={{ marginBottom: 14 }}>
+              <button className={addType === 'occasion' ? 'cat-pick active' : 'cat-pick'} onClick={() => setAddType('occasion')}>🎉 مناسبة</button>
+              <button className={addType === 'appointment' ? 'cat-pick active' : 'cat-pick'} onClick={() => setAddType('appointment')}>🗓️ موعد</button>
+            </div>
+          )}
 
-          <div className="auth-field">
-            <label>نوع المناسبة *</label>
-            <input className="input-field" placeholder="مثال: زواج، تخرّج" value={form.occasionName}
-              onChange={(e) => setForm((f) => ({ ...f, occasionName: e.target.value }))} maxLength={40} />
-          </div>
+          {(editing || addType === 'occasion') ? (
+            <>
+              <div className="auth-field">
+                <label>اسم الشخص *</label>
+                <input className="input-field" placeholder="اسم الشخص" value={form.personName}
+                  onChange={(e) => setForm((f) => ({ ...f, personName: e.target.value }))} maxLength={60} />
+              </div>
 
-          <div className="auth-field">
-            <label>تاريخ المناسبة *</label>
-            <input type="date" className="input-field" value={form.date}
-              onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))} />
-          </div>
+              <div className="auth-field">
+                <label>نوع المناسبة *</label>
+                <input className="input-field" placeholder="مثال: زواج، تخرّج" value={form.occasionName}
+                  onChange={(e) => setForm((f) => ({ ...f, occasionName: e.target.value }))} maxLength={40} />
+              </div>
 
-          <div className="auth-field">
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-              <input type="checkbox" checked={form.isAnnual}
-                onChange={(e) => setForm((f) => ({ ...f, isAnnual: e.target.checked }))} />
-              تتكرر كل سنة (مثل ذكرى زواج)
-            </label>
-          </div>
+              <div className="auth-field">
+                <label>تاريخ المناسبة *</label>
+                <input type="date" className="input-field" value={form.date}
+                  onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))} />
+              </div>
 
-          <div className="auth-field">
-            <label>أفكار الهدايا 🎁</label>
-            <textarea className="input-field" rows={2} placeholder="مثال: عطر، ساعة، كتاب..."
-              value={form.giftIdeas} onChange={(e) => setForm((f) => ({ ...f, giftIdeas: e.target.value }))} maxLength={200} />
-          </div>
+              <div className="auth-field">
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                  <input type="checkbox" checked={form.isAnnual}
+                    onChange={(e) => setForm((f) => ({ ...f, isAnnual: e.target.checked }))} />
+                  تتكرر كل سنة (مثل ذكرى زواج)
+                </label>
+              </div>
 
-          <div className="auth-field">
-            <label>ملاحظات</label>
-            <textarea className="input-field" rows={2} placeholder="أي تفاصيل إضافية..."
-              value={form.notes} onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))} maxLength={200} />
-          </div>
+              <div className="auth-field">
+                <label>أفكار الهدايا 🎁</label>
+                <textarea className="input-field" rows={2} placeholder="مثال: عطر، ساعة، كتاب..."
+                  value={form.giftIdeas} onChange={(e) => setForm((f) => ({ ...f, giftIdeas: e.target.value }))} maxLength={200} />
+              </div>
 
-          <button className="btn-primary" style={{ width: '100%', marginTop: 8 }} onClick={handleSave}>
-            {editing ? '💾 حفظ التعديل' : '✅ إضافة المناسبة'}
-          </button>
-          {editing && (
-            <button className="btn-secondary" style={{ width: '100%', marginTop: 8 }}
-              onClick={() => { setEditing(null); setForm(EMPTY_FORM); setTab('all'); }}>إلغاء</button>
+              <div className="auth-field">
+                <label>ملاحظات</label>
+                <textarea className="input-field" rows={2} placeholder="أي تفاصيل إضافية..."
+                  value={form.notes} onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))} maxLength={200} />
+              </div>
+
+              <button className="btn-primary" style={{ width: '100%', marginTop: 8 }} onClick={handleSave}>
+                {editing ? '💾 حفظ التعديل' : '✅ إضافة المناسبة'}
+              </button>
+              {editing && (
+                <button className="btn-secondary" style={{ width: '100%', marginTop: 8 }}
+                  onClick={() => { setEditing(null); setForm(EMPTY_FORM); setTab('all'); }}>إلغاء</button>
+              )}
+            </>
+          ) : (
+            <>
+              <div className="auth-field">
+                <label>اسم الشخص *</label>
+                <input className="input-field" placeholder="اسم الشخص" value={apptName}
+                  onChange={(e) => setApptName(e.target.value)} maxLength={60} />
+              </div>
+
+              <div className="auth-field">
+                <label>وقت الموعد *</label>
+                <input type="datetime-local" className="input-field" value={apptWhen}
+                  onChange={(e) => setApptWhen(e.target.value)} />
+              </div>
+
+              <button className="btn-primary" style={{ width: '100%', marginTop: 8 }} onClick={handleSaveAppointment}>
+                🗓️ إضافة الموعد
+              </button>
+            </>
           )}
         </div>
       )}

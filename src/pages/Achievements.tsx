@@ -7,6 +7,7 @@ import { lazy, Suspense, useState } from 'react';
 import BackButton from '../components/BackButton';
 import XPBar from '../components/XPBar';
 import Dose from '../components/Dose';
+import { pickLoadingPhrase } from '../data/vibes';
 
 const Streak = lazy(() => import('./Streak'));
 const JourneyGallery = lazy(() => import('./JourneyGallery'));
@@ -18,7 +19,7 @@ type Tab = 'streak' | 'badges' | 'journey' | 'wrapped';
 function TabLoader() {
   return (
     <div className="card" style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '28px 0' }}>
-      ⏳ لحظة...
+      {pickLoadingPhrase()}
     </div>
   );
 }

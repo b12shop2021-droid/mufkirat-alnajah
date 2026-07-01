@@ -97,7 +97,7 @@ export default function Templates() {
           </ul>
           <button className={applied === t.id ? 'btn-primary done' : 'btn-primary'} style={{ width: '100%' }}
             disabled={applied === t.id} onClick={() => apply(t)}>
-            {applied === t.id ? '✅ بدأ التحدّي — وريهم وش فيك!' : 'ابدأ التحدّي'}
+            {applied === t.id ? '✅ بدأ التحدّي — وريهم وش فيك!' : 'وريهم وش فيك — ابدأ التحدّي وانت قدها 🔥'}
           </button>
         </div>
       ))}

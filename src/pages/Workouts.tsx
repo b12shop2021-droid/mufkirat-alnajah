@@ -7,6 +7,7 @@
 import { lazy, Suspense, useState } from 'react';
 import BackButton from '../components/BackButton';
 import Dose from '../components/Dose';
+import { pickLoadingPhrase } from '../data/vibes';
 
 const CaptainWorkout = lazy(() => import('./CaptainWorkout'));
 const CustomWorkout = lazy(() => import('./CustomWorkout'));
@@ -17,7 +18,7 @@ type Tab = 'captain' | 'custom' | 'guide';
 function TabLoader() {
   return (
     <div className="card" style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '28px 0' }}>
-      ⏳ لحظة...
+      {pickLoadingPhrase()}
     </div>
   );
 }

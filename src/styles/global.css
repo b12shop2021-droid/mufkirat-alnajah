@@ -1317,9 +1317,9 @@ select {
 .subtab {
   flex: 1;
   text-align: center;
-  padding: 10px 0;
+  padding: 11px 4px;
   border-radius: 12px;
-  font-size: 0.85rem;
+  font-size: 0.92rem;
   font-weight: 700;
   color: var(--text-secondary);
 }
@@ -1327,6 +1327,8 @@ select {
 .subtab.active {
   background: var(--primary);
   color: #fff;
+  box-shadow: var(--shadow-soft);
+  font-weight: 800;
 }
 
 /* ===== الملاحظات ===== */
@@ -2425,6 +2427,19 @@ select {
   font-size: 2rem;
   font-weight: 800;
   margin: 0 auto 12px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.profile-avatar-remove {
+  display: block;
+  margin: -6px auto 12px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .profile-greeting {
@@ -2716,6 +2731,37 @@ select {
   font-size: 0.74rem;
   font-weight: 800;
   flex-shrink: 0;
+}
+
+.vent-card {
+  background: var(--surface);
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.vent-head {
+  font-weight: 800;
+  color: var(--deep);
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+}
+
+.vent-text {
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 8px;
+}
+
+.vent-sub {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
 }
 
 .img-slot {
@@ -3771,10 +3817,13 @@ select {
 
 .set-input {
   flex: 1;
+  min-width: 0;
+  width: 100%;
   border: 1.5px solid var(--border);
   border-radius: 10px;
-  padding: 8px 10px;
-  font-size: 0.82rem;
+  padding: 10px 6px;
+  font-size: 0.9rem;
+  font-weight: 700;
   outline: none;
   text-align: center;
   background: var(--surface);
@@ -3941,6 +3990,17 @@ select {
   font-weight: 700;
   margin-bottom: 6px;
   color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.home-hero-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.5);
 }
 
 .home-hero-date {
@@ -4401,11 +4461,33 @@ select {
   font-weight: 600;
 }
 
+.home-grid-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tile-reorder-toggle {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
 .home-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 18px 12px;
   margin-bottom: 18px;
+}
+
+.tile-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .tile {
@@ -4414,6 +4496,22 @@ select {
   align-items: center;
   gap: 8px;
   background: none;
+}
+
+.tile-reorder-arrows {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.tile-reorder-arrows button {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--primary);
+  font-size: 0.7rem;
 }
 
 .tile-circle {
@@ -4712,6 +4810,15 @@ select {
   color: var(--primary);
   letter-spacing: 0.5px;
   margin-bottom: 6px;
+}
+
+.hub-slogan {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: 0.5px;
+  margin: -6px 0 14px;
 }
 
 .auth-title {

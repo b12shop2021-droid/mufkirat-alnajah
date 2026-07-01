@@ -10,6 +10,7 @@ import XPBar from '../components/XPBar';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
 import Dose from '../components/Dose';
+import VentBox from '../components/VentBox';
 
 /* 8 حالات مزاج (إيموجي + وصف) */
 const MOODS = [
@@ -22,6 +23,9 @@ const MOODS = [
   { e: '😴', l: 'متعب' },
   { e: '💪', l: 'قوي' },
 ];
+
+/* مؤشرات المزاج السيء — يُعرض عندها صندوق تفريغ الطاقة السلبية */
+const NEGATIVE_MOOD_INDICES = [3, 4, 6];
 
 /* وصف نسبي لعدد الأيام الماضية */
 const relativeDay = (offset: number): string => {
@@ -138,6 +142,13 @@ export default function Mood() {
           {saveLabel(nick)}
         </button>
       </div>
+
+      {selected !== null && NEGATIVE_MOOD_INDICES.includes(selected) && (
+        <>
+          <h1 className="section-title">🌪️ فضّها هنا</h1>
+          <VentBox />
+        </>
+      )}
 
       <h1 className="section-title">✨ لحظة الفخر اليومية</h1>
       <div className="pride-card">

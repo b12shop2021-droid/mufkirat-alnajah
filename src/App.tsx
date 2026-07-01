@@ -13,6 +13,7 @@ import StorageBanner from './components/StorageBanner';
 import { useCore } from './core/useCore';
 import { isPinEnabled, isSessionUnlocked } from './core/pinUtils';
 import { scheduleNotifications, schedulePrayerNotifications } from './core/notificationScheduler';
+import { pickLoadingPhrase } from './data/vibes';
 import Login from './pages/Login';
 import Onboarding from './pages/Onboarding';
 import Home from './pages/Home';
@@ -42,7 +43,7 @@ const Search = lazy(() => import('./pages/Search'));
 function Loader() {
   return (
     <div className="page" style={{ textAlign: 'center', color: 'var(--text-secondary)', paddingTop: 60 }}>
-      ⏳ لحظة...
+      {pickLoadingPhrase()}
     </div>
   );
 }

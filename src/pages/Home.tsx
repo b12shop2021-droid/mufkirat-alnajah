@@ -52,13 +52,24 @@ export default function Home() {
     }
   })();
 
+  /* التاريخ الميلادي */
+  const gregorianDate = (() => {
+    try {
+      return new Intl.DateTimeFormat('ar-SA', {
+        day: 'numeric', month: 'long', year: 'numeric',
+      }).format(new Date());
+    } catch {
+      return '';
+    }
+  })();
+
   /* تحية حسب توقيت اليوم (لهجة سعودية شبابية) */
   const getTimeGreet = () => {
     const h = new Date().getHours();
     if (h >= 4 && h < 11) return { text: 'صباح النشاط', badge: '🌅', night: false };
     if (h >= 11 && h < 15) return { text: 'نهارك سعيد', badge: '🌞', night: false };
     if (h >= 15 && h < 18) return { text: 'مساء الخير', badge: '🌇', night: false };
-    if (h >= 18 && h < 23) return { text: 'مساك ورد', badge: '🌙', night: true };
+    if (h >= 18 && h < 23) return { text: 'مسائك ورد وسعادة', badge: '🌸', night: true };
     return { text: 'ليلة هادئة', badge: '✨', night: true };
   };
   const tg = getTimeGreet();
@@ -254,11 +265,27 @@ export default function Home() {
     { icon: '/icons/goals.webp', label: 'الأهداف', to: '/goals' },
     { icon: '/icons/expenses.webp', label: 'دراهمي', to: '/expenses' },
     { icon: '/icons/workouts.webp', label: 'قم لـ جيم', to: '/workouts' },
-    { icon: '/icons/meals.webp', label: 'أكلي الصح', to: '/meals' },
+    { icon: '/icons/meals.webp', label: 'أكلي الصحي', to: '/meals' },
     { icon: '/icons/analytics.webp', label: 'إنجازي الأسبوعي', to: '/analytics' },
     { icon: '/icons/pledges.webp', label: 'وعد الحر دين', to: '/pledges' },
     { icon: '/icons/achievements.webp', label: 'منصة التتويج', to: '/achievements' },
   ];
+
+  /* ترتيب البلاطات اليدوي — لو المستخدم رتّب من قبل نستخدم ترتيبه، وأي بلاطة جديدة تُضاف بالنهاية */
+  const tileOrder = s.homeTileOrder.length ? s.homeTileOrder : tiles.map((t) => t.to);
+  const orderedTiles = [
+    ...tileOrder.map((to) => tiles.find((t) => t.to === to)).filter((t): t is typeof tiles[number] => !!t),
+    ...tiles.filter((t) => !tileOrder.includes(t.to)),
+  ];
+  const [reorderMode, setReorderMode] = useState(false);
+  const moveTile = (to: string, dir: -1 | 1) => {
+    const order = orderedTiles.map((t) => t.to);
+    const i = order.indexOf(to);
+    const j = i + dir;
+    if (j < 0 || j >= order.length) return;
+    [order[i], order[j]] = [order[j], order[i]];
+    core.setHomeTileOrder(order);
+  };
 
   return (
     <div className="page">
@@ -273,9 +300,12 @@ export default function Home() {
         <div className="home-hero-row">
           <div>
             <div className="home-hero-greet">
+              {s.profile.avatar && (
+                <img className="home-hero-avatar" src={s.profile.avatar} alt="" width={28} height={28} />
+              )}
               {tg.badge} {tg.text} يا {greeting}
             </div>
-            {hijriDate && <div className="home-hero-date">🗓️ {hijriDate} هـ</div>}
+            {hijriDate && <div className="home-hero-date">🗓️ {hijriDate} هـ {gregorianDate && `· ${gregorianDate}م`}</div>}
             <div className="home-hero-title">حقق حلمك وكن ملهماً ✨</div>
           </div>
           <div className="home-hero-side">
@@ -411,8 +441,6 @@ export default function Home() {
         <div className="day-done-badge">🏅 أنجزت يومك كامل — كفووو!</div>
       )}
 
-      <div className="greet-strip">{whisper}</div>
-
       <button className="next-step" onClick={() => navigate(next.to)}>
         <span>{next.t}</span>
         <span>←</span>
@@ -436,40 +464,59 @@ export default function Home() {
         )}
       </div>
 
-      <h2 className="section-title">🧭 رحلتك اليوم</h2>
-      <div className="home-grid">
-        {tiles.map((t) => (
-          <button key={t.label + t.to} className="tile" onClick={() => navigate(t.to)}>
-            <div className={t.label === 'الهمّة' ? 'tile-circle glow' : 'tile-circle'}>
-              {t.icon.startsWith('/') ? (
-                <img className="tile-img" src={t.icon} alt="" width={42} height={42} loading="lazy" decoding="async" />
-              ) : (
-                <span>{t.icon}</span>
-              )}
-              {t.streak ? <div className="tile-streak-dot">{t.streak}</div> : null}
-            </div>
-            <div className="tile-label">{t.label}</div>
-          </button>
-        ))}
-      </div>
-
-      <div className="motiv-card">
-        <div style={{ fontSize: '1.6rem', marginBottom: 6 }}>✨</div>
-        <div className="motiv-text">{motiv}</div>
-      </div>
-
-      {/* اقتباس اليوم */}
+      {/* بطاقة تحفيزية دوّارة — تتغيّر كل ساعة بين همسة الفجر، عبارة تحفيزية، واقتباس اليوم */}
       {(() => {
         const lastMood = s.moodLog.length > 0 ? s.moodLog[s.moodLog.length - 1].moodIdx : undefined;
-        const q = getDailyQuote(lastMood);
-        return (
+        const dailyQuote = getDailyQuote(lastMood);
+        const candidates = [
+          { kind: 'whisper' as const, emoji: '🌅', text: whisper },
+          { kind: 'motiv' as const, emoji: '✨', text: motiv },
+          { kind: 'quote' as const, text: dailyQuote.text, author: dailyQuote.author },
+        ];
+        const rotating = candidates[new Date().getHours() % candidates.length];
+        return rotating.kind === 'quote' ? (
           <div className="quote-card">
             <div className="quote-mark">"</div>
-            <div className="quote-text">{q.text}</div>
-            <div className="quote-author">— {q.author}</div>
+            <div className="quote-text">{rotating.text}</div>
+            <div className="quote-author">— {rotating.author}</div>
+          </div>
+        ) : (
+          <div className="motiv-card">
+            <div style={{ fontSize: '1.4rem', marginBottom: 6 }}>{rotating.emoji}</div>
+            <div className="motiv-text">{rotating.text}</div>
           </div>
         );
       })()}
+
+      <div className="home-grid-head">
+        <h2 className="section-title" style={{ margin: 0 }}>🧭 رحلتك اليوم</h2>
+        <button className="tile-reorder-toggle" onClick={() => setReorderMode((v) => !v)}>
+          {reorderMode ? '✅ تم الترتيب' : '↕️ رتّب'}
+        </button>
+      </div>
+      <div className="home-grid">
+        {orderedTiles.map((t) => (
+          <div key={t.label + t.to} className="tile-wrap">
+            <button className="tile" onClick={() => (reorderMode ? undefined : navigate(t.to))}>
+              <div className={t.label === 'الهمّة' ? 'tile-circle glow' : 'tile-circle'}>
+                {t.icon.startsWith('/') ? (
+                  <img className="tile-img" src={t.icon} alt="" width={42} height={42} loading="lazy" decoding="async" />
+                ) : (
+                  <span>{t.icon}</span>
+                )}
+                {t.streak ? <div className="tile-streak-dot">{t.streak}</div> : null}
+              </div>
+              <div className="tile-label">{t.label}</div>
+            </button>
+            {reorderMode && (
+              <div className="tile-reorder-arrows">
+                <button aria-label="أقدّم" onClick={() => moveTile(t.to, -1)}>▲</button>
+                <button aria-label="أأخّر" onClick={() => moveTile(t.to, 1)}>▼</button>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
 
       <div className="week-card">
         <div className="week-head">

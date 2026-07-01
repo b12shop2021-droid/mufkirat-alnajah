@@ -91,7 +91,7 @@ export default function Meals() {
       <BackButton />
       <XPBar />
 
-      <h1 className="section-title">🍽️ أكلي الصح</h1>
+      <h1 className="section-title">🍽️ أكلي الصحي</h1>
       <Dose section="meals" />
 
       {/* السعرات اليومية */}
@@ -123,7 +123,7 @@ export default function Meals() {
 
       {/* متتبع الماء */}
       <div className="card">
-        <div className="section-title" style={{ marginBottom: 4 }}>💧 الماء ({water}/8 أكواب)</div>
+        <div className="section-title" style={{ marginBottom: 4 }}>🥤 الماء ({water}/8 أكواب)</div>
         <div className="water-row">
           {Array.from({ length: 8 }, (_, i) => i + 1).map((n) => (
             <button
@@ -132,7 +132,7 @@ export default function Meals() {
               aria-label={`كوب ${n}`}
               onClick={() => core.setWaterCups(n === water ? n - 1 : n)}
             >
-              💧
+              🥤
             </button>
           ))}
         </div>

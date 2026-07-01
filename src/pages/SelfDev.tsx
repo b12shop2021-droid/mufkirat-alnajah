@@ -6,6 +6,7 @@
 import { lazy, Suspense, useState } from 'react';
 import BackButton from '../components/BackButton';
 import XPBar from '../components/XPBar';
+import { pickLoadingPhrase } from '../data/vibes';
 
 const Identity = lazy(() => import('./Identity'));
 const WheelReview = lazy(() => import('./WheelReview'));
@@ -15,7 +16,7 @@ type Tab = 'identity' | 'review';
 function TabLoader() {
   return (
     <div className="card" style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '28px 0' }}>
-      ⏳ لحظة...
+      {pickLoadingPhrase()}
     </div>
   );
 }

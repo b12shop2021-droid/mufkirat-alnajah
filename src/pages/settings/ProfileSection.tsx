@@ -3,13 +3,36 @@
    جزء من صفحة الإعدادات. الحالة عبر useCore، والتنبيهات عبر setHint.
    =================================================================== */
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useCore, type Gender } from '../../core/useCore';
 import PageHero from '../../components/PageHero';
+
+const MAX_AVATAR_BYTES = 1_500_000;
 
 export default function ProfileSection({ setHint }: { setHint: (m: string) => void }) {
   const core = useCore();
   const { profile } = core.state;
+  const avatarInput = useRef<HTMLInputElement>(null);
+
+  /* رفع صورة شخصية محلية (base64) مع التحقق من النوع والحجم */
+  const handleAvatar = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setHint('⚠️ لازم تختار صورة');
+      return;
+    }
+    if (file.size > MAX_AVATAR_BYTES) {
+      setHint('⚠️ الصورة كبيرة (الحد ١.٥ ميجا)');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') core.updateProfile({ avatar: reader.result });
+    };
+    reader.readAsDataURL(file);
+  };
 
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
@@ -43,7 +66,29 @@ export default function ProfileSection({ setHint }: { setHint: (m: string) => vo
   return (
     <>
       <PageHero variant="deep" centered>
-        <div className="profile-avatar">{profile.name ? profile.name.charAt(0) : '🙂'}</div>
+        <input
+          ref={avatarInput}
+          type="file"
+          accept="image/*"
+          style={{ display: 'none' }}
+          onChange={handleAvatar}
+        />
+        <button
+          className="profile-avatar"
+          aria-label="تغيير الصورة الشخصية"
+          onClick={() => avatarInput.current?.click()}
+          style={profile.avatar ? { backgroundImage: `url(${profile.avatar})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
+        >
+          {!profile.avatar && (profile.name ? profile.name.charAt(0) : '🙂')}
+        </button>
+        {profile.avatar && (
+          <button
+            className="profile-avatar-remove"
+            onClick={() => core.updateProfile({ avatar: '' })}
+          >
+            🗑️ حذف الصورة
+          </button>
+        )}
         <div className="profile-greeting">
           {profile.name || 'مرحباً بك'}
           {profile.nickname ? ` · ${profile.nickname}` : ''}

@@ -38,6 +38,7 @@ export interface Profile {
   job: string;
   height: number; // مستقل تماماً — لا ربط حسابي (BMI)
   weight: number; // مستقل تماماً — لا ربط حسابي (BMI)
+  avatar: string; // صورة شخصية محلية (base64)، فاضية = بدون صورة
 }
 
 export interface Streak {
@@ -238,6 +239,8 @@ export interface CoreState {
   weeklyChallenge: WeeklyChallengeState | null; // التحدّي الأسبوعي العشوائي
   dailyIntention: { date: string; text: string } | null; // نِيّة اليوم — كلمة/جملة تركيز
   intentionLog: { date: string; text: string }[]; // أرشيف النِيّات السابقة (لكل يوم)
+  ventNote: { text: string; expiresAt: number } | null; // تفريغ طاقة سلبية — تُمحى تلقائياً بعد ساعة، بدون أرشيف
+  homeTileOrder: string[]; // ترتيب بلاطات الرئيسية اليدوي (مصفوفة روابط to)؛ فاضي = الترتيب الافتراضي
 }
 
 /* حالة التحدّي الأسبوعي — الفهرس يُشتق من معرّف الأسبوع، ونخزّن الإتمام فقط */
@@ -381,6 +384,7 @@ const DEFAULT_STATE: CoreState = {
     job: '',
     height: 0,
     weight: 0,
+    avatar: '',
   },
   xp: 0,
   streak: { current: 0, longest: 0, lastDoneDate: '', freezeMonth: '' },
@@ -445,6 +449,8 @@ const DEFAULT_STATE: CoreState = {
   weeklyChallenge: null,
   dailyIntention: null,
   intentionLog: [],
+  ventNote: null,
+  homeTileOrder: [],
 };
 
 /* قراءة الحالة المحفوظة من localStorage مع دمج آمن مع الافتراضي */
@@ -508,6 +514,9 @@ const loadState = (): CoreState => {
       weeklyChallenge: parsed.weeklyChallenge ?? null,
       dailyIntention: parsed.dailyIntention ?? null,
       intentionLog: parsed.intentionLog ?? [],
+      ventNote:
+        parsed.ventNote && parsed.ventNote.expiresAt > Date.now() ? parsed.ventNote : null,
+      homeTileOrder: parsed.homeTileOrder ?? [],
     };
   } catch {
     return DEFAULT_STATE;
@@ -526,6 +535,9 @@ interface CoreContextValue {
   weekly: { def: WeeklyChallengeDef; done: boolean; weekKey: string }; // التحدّي الأسبوعي
   completeWeeklyChallenge: () => void;
   setDailyIntention: (text: string) => void;
+  setVentNote: (text: string) => void;
+  clearVentNote: () => void;
+  setHomeTileOrder: (order: string[]) => void;
   addXP: (amount: number) => void;
   updateProfile: (patch: Partial<Profile>) => void;
   markStreakToday: () => void;
@@ -585,6 +597,7 @@ interface CoreContextValue {
   saveSleep: (sleepTime: string, wakeTime: string) => number; // يعيد عدد الساعات
   logSleep: (date: string, hours: number) => void; // استيراد مباشر بالتاريخ والساعات
   addRelation: (name: string) => void;
+  addAppointment: (name: string, when: string) => void;
   toggleRelation: (id: string) => void;
   scheduleRelationCall: (id: string, when: string) => void; // جدولة موعد اتصال ('' يلغي)
   removeRelation: (id: string) => void;
@@ -1509,6 +1522,25 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
+  /* إضافة موعد مباشرة: شخص جديد (أو موجود بنفس الاسم) + جدولة موعد اتصال عليه بضغطة واحدة */
+  const addAppointment = useCallback((name: string, when: string) => {
+    const t = clean(name);
+    if (!t || !when) return;
+    setState((s) => {
+      const existing = s.relations.find((r) => r.name === t);
+      if (existing) {
+        return {
+          ...s,
+          relations: s.relations.map((r) => (r.id === existing.id ? { ...r, scheduledAt: when } : r)),
+        };
+      }
+      return {
+        ...s,
+        relations: [...s.relations, { id: crypto.randomUUID(), name: t, contacted: false, scheduledAt: when }],
+      };
+    });
+  }, []);
+
   /* تبديل حالة التواصل + احتساب +5 عند تأكيد التواصل */
   const toggleRelation = useCallback(
     (id: string) => {
@@ -2120,6 +2152,24 @@ export function CoreProvider({ children }: { children: ReactNode }) {
     }
   }, [state.dailyIntention, addXP]);
 
+  /* تفريغ طاقة سلبية — خانة كتابة تُمحى تلقائياً بعد ساعة، بدون أرشيف دائم */
+  const setVentNote = useCallback((text: string) => {
+    const t = clean(text);
+    setState((s) => ({
+      ...s,
+      ventNote: t ? { text: t, expiresAt: Date.now() + 60 * 60 * 1000 } : null,
+    }));
+  }, []);
+
+  const clearVentNote = useCallback(() => {
+    setState((s) => ({ ...s, ventNote: null }));
+  }, []);
+
+  /* ترتيب يدوي لبلاطات الرئيسية */
+  const setHomeTileOrder = useCallback((order: string[]) => {
+    setState((s) => ({ ...s, homeTileOrder: order }));
+  }, []);
+
   const value = useMemo<CoreContextValue>(
     () => ({
       state,
@@ -2132,6 +2182,9 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       weekly,
       completeWeeklyChallenge,
       setDailyIntention,
+      setVentNote,
+      clearVentNote,
+      setHomeTileOrder,
       addXP,
       updateProfile,
       markStreakToday,
@@ -2180,6 +2233,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       saveSleep,
       logSleep,
       addRelation,
+      addAppointment,
       toggleRelation,
       scheduleRelationCall,
       removeRelation,
@@ -2240,6 +2294,9 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       weekly,
       completeWeeklyChallenge,
       setDailyIntention,
+      setVentNote,
+      clearVentNote,
+      setHomeTileOrder,
       addXP,
       updateProfile,
       markStreakToday,
@@ -2288,6 +2345,7 @@ export function CoreProvider({ children }: { children: ReactNode }) {
       saveSleep,
       logSleep,
       addRelation,
+      addAppointment,
       toggleRelation,
       scheduleRelationCall,
       removeRelation,

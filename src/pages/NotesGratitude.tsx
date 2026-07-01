@@ -9,8 +9,9 @@ import XPBar from '../components/XPBar';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { fireConfetti } from '../components/Confetti';
+import VentBox from '../components/VentBox';
 
-type Tab = 'notes' | 'grat';
+type Tab = 'notes' | 'grat' | 'vent';
 
 interface PendingDelete {
   kind: 'note' | 'grat';
@@ -92,7 +93,15 @@ export default function NotesGratitude() {
         >
           🙏 شكر اليوم
         </button>
+        <button
+          className={tab === 'vent' ? 'subtab active' : 'subtab'}
+          onClick={() => setTab('vent')}
+        >
+          🌪️ تفريغ سلبي
+        </button>
       </div>
+
+      {tab === 'vent' && <VentBox />}
 
       {tab === 'notes' && (
         <>

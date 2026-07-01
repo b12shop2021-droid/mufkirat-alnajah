@@ -4,7 +4,6 @@
 
 import { useState } from 'react';
 import { useLocation } from 'wouter';
-import BackButton from '../components/BackButton';
 
 type Tab = 'daily' | 'journey' | 'deep' | 'achievements';
 
@@ -23,7 +22,7 @@ const TABS: { id: Tab; label: string; links: Link[] }[] = [
       { iconClass: 'ic-mood',     label: 'مودي اليوم',                to: '/mood'   },
       { iconClass: 'ic-notes',    label: 'فضفضة وامتنان',             to: '/notes'  },
       { iconClass: 'ic-quran',    label: 'وردي اليومي',               to: '/quran'  },
-      { iconClass: 'ic-meals',    label: 'أكلي الصح',                 to: '/meals'  },
+      { iconClass: 'ic-meals',    label: 'أكلي الصحي',                to: '/meals'  },
     ],
   },
   {
@@ -67,8 +66,8 @@ export default function Hub() {
 
   return (
     <div className="page">
-      <BackButton to="/" />
       <h1 className="section-title">📖 الهمّة</h1>
+      <div className="hub-slogan">الـهـمّـة معاك حتى تصل الـقــمــــة</div>
 
       {/* تبويب العهود المستقل البارز */}
       <button
@@ -86,7 +85,6 @@ export default function Hub() {
           <button
             key={t.id}
             className={tab === t.id ? 'subtab active' : 'subtab'}
-            style={{ fontSize: '0.7rem' }}
             onClick={() => setTab(t.id)}
           >
             {t.label}

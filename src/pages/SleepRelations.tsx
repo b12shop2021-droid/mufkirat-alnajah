@@ -87,7 +87,7 @@ export default function SleepRelations({ embedded = false }: { embedded?: boolea
             />
           </div>
           <div className="sleep-field">
-            <label>⏰ وقت الصحيان</label>
+            <label>⏰ وقت ما فتحت عيونك الحلوة</label>
             <input
               type="time"
               className="input-field"
